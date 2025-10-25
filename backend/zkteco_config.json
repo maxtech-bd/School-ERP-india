@@ -1,0 +1,37 @@
+{
+  "erp": {
+    "base_url": "http://localhost:8000/api",
+    "auth_token": "your_jwt_token_here"
+  },
+  "devices": [
+    {
+      "device_id": "DEV001",
+      "device_name": "Main Entrance",
+      "ip_address": "192.168.1.201",
+      "port": 4370,
+      "timeout": 5,
+      "location": "Ground Floor, Main Building"
+    },
+    {
+      "device_id": "DEV002", 
+      "device_name": "Staff Room",
+      "ip_address": "192.168.1.202",
+      "port": 4370,
+      "timeout": 5,
+      "location": "First Floor, Admin Block"
+    },
+    {
+      "device_id": "DEV003",
+      "device_name": "Library",
+      "ip_address": "192.168.1.203", 
+      "port": 4370,
+      "timeout": 5,
+      "location": "Ground Floor, Academic Block"
+    }
+  ],
+  "sync_interval": 30,
+  "retry_attempts": 3,
+  "real_time_enabled": true,
+  "batch_sync_enabled": true,
+  "batch_sync_schedule": "0 */6 * * *"
+}

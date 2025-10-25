@@ -1,0 +1,50 @@
+MaxTechBD School ERP - Fee Management Engine
+===========================================
+
+Version: v3.0-final-stable
+Build: Stable – MaxTechBD Fee Engine
+Release Date: October 23, 2025
+Status: PRODUCTION-READY ✅
+
+Critical Components (Protected):
+- Fee Management System
+- Student Fees Automation
+- Payment Collection Engine
+- Real-time Fee Due Updates
+
+Verified Features:
+✅ Automatic student_fees generation on configuration create/update
+✅ Smart pending amount recalculation (preserves payment history)
+✅ Real-time Fee Due tab updates (removes students after full payment)
+✅ ERP payment logic (overdue → pending → advance)
+✅ Multi-tenant data isolation with is_active filtering
+✅ Soft-delete protection for historical records
+
+Protected Fields & Filters:
+⚠️ StudentFee.is_active: bool = True (DO NOT REMOVE)
+⚠️ All student_fees queries MUST include "is_active": True filter
+⚠️ Payment queries MUST filter for active records only
+
+Technical Debt Status: ZERO
+Known Issues: NONE
+Regression Risk: LOW (with protection rules enforced)
+
+Breaking Changes from v2.x:
+- Added mandatory is_active field to StudentFee model
+- All student_fees queries now require is_active filter
+- Payment collection targets active records only
+
+Migration Notes:
+- Existing student_fees records without is_active will be excluded from queries
+- Run manual data migration to add is_active=True to old records if needed
+- No schema changes required for new installations
+
+Maintenance Guidelines:
+1. Never remove is_active field from StudentFee model
+2. Never remove is_active filter from student_fees queries
+3. Always test payment collection after any fee-related changes
+4. Verify Fee Due tab updates in real-time after modifications
+
+Build Verified By: MaxTechBD Development Team
+Last Tested: October 23, 2025
+Deployment Environment: Replit Production

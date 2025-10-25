@@ -1,0 +1,6 @@
+employee_id,name,email,phone,designation,department,qualification,experience_years,date_of_joining,salary,address
+EMP-2025-0001,John Smith,john.smith@email.com,9876543210,Teacher,Science,B.Ed,5,2020-04-15,40000,New York
+EMP-2025-0002,Sarah Johnson,sarah.j@email.com,9876543211,Accountant,Finance,M.Com,3,2021-06-01,35000,California
+EMP-2025-0003,David Brown,david.b@email.com,9876543212,Librarian,Library,MA,8,2018-01-10,45000,Chicago
+EMP-2025-0004,Emily Davis,emily.davis@email.com,9876543213,Principal,Administration,M.Ed,12,2015-08-20,60000,Boston
+EMP-2025-0005,Michael Wilson,m.wilson@email.com,9876543214,Teacher,Mathematics,M.Sc,6,2019-02-10,42000,Seattle

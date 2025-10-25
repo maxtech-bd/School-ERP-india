@@ -1,0 +1,25 @@
+# BACKEND-ONLY DEPLOYMENT - Exclude everything except backend
+
+# Exclude everything
+**/*
+
+# Include ONLY backend
+!backend/
+!backend/**/*.py
+!backend/requirements-minimal.txt
+!.replit
+!build.sh
+!start.sh
+
+# Explicitly exclude large files even in backend
+backend/uploads
+backend/uploads/**
+backend/__pycache__
+backend/**/__pycache__
+backend/**/*.pyc
+**/.cache
+**/node_modules
+frontend/
+attached_assets/
+*.log
+.git

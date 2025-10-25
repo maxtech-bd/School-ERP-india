@@ -1,0 +1,10 @@
+# Ignore frontend for backend-only deployment
+frontend/
+node_modules/
+*.backup
+attached_assets/
+.git/
+.cache/
+tests/
+*.md
+README.md
