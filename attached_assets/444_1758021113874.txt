@@ -1,0 +1,83 @@
+Hi Replit Team,
+
+আমার Certificates Module এ এখনও অনেকগুলো critical issue আছে। নিচে tab-wise details দিলাম:
+
+🔹 Course Tab
+
+Generate Course Certificate button কাজ করছে না।
+
+Dashboard এ "Total Issued / Pending / This Month" count update হচ্ছে না।
+👉 Expected Behavior: Student select → course details fill-up → generate button → PDF certificate তৈরি হবে, সাথে সাথে dashboard এ reflect হবে।
+
+🔹 Transfer Tab
+
+Generate TC / View / PDF / Print buttons কাজ করছে না।
+
+Dashboard এর total issued / pending reflect হচ্ছে না।
+👉 Expected Behavior: Generate TC করলে record DB তে save হবে → View/PDF/Print কাজ করবে → Dashboard count update হবে।
+
+🔹 Progress Report Tab
+
+View Template / Generate Report কাজ করছে না।
+
+Dashboard reflect হচ্ছে না।
+👉 Expected Behavior: Report generate করলে student performance data সহ PDF তৈরি হবে এবং Dashboard এ নতুন report count reflect করবে।
+
+🔹 Adhar Extract Tab
+
+Process Extract button কাজ করছে না।
+
+Dashboard এ total extract count update হচ্ছে না।
+👉 Expected Behavior: Process extract করলে selected student-এর Aadhaar extract generate হবে এবং DB তে persist হবে।
+
+🔹 Bonafide Tab
+
+View Template / Generate Certificate কাজ করছে না।
+
+Dashboard reflect হচ্ছে না।
+👉 Expected Behavior: Bonafide certificate generate করলে professional PDF download হবে এবং dashboard এ সংখ্যা reflect হবে।
+
+🔹 ID Cards Tab
+
+Student IDs / Staff IDs / Print Cards কাজ করছে না।
+
+Print design professional নয়।
+
+Dashboard এ issued ID cards count reflect হচ্ছে না।
+👉 Expected Behavior: Student/Staff select করে → ID card generate → Professionally designed PDF print হবে → Dashboard এ issued count update হবে।
+
+✅ My Suggestions (Improvement Points):
+
+Backend Integration:
+
+সব certificate, report, TC, ID card → MongoDB তে persist করতে হবে।
+
+Dashboard count সবসময় DB থেকে calculate হতে হবে।
+
+Professional PDF Templates:
+
+Course/Transfer/Bonafide/Progress Report/ID Cards → সবগুলোর জন্য standard ERP-grade design template ব্যবহার করতে হবে।
+
+Print friendly format থাকতে হবে (header, logo, student info, guardian info, signature field)।
+
+Real-time Updates:
+
+Certificate/Report generate করার সাথে সাথে Dashboard refresh হতে হবে।
+
+Pending/Issued counters auto-update হতে হবে।
+
+Button Workflow:
+
+সব button click করলে → Generate → Save → Reflect → Download → Print → সবকিছু কাজ করতে হবে।
+
+কোনো button static বা inactive থাকা উচিত নয়।
+
+User Experience Enhancements:
+
+Success toast + PDF download একসাথে trigger করতে হবে।
+
+Error হলে clear message দেখাতে হবে।
+
+Multiple certificate bulk generate option add করলে আরও effective হবে।
+
+⚡ Please fix these issues and improvements so that the Certificates Module becomes fully functional ERP-standard with real-time dashboard sync, professional PDF/Print templates, and complete backend integration.

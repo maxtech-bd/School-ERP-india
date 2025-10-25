@@ -1,0 +1,204 @@
+Got it, Farid. Here’s a tight spec for Staff → Add Staff so you can build it properly in Replit.
+
+🎯 Goal
+
+Create a complete “Add Staff” flow that saves a staff member and updates the UI without bouncing to the dashboard.
+
+🧾 Form Fields (recommended)
+
+Identity
+
+Employee ID (auto/optional manual, unique per tenant)
+
+Full Name (required)
+
+Gender, Date of Birth
+
+Photo upload (JPEG/PNG ≤ 2 MB)
+
+Contact
+
+Email (required, unique, lowercase)
+
+Phone (required, E.164)
+
+Address (line, city, state, postal code)
+
+Employment
+
+Department (Teaching, Admin, Accounts, etc.)
+
+Designation (Head Teacher, Clerk, etc.)
+
+Role (admin | teacher | staff | … for RBAC)
+
+Date of Joining (required)
+
+Employment Type (Full-time / Part-time / Contract)
+
+Experience (years, number 0–50)
+
+Monthly Salary (number ≥ 0)
+
+Status (Active | Inactive)
+
+Teaching (if role = teacher)
+
+Classes/Sections (multi-select)
+
+Subjects (multi-select)
+
+✅ Validation (front + back)
+
+Required: name, email, phone, role, department, date_of_joining
+
+Unique: email, employee_id (scoped to tenant)
+
+Formats: email, phone, salary as number, photo type/size
+
+Block duplicate on server with 409 + friendly message:
+“Email already exists for this school.”
+
+🧠 UX Behavior
+
+Page title: “Add Staff”
+
+Buttons:
+
+Save (creates staff then takes to Staff Profile)
+
+Save & Add Another (creates, clears form, keeps you here)
+
+Cancel / Back to Staff List
+
+Live feedback: inline field errors + top toast (“Staff added successfully”)
+
+Keep data on error: don’t clear the form
+
+Loading state: disable Save while posting
+
+RBAC: only admin/super_admin may access this route; others see 403 page (not dashboard redirect)
+
+🔌 API Contract (example)
+
+Create staff
+POST /api/staff
+
+{
+  "employeeId": "EMP-2025-0012",
+  "name": "Ayesha Khan",
+  "email": "ayesha@school.edu",
+  "phone": "+8801712345678",
+  "department": "Teaching",
+  "designation": "Science Teacher",
+  "role": "teacher",
+  "dateOfJoining": "2025-09-06",
+  "experienceYears": 5,
+  "salaryMonthly": 20000,
+  "address": "West Gohira",
+  "status": "Active",
+  "gender": "Female"
+}
+
+
+Response 201
+
+{
+  "id": "66df…",
+  "tenantId": "…",
+  "createdAt": "…"
+}
+
+
+Lookups
+
+GET /api/departments
+
+GET /api/designations
+
+GET /api/roles → for dropdowns
+
+Photo upload (optional)
+
+POST /api/files → returns fileId/url, include in staff payload
+
+🧱 Data Model (MongoDB)
+{
+  _id,
+  tenantId,
+  employeeId,
+  name,
+  email,
+  phone,
+  department,
+  designation,
+  role,               // for RBAC
+  dateOfJoining,
+  experienceYears,
+  salaryMonthly,
+  address,
+  status,             // Active/Inactive
+  gender,
+  photoUrl,
+  classes: [classId], // if teacher
+  subjects: [subjectId],
+  createdBy,
+  createdAt, updatedAt
+}
+
+
+Indexes
+
+{ tenantId, email } unique
+
+{ tenantId, employeeId } unique
+
+🧭 Routing (React Router)
+
+/staff/add → AddStaff page (guarded)
+
+On success:
+
+Update header counters (Total Staff)
+
+Invalidate/refresh GET /api/staff list
+
+Redirect to /staff/:id or /staff with toast
+
+🛡️ Guard & Errors
+
+Unauthorized → /login (not dashboard)
+
+Forbidden role → /403 with message
+
+Server errors → toast + keep form
+
+Network retry banner if offline
+
+🧪 Acceptance Checklist
+
+ Admin can open /staff/add without redirect
+
+ Required fields block submission with clear messages
+
+ Duplicate email/employeeId returns friendly error
+
+ Save → creates record, shows success toast, updates counters
+
+ Save & Add Another → stays on page with cleared form
+
+ Cancel → returns to Staff List
+
+ Non-admin gets 403 page
+
+ State persists if submit fails
+
+🔮 Nice to have (later)
+
+CSV Import (bulk staff) with progress + error report
+
+“Generate Employee ID” button with prefix per school
+
+Audit log: who created/edited staff
+
+Soft delete (status=Inactive) instead of hard delete

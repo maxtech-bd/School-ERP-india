@@ -1,0 +1,77 @@
+Subject: Enforce academic-only restriction in AI behavior (model-level rule)
+
+Hi Replit Team,
+
+The CMS-first logic and non-academic filter are working great.
+Now I want to strengthen this by making the AI itself follow the academic-only restriction, even if the student tries to bypass it.
+
+🎯 Requirement:
+
+Ensure the AI model (GPT) never answers questions unrelated to academic or syllabus topics — even if the backend filter misses something.
+
+If the student asks anything not related to the school’s academic subjects (Physics, Chemistry, Biology, Math, English, Computer Science, Geography, History, etc.), the AI should respond politely and consistently with a restriction message.
+
+🧩 Implementation Plan
+✅ Step 1: Update System Prompt in backend/server.py
+
+When generating the GPT prompt (in ai-engine/chat route), include this strict directive:
+
+You are a School Academic Assistant.
+You must only answer academic or syllabus-related questions (Physics, Chemistry, Biology, Math, English, Computer Science, Geography, History, etc.).
+If a user asks a non-academic or personal question (e.g., sports, jokes, politics, entertainment, celebrities, general trivia), you must respond:
+“Sorry, I can only answer academic or syllabus-related questions. Please ask something from your subjects.”
+
+Do not provide any other response, even if the user insists or rephrases.
+
+✅ Step 2: Combine with Backend Filter
+
+Keep the backend is_academic filter to block non-academic queries early.
+
+If something slips through, GPT will still refuse internally due to the system prompt.
+
+Together, these make a two-layer restriction:
+
+Backend filter = blocks requests
+
+AI prompt = enforces behavior
+
+✅ Step 3: Modify Response Structure
+
+When GPT refuses due to the rule, tag the output:
+
+{
+  "source": "restricted",
+  "message": "Non-academic question blocked by AI rule"
+}
+
+
+This helps track when the model itself blocked an answer.
+
+🧠 Example Scenarios
+User Question	AI Response	Source
+What is Ohm’s Law?	“Ohm’s Law states that V = IR…”	CMS
+Who is Einstein?	“Einstein was a scientist known for relativity…”	GPT
+Tell me a joke	“Sorry, I can only answer academic or syllabus-related questions.”	Restricted
+Who is Messi?	“Sorry, I can only answer academic or syllabus-related questions.”	Restricted
+How to make cake?	“Sorry, I can only answer academic or syllabus-related questions.”	Restricted
+⚙️ Benefits
+
+✅ Prevents misuse of the AI Assistant
+✅ Keeps student focus on syllabus
+✅ Reduces token usage from off-topic queries
+✅ Ensures consistent, safe, and academic-only responses
+✅ Reinforces CMS-first approach
+
+🔐 Optional (Recommended)
+
+Add a Teacher/Admin Switch in Settings:
+
+Toggle “Academic-Only Mode” ON/OFF
+
+Default ON for students
+
+OFF for teachers/admins
+
+Thanks,
+Farid (MaxTech BD)
+“Please ensure the AI strictly follows academic-only behavior at both backend and model level.”

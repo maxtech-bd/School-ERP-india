@@ -1,0 +1,63 @@
+Title: HSS → Submit Enrollment crashes with “Objects are not valid as a React child”
+
+Severity: High (blocks completing any enrollment)
+
+Environment:
+
+App: School ERP (Replit deployment)
+
+Route: /hss/enroll/new (after pressing Submit on the enrollment wizard)
+
+User: System Administrator
+
+Browser: Chrome (latest)
+
+Steps to Reproduce:
+
+Go to HSS → Enrollment and complete all steps.
+
+Press Submit on the final step.
+
+App navigates to /hss/enroll/new and shows a red error screen.
+
+Actual Result (Error screen):
+“Objects are not valid as a React child (found: object with keys {type, loc, msg, input, url}). If you meant to render a collection of children, use an array instead.”
+(Stack shows throwOnInvalidObjectType / createChild / reconcileChildrenArray …)
+
+Expected Result:
+
+Enrollment should be created.
+
+A success toast should appear.
+
+User should be auto-returned to HSS Admission Register with the new record visible.
+
+Notes & Hypothesis (for the devs):
+
+The error appears immediately after submission, which strongly suggests an error object (or full API response object) is being rendered directly in JSX (e.g., putting an object into a <Text>/<span>/toast body instead of a string).
+
+The keys in the object {type, loc, msg, input, url} look like a server validation error payload, possibly an array of error items or a structured object.
+
+Likely places to check:
+
+The submit handler of the final enrollment step (success and error branches).
+
+The toast/notification component and any status banners after submit: ensure only strings are passed to UI text nodes.
+
+If the backend returns an array of errors, map them to strings before rendering; don’t pass the raw object/array to JSX.
+
+Confirm that navigation to /hss/enroll/new is correct—this might be a fallback route showing the error UI when the handler tries to render the payload.
+
+Also verify the API response: if it returns {success:false, errors:[…]}, the UI should parse and stringify messages, not render the whole object.
+
+What to fix / validate:
+
+In the enrollment submit flow, guard all UI text (toast, banners, inline errors) to only render strings.
+
+If you need to show multiple errors, map them to a list of strings; don’t render an object directly.
+
+Log the raw API error to console, but format what goes into JSX.
+
+After success, navigate back to /hss/register and refresh list; after failure, stay on the wizard and show human-readable messages.
+
+Impact: Users cannot complete HSS enrollment; the workflow is blocked at submission.

@@ -1,0 +1,125 @@
+Hi Replit Team,
+
+I would like to request assistance implementing a new AI Assistant module inside our School ERP system (MaxTech BD) — fully integrated with OCR, Voice, and n8n automation.
+
+🚨 Important Instruction:
+Please do not touch or modify any other existing modules (HSS, Fees, Reports, Transport, etc.).
+Only focus on integrating and testing the new AI Assistant feature under a separate section — “AI Assistant.”
+
+
+---
+
+🔹 Feature Requirements
+
+1. AI Assistant (GPT-4o-mini)
+
+Students and teachers can ask academic questions using text, image, or voice.
+
+AI should respond with:
+
+📘 Academic or textbook-based answers
+
+📗 Reference explanations
+
+🤖 Simplified AI-generated summaries
+
+
+Include text + voice response output.
+
+
+
+2. OCR (Image Reading)
+
+Integrate Tesseract OCR (open-source) to extract text from images or scanned documents.
+
+Run locally to avoid external API costs.
+
+
+
+3. Voice Input / Output
+
+Use Whisper.cpp (Speech-to-Text) for converting student voice queries to text.
+
+Use OpenAI TTS or ElevenLabs Lite for converting AI responses to voice playback.
+
+
+
+4. n8n Automation Integration
+
+Automate background processes using n8n:
+
+Log AI activity and responses
+
+Send notifications to teachers
+
+Trigger smart workflows (e.g., “AI Homework Summary,” “Study Tips Reminder”)
+
+
+
+
+
+
+---
+
+💡 Suggested Setup Plan (Optimized for Low Cost)
+
+Layer	Tool / Tech	Description	Cost
+
+🤖 AI Core	GPT-4o-mini (OpenAI API)	Text reasoning + answer generation	~$3/mo
+🧠 OCR	Tesseract (self-hosted)	Free image-to-text conversion	$0
+🎙 Voice	Whisper.cpp + OpenAI TTS	Voice recognition + voice reply	~$1/mo
+🔁 Automation	n8n (self-hosted)	Workflow automation & logging	$0
+☁ Hosting	Replit + Render	Shared deployment	~$8/mo
+💾 Database	Supabase Free Tier	Store AI logs & usage data	$0
+
+
+✅ Estimated Monthly Cost: $10 – $12 total
+
+
+---
+
+⚙ Implementation Recommendations (from ChatGPT)
+
+To ensure stability and performance:
+
+Use async FastAPI routes for all AI and OCR requests.
+
+Add a separate route group (/ai-engine) to isolate this feature.
+
+Use local caching for common questions (reduce API cost by 40–60%).
+
+Implement Redis / n8n queue for background automation (non-blocking).
+
+Add teacher logs for activity tracking and accountability.
+
+Embed a mini AI chat widget inside the ERP dashboard for direct interaction.
+
+
+
+---
+
+🎯 Expected Behavior
+
+✅ Students can ask questions (text, photo, or voice)
+✅ AI Assistant responds instantly inside ERP
+✅ Teachers can view AI usage logs
+✅ n8n handles automation and notifications
+✅ System remains low-cost, fast, and isolated from other modules
+
+
+---
+
+📍 Key Notes
+
+Please implement this module as a separate standalone feature.
+
+Do not modify or update any other School ERP sections or existing logic.
+
+Keep the architecture modular so it can be expanded later to other schools.
+
+
+
+---
+
+Thank you for your continuous support.
+Once this AI module is implemented and stable, I plan to roll it out across all MaxTech BD School ERP deployments.

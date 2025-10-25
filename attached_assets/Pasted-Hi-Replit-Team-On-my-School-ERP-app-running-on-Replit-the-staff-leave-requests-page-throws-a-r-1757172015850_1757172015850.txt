@@ -1,0 +1,74 @@
+Hi Replit Team,
+
+On my School ERP app (running on Replit), the /staff/leave-requests page throws a runtime error and shows the red overlay:
+
+A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+
+Steps to reproduce
+
+Navigate to Staff → Leave Requests.
+
+Page mounts and immediately crashes with the error above.
+
+Expected
+
+Page should render the Leave Request form (type/date/etc.) with dropdowns working.
+
+Actual
+
+Runtime error overlay; page unusable.
+
+Suspected cause
+
+I’m using shadcn/ui Select. One or more <SelectItem> has value="" (empty string), or the controlled value of <Select> is "" initially. In shadcn, every SelectItem must have a non-empty value, and the <Select> should start as undefined or a real value.
+
+Suggested fix (code)
+// ❌ Problematic (empty value)
+<Select value={type} onValueChange={setType}>
+  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+  <SelectContent>
+    <SelectItem value="">-- Select --</SelectItem>  // <-- remove or change
+    <SelectItem value="SICK">Sick Leave</SelectItem>
+    <SelectItem value="CASUAL">Casual Leave</SelectItem>
+    <SelectItem value="ANNUAL">Annual Leave</SelectItem>
+  </SelectContent>
+</Select>
+
+// ✅ Correct
+const [type, setType] = useState<string | undefined>(undefined); // not ""
+
+<Select value={type} onValueChange={setType}>
+  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+  <SelectContent>
+    {/* no empty-value items */}
+    <SelectItem value="SICK">Sick Leave</SelectItem>
+    <SelectItem value="CASUAL">Casual Leave</SelectItem>
+    <SelectItem value="ANNUAL">Annual Leave</SelectItem>
+    <SelectItem value="UNPAID">Unpaid Leave</SelectItem>
+  </SelectContent>
+</Select>
+
+// If a placeholder row is needed:
+<SelectItem value="__placeholder" disabled className="text-muted-foreground">
+  Select type…
+</SelectItem>
+
+
+Also ensure any other selects (department, status, staff pickers) follow the same pattern:
+
+initial state undefined (not "")
+
+every <SelectItem> has a non-empty value
+
+don’t coerce falsy values to "" when mapping options
+
+Environment
+
+React 19 / shadcn/ui on Replit
+
+Route: /staff/leave-requests
+
+Could you help patch this across the Leave Requests page (and any similar selects) so the page renders?
+
+Thanks,
+Farid

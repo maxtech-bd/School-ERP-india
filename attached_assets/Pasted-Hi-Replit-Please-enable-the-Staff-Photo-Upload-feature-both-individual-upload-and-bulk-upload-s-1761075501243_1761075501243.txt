@@ -1,0 +1,75 @@
+Hi Replit,
+
+Please enable the Staff Photo Upload feature — both individual upload and bulk upload, similar to the existing student module.
+
+📸 Requested Features:
+1️⃣ Individual Staff Photo Upload
+
+Add a small camera icon or “Upload Photo” button in the Add / Edit Staff Member form.
+
+The uploaded image should:
+
+Save to /uploads/staff/{employee_id}_{uuid}.jpg
+
+Update the photo_url field in the staff database table
+
+Display as a circular avatar in the Staff List table (replacing initials)
+
+2️⃣ Bulk Photo Upload (same style as Students)
+
+Add a “Bulk Photo Upload” button beside Import Staff / Export.
+
+The modal should include:
+
+Title: “Bulk Photo Upload (Staff)”
+
+File format allowed: .jpg, .png
+
+Rule: File name must match the staff Employee ID
+e.g.
+
+EMP-2025-0004.jpg
+EMP-2025-0005.jpg
+EMP-2025-0007.jpg
+
+
+Max size: 2MB per image
+
+Recommended: 300x400 pixels
+
+On upload → system auto-links photo with corresponding employee
+
+✅ Expected Behavior:
+
+Uploaded photos are saved under /uploads/staff/
+
+Database updates staff record with photo_url
+
+Staff List immediately displays uploaded avatars
+
+If photo not found → fallback initials shown (like now)
+
+⚙️ Backend Implementation Suggestion:
+@app.post("/api/staff/bulk-photo-upload")
+async def upload_staff_photos(files: List[UploadFile] = File(...)):
+    for file in files:
+        filename = file.filename
+        employee_id = filename.split(".")[0]
+        staff = db.query(Staff).filter(Staff.employee_id == employee_id).first()
+        if staff:
+            save_path = f"uploads/staff/{filename}"
+            with open(save_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            staff.photo_url = f"/uploads/staff/{filename}"
+            db.commit()
+    return {"message": "Photos uploaded successfully"}
+
+🧾 Benefit:
+
+Consistent with Student module
+
+Saves manual upload time for large staff databases
+
+Ensures uniform UI and easy management of staff records
+
+Once implemented, both Student and Staff modules will have identical bulk photo systems.

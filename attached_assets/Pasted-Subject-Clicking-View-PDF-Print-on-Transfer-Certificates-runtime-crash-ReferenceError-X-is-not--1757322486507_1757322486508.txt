@@ -1,0 +1,82 @@
+Subject: Clicking View/PDF/Print on Transfer Certificates → runtime crash: ReferenceError: X is not defined
+
+Area: Certificates → Transfer tab → Actions (View / PDF / Print)
+
+Steps to reproduce
+
+Open /certificates, select the Transfer tab.
+
+Ensure there is at least one Issued transfer certificate in the list.
+
+Click View (same result with PDF or Print).
+
+Actual result
+
+The app crashes and shows a red error screen:
+
+Uncaught runtime errors:
+
+ERROR
+ReferenceError: X is not defined
+    at Certificates (…/static/js/bundle.js:107236:99)
+    at Object.react_stack_bottom_frame (…/bundle.js:53224:18)
+    at renderWithHooks (…/bundle.js:43434:20)
+    at updateFunctionComponent (…/bundle.js:45127:17)
+    …
+
+
+No preview/PDF/print action occurs.
+
+Expected behavior
+
+View: opens a preview of the selected Transfer Certificate.
+
+PDF: generates/downloads the certificate PDF (or opens it in a new tab).
+
+Print: opens a print-friendly view and triggers the browser print dialog.
+
+Notes / likely root cause
+
+The crash occurs inside the Certificates component and complains that X is not defined.
+
+This usually happens when JSX renders <X /> (often a close icon from lucide/heroicons) without importing it, or when a variable named X is referenced but never declared.
+
+Because the component throws before rendering, the downstream click handlers for View/PDF/Print never run, which is why all three appear “not working”.
+
+What to check
+
+Certificates component
+
+Search for any usage of <X /> (or X variable) and ensure it’s properly imported:
+
+Example (lucide): import { X, Eye, Download, Printer } from 'lucide-react'
+
+If X is a local state/prop, make sure it’s declared/defined in scope.
+
+Action handlers
+
+After fixing the crash, verify that handlers receive the row TC ID and call the right routes:
+
+GET /transfer-certificates/{id} → View
+
+GET /transfer-certificates/{id}/pdf → PDF
+
+Print view (HTML or PDF in new tab) → Print
+
+Ensure you use window.open(url, '_blank') (or a programmatic download) and show a toast on failure.
+
+Permissions/CORS
+
+Confirm responses return with proper CORS and Content-Disposition for downloadable PDFs.
+
+Acceptance criteria
+
+No runtime error in Certificates component.
+
+View shows the correct certificate.
+
+PDF opens/downloads as expected.
+
+Print opens a print-friendly view and triggers the print dialog.
+
+Failures show a readable toast instead of crashing.

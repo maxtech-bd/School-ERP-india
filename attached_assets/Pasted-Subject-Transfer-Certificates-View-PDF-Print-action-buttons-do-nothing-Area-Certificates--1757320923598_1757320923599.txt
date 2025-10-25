@@ -1,0 +1,63 @@
+Subject: Transfer Certificates – “View / PDF / Print” action buttons do nothing
+
+Area: Certificates → Transfer tab
+Record state: Status = Issued (TC exists in the table)
+
+Steps to reproduce
+
+Go to /certificates and select the Transfer tab.
+
+Ensure there is at least one issued TC in the list.
+
+Click View, PDF, or Print in the Actions column.
+
+Actual result
+
+Nothing happens (no modal, no navigation, no download, no print dialog).
+
+The buttons appear enabled but have no effect.
+
+Expected behavior
+
+View: Opens a preview modal/page for the selected Transfer Certificate.
+
+PDF: Triggers a file download of the TC as a PDF (e.g., TC_ADM5555_2025-09-09.pdf).
+
+Print: Opens a print-friendly view and the browser print dialog.
+
+What to check (suggestions)
+
+Frontend:
+
+Verify the onClick handlers are wired with the row’s TC ID and not blocked by preventDefault() or missing routing.
+
+If they’re <a> tags with href="#", ensure click handlers call the correct functions and that the default action isn’t swallowing navigation.
+
+For PDF, use a direct GET to the file endpoint and window.open(url, '_blank') or programmatic download.
+
+For Print, open a print view (new tab or hidden iframe) and call window.print() when ready.
+
+Backend/API routes (examples):
+
+GET /transfer-certificates/{id} → returns certificate data for View.
+
+GET /transfer-certificates/{id}/pdf → returns application/pdf for PDF.
+
+(Option A) GET /transfer-certificates/{id}/print → print-friendly HTML, or
+(Option B) reuse the PDF endpoint and open in a new tab for printing.
+
+Permissions/guards:
+
+Make sure actions are enabled for Issued (and any allowed statuses) and not gated by role/tenant checks.
+
+Confirm CORS/Content-Disposition headers for the PDF download.
+
+Acceptance criteria
+
+Clicking View opens a preview with the correct TC data.
+
+Clicking PDF downloads/opens the PDF in a new tab.
+
+Clicking Print opens a print-friendly view and shows the browser print dialog.
+
+Errors (network/permission) show a user-friendly toast instead of silent failure.

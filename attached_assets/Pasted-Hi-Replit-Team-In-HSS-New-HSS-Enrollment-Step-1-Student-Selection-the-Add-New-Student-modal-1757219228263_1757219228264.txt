@@ -1,0 +1,97 @@
+Hi Replit Team,
+
+In HSS → New HSS Enrollment → Step 1 (Student Selection), the Add New Student modal opens, I fill all fields, but clicking Create Student does nothing. The student isn’t created or pre-selected, and the wizard can’t proceed.
+
+What should happen
+
+Validate required fields (name, DOB, at least one contact).
+
+POST /api/students with the form payload.
+
+On 201 Created:
+
+Close the modal,
+
+Set wizard.studentId to the new student,
+
+Enable Next,
+
+Show toast “Student created & selected”.
+
+What happens now
+
+Button click has no effect; no toast; no DB record; Next stays disabled.
+
+Likely causes
+
+Button not wired (onClick missing) or not type="button" (form reload).
+
+API call not configured (wrong baseURL/CORS/route).
+
+Backend route POST /api/students missing or returning non-JSON.
+
+Success not updating state (wizard.studentId never set).
+
+Errors are swallowed; nothing shown to user.
+
+My suggestions (quick wins)
+
+Frontend
+
+// inside Add New Student modal
+const [submitting, setSubmitting] = useState(false);
+
+async function handleCreate(values) {
+  try {
+    setSubmitting(true);
+    const { data: s } = await api.post("/api/students", values); // ensure baseURL
+    setWizard(w => ({ ...w, studentId: s.id })); // preselect
+    setShowCreate(false);
+    toast.success("Student created & selected");
+  } catch (err) {
+    const msg = err?.response?.data?.message ?? "Failed to create student";
+    toast.error(msg);
+  } finally {
+    setSubmitting(false);
+  }
+}
+
+<Button
+  type="button"                              // prevent form submit/reload
+  onClick={form.handleSubmit(handleCreate)}  // wire the handler
+  disabled={submitting}
+>
+  {submitting ? "Saving..." : "Create Student"}
+</Button>
+
+
+Backend (expected contract)
+
+POST /api/students
+Request { name, dob, email?, phone?, address?, parentName?, parentPhone? }
+Response (201) { id, name, phone, ... }
+
+Enforce unique constraints (e.g., tenantId + phone/email).
+
+Return clear 4xx messages (e.g., “Phone already in use”).
+
+Enable CORS for the frontend origin.
+
+Wizard state & Next button
+
+// enable Next only when a student is chosen
+<Button onClick={() => goToStep("ACADEMIC_DETAILS")} disabled={!wizard.studentId}>
+  Next
+</Button>
+
+
+Diagnostics to enable
+
+Console log API errors (status/message) when submission fails.
+
+In Network tab, confirm the POST /api/students request is sent and responses are JSON.
+
+Could you please wire the Create Student action as above and confirm the backend route is reachable so the wizard can proceed?
+
+Thanks,
+Farid

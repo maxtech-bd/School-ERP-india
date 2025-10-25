@@ -1,0 +1,147 @@
+Hi Replit Team 👋
+
+I’ve completed a full QA testing of our School ERP System after deployment.
+Even though the main system loads successfully, several functional and UI-level modules are still broken.
+Below is the list of critical issues that remain unresolved despite multiple fixes:
+
+
+---
+
+⚫ UI & Layout Problems
+
+Dark Mode isn’t applied properly — background & button text colors are inconsistent.
+
+Some button labels are invisible in Dark Mode.
+
+Sidebar bug: Interface scrolls to the top every time a new component is clicked.
+
+
+
+---
+
+🎓 Student Module Issues
+
+Import Students option not working — keeps showing “Invalid Data Format” error even after uploading valid Excel/CSV files.
+
+Bulk Photo Upload not working — “Upload Successful” toast shows, but photos are not visible afterward.
+
+Individual Photo Upload section under Students Module has no functionality (upload buttons inactive).
+
+
+
+---
+
+👨‍🏫 Staff Management Issues
+
+Staff Information Update and Delete functions not working.
+
+Staff Import feature fails every time — same error persists even after correcting CSV data.
+
+
+
+---
+
+🏫 Leave & Class Management
+
+“Leave Type” dropdown missing under New Leave Request — user cannot create new leave requests.
+
+Class Management Module not functional — sections cannot be created or edited.
+
+
+
+---
+
+📜 HSS Module Problems
+
+HSS Transfer Certificate status cannot be changed (Draft → Issued → Cancelled).
+
+Conduct Certificate status cannot be changed.
+
+HSS submodules (Enroll Student, Admission Register, Transfer Certificate, Conduct Certificate, Consolidated Report, Set Tags) are all non-functional.
+
+Save Configuration options for Manage Fees Tab are not visible.
+
+
+
+---
+
+🧠 AI Tools & CMS Issues
+
+AI Summary output contains raw code syntax (JSON tags, HTML) — not human readable.
+
+AI Test Generator and AI Quiz Generator fail to generate tests.
+
+AI Assistant not responding (no backend communication).
+
+
+
+---
+
+📊 Reports & Settings
+
+All tabs under Report Dashboard are inactive (no data rendering).
+
+Settings → Biometric Devices crashes the page (console logs show JS error).
+
+Calendar module works fine ✅
+
+
+
+---
+
+⚙ Admission & Date Validation
+
+Online Application status cannot be changed (read-only state).
+
+Admission Settings section not configurable.
+
+Date Picker allows invalid/future dates (e.g., Admission Date, DOB).
+
+Expected: validation or alert for invalid/future dates
+
+Actual: accepts any date without restriction
+
+
+
+
+---
+
+💡 Request
+
+Please assign a full-stack engineer to recheck the following:
+
+1. Backend endpoints for the above modules (especially under /students, /staff, /fees, /ai, /hss, /settings)
+
+
+2. Frontend event binding for inactive buttons
+
+
+3. AI module integration (Quiz, Summary, Assistant)
+
+
+4. Validation logic for date and data imports
+
+
+
+Once fixes are applied, please redeploy to verify in staging before production.
+
+
+---
+
+Testing Environment:
+
+Development URL: ✅ https://3516d251-7e36-40e8-b0eb-3a3eaa6959f7-00-3t9xpjugl0f0e.pike.replit.dev/
+
+Deployment URL: ❌ https://erp-jahirvklbd.replit.app (still unstable)
+
+
+
+---
+
+Thank you for your patience — please confirm when these bugs are assigned to the QA or deployment fix queue.
+
+Kind regards,
+Farid (MaxTech BD)
+Managing Director
+📧 info@maxtechbd.com
+🌐 https://maxtechbd.com

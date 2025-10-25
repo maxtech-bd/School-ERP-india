@@ -1,0 +1,84 @@
+Hi team,
+
+The current Transfer Certificate design looks very plain and basic (see attached screenshot). I’d like to make it look professional and attractive — similar to official school certificates with branding and layout polish.
+
+Here’s what I’d like implemented in the updated version:
+
+🎓 Updated Transfer Certificate Design Requirements
+
+Header Section (Professional Layout)
+
+Add school logo (left) and school tagline centered
+
+Include address, phone, email, and website in one line
+
+Use a clean header color: #1E3A8A (Deep Blue)
+
+Example:
+
+DEMO SCHOOL  
+"Excellence in Learning and Character"  
+123 Learning City | info@demoschool.edu | (555) 123-4567  
+
+
+Certificate Title Section
+
+Title centered: “🏆 TRANSFER CERTIFICATE 🏆”
+
+Use bold 22px text with a subtle gold divider line below
+
+Student Information Table (Modern Styling)
+
+Display all student details in a clean bordered or shaded table:
+
+Student Name, Admission No, Class, Section, Date of Admission, Date of Leaving, Reason for Transfer, Conduct & Behavior, Issue Date, Certificate ID
+
+Use a light background (#F8FAFC) with icons (📅, 🧑‍🎓, 🏷️) beside labels
+
+Font: Poppins or Roboto for neat alignment
+
+Signature Section
+
+Two signature boxes:
+
+Left: Class Teacher (Signature)
+
+Right: Principal (Signature)
+
+Option to upload digital signature images
+
+Footer Section
+
+Add generated info:
+Generated on: 05/10/2025 | Certificate ID: #### | Verified by DEMO SCHOOL
+
+Include a QR code for online verification
+
+Add a faint school logo watermark in background
+
+Color & Font Scheme
+
+Header: #1E3A8A
+
+Accent/Highlight: #059669 (Emerald Green)
+
+Text: #111827
+
+Footer: #6B7280
+
+Font: Poppins / Roboto
+
+✅ Expected Output
+
+When clicking View / Download / Print, the certificate should:
+
+Display the full styled layout (not plain text)
+
+Render correctly in PDF with header, table, QR, and watermark
+
+Automatically include student + school data dynamically
+
+Please update the Transfer Certificate template in the ERP according to this design standard.
+This will make the document look official, elegant, and consistent with other reports.
+
+Thank you! 🚀

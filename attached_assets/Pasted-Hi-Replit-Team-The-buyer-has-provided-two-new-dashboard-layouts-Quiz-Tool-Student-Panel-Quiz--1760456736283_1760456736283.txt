@@ -1,0 +1,143 @@
+Hi Replit Team,
+
+The buyer has provided two new dashboard layouts — Quiz Tool (Student Panel)
+
+Quiz Tool Dashboard Layout
+
+ and Test Generator (Teacher/Admin Panel)
+
+Test Generator Dashboard Layout
+
+ — which now need to be integrated into our existing School ERP AI Assistant system.
+Below is the full implementation plan according to their requirements:
+
+🎯 1. AI Quiz Tool (Student Panel)
+
+Scope: Grades 1–12
+User Role: Student
+
+Core Features:
+✅ Filters: Class · Subject · Chapter · Topic
+✅ Difficulty Levels: Easy · Medium · Hard
+✅ Tags (Learning Dimensions): Knowledge · Understanding · Application · Reasoning · Skills
+
+AI Functions:
+
+AI dynamically generates quizzes based on selected filters and tags.
+
+Quizzes are for self-assessment and practice only (not for grading).
+
+After submission:
+
+Auto-correction
+
+Auto-grading
+
+Instant feedback + progress tracking
+
+UI Components:
+
+“Start Quiz” → Generate customized question set
+
+“Regenerate” → Refresh question set
+
+“Save” → Save quiz for later
+
+“Submit” → Evaluate quiz automatically
+
+“View Results” → Show performance dashboard
+
+Automation:
+
+AI fetches tagged questions from CMS-first database.
+
+Tracks student performance history for progress insights.
+
+🎯 2. AI Test Generator (Teacher/Admin Panel)
+
+Scope: Grades 1–12
+User Roles: Teacher, Admin, Student (as recipient)
+
+A) AI-Powered Test Generator
+
+✅ Teachers can generate tests instantly using AI.
+✅ Example: Generate 10 questions → keep 5, regenerate 5.
+✅ Schedule delivery to students (auto-publish on time).
+✅ Auto-Correction + Auto-Grading after test submission.
+
+UI Actions:
+Generate · Edit · Save · Schedule · Publish · View Results
+
+B) Manual Upload Option
+
+✅ Teachers can upload existing question papers manually.
+✅ Supports scheduling for timed delivery.
+✅ Same auto-grading & result reporting system applies.
+
+UI Actions:
+Upload · Save · Schedule · Publish · View Results
+
+🧠 Shared Tag System (for both)
+
+AI categorizes questions using these cognitive tags:
+
+Knowledge
+
+Understanding
+
+Application
+
+Reasoning
+
+Skills
+
+This ensures AI generates balanced and subject-appropriate question sets for both Quiz and Test modules.
+
+🔧 Technical Integration Plan
+
+Database:
+
+Extend existing academic_content and qa_pairs collections.
+
+Add tagging fields: difficulty, topic, learning_tag, type.
+
+Backend APIs:
+
+POST /api/quiz/generate → AI generates quiz (student side)
+
+POST /api/test/generate → AI generates test (teacher side)
+
+POST /api/test/upload → Manual upload
+
+POST /api/test/schedule → Schedule test delivery
+
+GET /api/quiz/results & /api/test/results → Fetch graded data
+
+Frontend UI:
+
+Add two new dashboards:
+
+Quiz Tool (Student Panel)
+
+Test Generator (Teacher/Admin Panel)
+
+Both connect to existing AI Assistant backend and CMS database.
+
+Evaluation Engine:
+
+Use same auto-correction logic as AI Assistant’s evaluation.
+
+Generate detailed performance reports.
+
+📊 Expected Outcome
+
+✅ AI Quiz → Student self-practice with instant grading
+✅ AI Test → Teacher/admin generated exams with scheduling
+✅ Auto-grading & performance tracking
+✅ Unified tag system ensures academic balance
+✅ CMS-first integration reduces GPT cost and improves accuracy
+
+Please start implementation according to these layouts and integrate them into the existing ERP AI Assistant system — ensuring both panels (Quiz & Test Generator) follow the same academic restriction logic and token optimization.
+
+Thank you,
+Farid (MaxTech BD)

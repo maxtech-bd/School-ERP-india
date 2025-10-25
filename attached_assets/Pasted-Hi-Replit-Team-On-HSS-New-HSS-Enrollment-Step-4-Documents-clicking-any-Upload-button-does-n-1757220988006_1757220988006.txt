@@ -1,0 +1,106 @@
+Hi Replit Team,
+
+On HSS → New HSS Enrollment → Step 4 (Documents), clicking any Upload button does nothing. No file picker, no drag-drop, and nothing gets attached to the enrollment.
+
+Expected behavior
+
+Clicking Upload opens a file picker (or accepts drag-drop).
+
+Client validates file type (PDF/JPG/PNG) and size (e.g., ≤ 5–10 MB).
+
+File uploads (with progress bar).
+
+We store the file and save a document record linked to the current enrollmentId and documentType (Previous Records / Birth Certificate / TC / Medical).
+
+On success, show preview/filename + “Replace / Remove”.
+
+Next remains disabled until required documents are uploaded (or marked optional).
+
+Actual
+
+Upload buttons are inert; no file dialog or request.
+
+Likely causes
+
+Buttons missing onClick and hidden <input type="file">.
+
+No upload API or presigned-URL flow wired (/api/files or S3/GCS PUT).
+
+CORS/baseURL blocking the upload request.
+
+Silent errors (promise rejected but not surfaced).
+
+Suggested fixes (front-end pattern)
+// 1) Hidden file input + button
+const fileRef = useRef<HTMLInputElement>(null);
+
+<Button type="button" onClick={() => fileRef.current?.click()}>
+  Upload
+</Button>
+<input
+  ref={fileRef}
+  type="file"
+  accept=".pdf,.jpg,.jpeg,.png"
+  hidden
+  onChange={async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File too large (max 10MB)");
+      return;
+    }
+    await handleUpload(file, "birth_certificate"); // document type
+  }}
+/>
+
+// 2) Upload handler (presigned-url or direct POST)
+async function handleUpload(file: File, docType: string) {
+  try {
+    setUploading(true);
+    // Option A: presigned upload
+    const { data: { uploadUrl, fileUrl } } =
+      await api.post("/api/files/presign", {
+        filename: file.name,
+        contentType: file.type,
+      });
+
+    await fetch(uploadUrl, { method: "PUT", body: file });
+
+    // save metadata against enrollment
+    await api.post("/api/hss/enrollments/" + enrollmentId + "/documents", {
+      type: docType,
+      url: fileUrl,
+      name: file.name,
+      size: file.size
+    });
+
+    toast.success("Document uploaded");
+    refreshDocs();
+  } catch (err:any) {
+    toast.error(err?.response?.data?.message ?? "Upload failed");
+  } finally {
+    setUploading(false);
+  }
+}
+
+Backend endpoints (expected)
+
+POST /api/files/presign → { uploadUrl, fileUrl }
+(or POST /api/files to receive multipart and return { url })
+
+POST /api/hss/enrollments/:id/documents → saves { type, url, name, size }
+
+CORS enabled for the frontend origin.
+
+UX notes
+
+Show per-file progress (0–100%).
+
+Display filename + size + “Replace / Remove”.
+
+Disable Next until all required docs uploaded (or indicate optional).
+
+Could you please wire the Upload buttons to open the file dialog and connect to the upload API as above so documents attach to the enrollment?
+
+Thanks,
+Farid

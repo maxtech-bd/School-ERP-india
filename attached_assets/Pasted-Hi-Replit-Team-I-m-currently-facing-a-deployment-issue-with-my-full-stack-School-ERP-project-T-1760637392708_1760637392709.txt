@@ -1,0 +1,66 @@
+Hi Replit Team 👋,
+
+I’m currently facing a deployment issue with my full-stack School ERP project.
+The app works perfectly in preview mode (URL:
+https://3516d251-7e36-40e8-b0eb-3a3eaa6959f7-00-3t9xpjugl0f0e.pike.replit.dev/login
+)
+but fails to load on the production deployment URL:
+https://erp-jahirvklbd.replit.app
+ → shows only “Not Found”.
+
+🧩 Details:
+
+Build succeeds ✅
+
+Bundle stage completes ✅ (no visible errors)
+
+Deployment promotes successfully
+
+But visiting the deployed domain shows: “Not Found”
+
+🧠 Analysis so far:
+
+Backend (FastAPI + Uvicorn) runs perfectly in preview mode.
+
+Deployment seems unable to detect or serve frontend static files after build.
+
+The app has a frontend/dist React build folder and backend served via Uvicorn on port 5000.
+
+I’ve confirmed .replit configuration uses only one port mapping (5000 → 80).
+
+Using “Reserved VM” (0.5 vCPU / 2 GB RAM) configuration.
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "reserved_vm"
+run = ["sh", "-c", "cd backend && python -m uvicorn server:app --host 0.0.0.0 --port 5000"]
+build = ["sh", "-c", "cd frontend && yarn install && yarn build --no-source-map && cd ../backend && pip install -r requirements.txt"]
+
+
+🔍 Expected Behavior:
+The deployed URL (https://erp-jahirvklbd.replit.app
+) should show the same login page that appears on the preview URL.
+
+⚠️ Actual Behavior:
+The deployment runs, but visiting the production URL only displays:
+
+Not Found
+
+
+💡 What I suspect:
+
+The Uvicorn backend starts correctly, but Replit deployment cannot detect the route because it may not be serving static files (index.html) from /frontend/dist.
+
+Deployment environment behaves differently from the editor preview environment.
+
+Can you please:
+1️⃣ Check the Replit deployment logs for this project (erp-jahirvklbd)
+2️⃣ Confirm whether the backend process is running after deployment
+3️⃣ Let me know if the routing or startup detection is failing internally
+
+Thanks for your help 🙏
+— Farid
+(Project: School ERP | Backend: FastAPI/Uvicorn | Frontend: React)

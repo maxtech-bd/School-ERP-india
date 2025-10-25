@@ -1,0 +1,190 @@
+🧾 SCHOOL ERP — FULL SYSTEM QA & BUG REPORT (FOR REPLIT DEV TEAM)
+
+📅 Date: 20 October 2025
+👤 Reported by: Farid (System QA / Developer, MaxTech BD)
+🧭 Environment: Replit – Pike Deployment
+🌐 Frontend: React + Tailwind
+⚙️ Backend: FastAPI + MongoDB
+📊 Build: Production (School ERP Full System)
+
+🧩 1️⃣ DASHBOARD & SYSTEM CORE
+Issue	Expected	Current Behavior
+Mode toggle (Dark/Light)	Should switch UI theme instantly	❌ No visual change
+Notification button	Show dropdown list of notifications	❌ Only count shown
+Search bar	Should search by student/staff/class	❌ No response
+Quick Action buttons	Redirect to respective forms	❌ No functionality
+Admission Summary sync	New admission should reflect instantly	❌ Not updating Recent Admissions
+🧩 2️⃣ STUDENT MANAGEMENT MODULE
+Issue	Expected	Result
+Upload file box	Selects file & triggers import	❌ Not working
+Download Sample Template	Should download CSV	❌ Not working
+Start Import button	Should process file	❌ Not working
+Choose File button	File dialog opens	✅ Working properly
+🧩 3️⃣ STUDENT ATTENDANCE MODULE
+Issue	Expected	Result
+Invalid input	Should block invalid data	❌ No validation
+Export PDF/Excel	Should export reports	✅ Working
+🧩 4️⃣ STUDENT PHOTO UPLOAD MODULE
+Test	Expected Result	Actual Result
+Page Load	Shows upload box & guidelines	✅ Works
+Upload Without File	Error: “Please select at least one photo”	❌ No message
+File Type Validation	Block PDF & invalid types	❌ No message (accepts file but doesn’t upload)
+File Size Validation	Block >2MB files	❌ No response
+File Name Validation	Match admission number	❌ No validation
+Multiple Upload	Upload multiple files	❌ No action
+Invalid Admission Match	Warning: “No matching student found”	❌ Nothing happens
+Re-Upload / Replace	Update existing photo	❌ No success message
+🧩 5️⃣ CLASS MANAGEMENT MODULE
+Issue	Expected	Result
+Create/Delete Section	Create unique or delete section	❌ Cannot delete/recreate
+Export CSV	Export all class data	✅ Working
+🧩 6️⃣ MARK ATTENDANCE MODULE
+Issue	Expected	Result
+Attendance Count Sync	Dashboard counts update instantly	❌ Delayed/inaccurate
+Attendance Report	Save & retrieve properly	✅ Works
+🧩 7️⃣ STAFF MANAGEMENT MODULE
+Test	Expected	Actual
+Page Load & UI	Loads table + summary	✅ Working
+Summary Cards	Match actual data	✅ OK
+Search	Show matching staff	✅ OK
+Department Filter	Show selected department only	❌ Not working
+Add Staff	Adds new staff	✅ OK
+Form Validation	Show full error messages	❌ Shows only numeric count
+Edit Staff	Allow editing	❌ Not working
+Delete Staff	Delete record	❌ Not working
+Import Staff	Import CSV/Excel	❌ Always errors
+Export Staff	Export CSV/XLSX	✅ OK
+Status Dropdown	“Inactive” tag display	❌ Not showing
+Data Integration	Sync to class management dropdown	✅ Working
+🧩 8️⃣ STAFF ATTENDANCE MODULE
+Issue	Expected	Result
+Department Filter	Filter by department	❌ Always shows all staff
+🧩 9️⃣ LEAVE REQUEST MODULE
+
+✅ All functions working perfectly.
+
+🧩 🔟 HSS MODULE (Higher Secondary Section)
+Enrollment Form
+Issue	Expected	Result
+Dropdown Validation	Block empty fields	❌ Next button works even blank
+Subject Selection	Auto-select mandatory subjects	❌ Not working
+Review Page	Show entered data	❌ Blank
+Validation Message	“Please select class & stream”	❌ Not triggered
+Transfer Certificate
+Issue	Expected	Result
+Generate TC	Create draft successfully	✅ Working
+Status Update	Mark as Issued	❌ No button/function
+Conduct Certificate
+Issue	Expected	Result
+Issue Certificate	Generate & status update	❌ Not working
+Search Field	Background color	⚠️ UI improvement needed
+Consolidated Report
+Issue	Expected	Result
+Generate/Refresh	Show enrolled data	❌ Not working
+Export CSV/PDF	Enable buttons	❌ Disabled (greyed out)
+Set Tags
+Issue	Expected	Result
+Duplicate Tag Validation	Show “Tag already assigned”	❌ Not working
+Other tests	Working	✅ OK
+🧩 1️⃣1️⃣ FEES MANAGEMENT MODULE
+Dashboard
+
+✅ Counts update correctly.
+
+Manage Fees
+Issue	Expected	Result
+Tuition / Transport / Admission fees config	Editable	❌ Not working
+Generate report	Should create report	❌ No action
+Bulk Payment	Show proceed button	❌ Missing button
+Student-Specific Tab
+
+❌ Payment history options not working.
+
+Fee Due Tab
+Issue	Expected	Result
+Dashboard Count	Should update	✅ Works
+Export Button	Should export data	❌ Not working
+Set Reminder	Should trigger notification	❌ Not working
+Fee Collection Tab
+
+✅ “Clear Form” & “Generate Receipt” buttons work properly.
+
+🧩 1️⃣2️⃣ ACCOUNTS MODULE
+
+✅ Almost all functions working.
+⚠️ Bug: Date Picker accepts future dates (should be disabled).
+
+🧩 1️⃣3️⃣ COURSE & CERTIFICATE MODULE
+Section	Issue
+Course Certificates	Generated but always in “Draft”
+Progress Reports	Works but status immutable
+Bonafide Certificates	Auto-filled invalid data + status not editable
+Transfer Certificates	✅ Working fine
+ID Cards	✅ Working fine
+🧩 1️⃣4️⃣ VEHICLE MANAGEMENT MODULE
+
+❌ No functionality works (Vehicle/Route/Assign Student fail to load data).
+
+🧩 1️⃣5️⃣ ACADEMIC CMS / AI / REPORT MODULES
+
+❌ All these modules are non-functional:
+
+Academic Content CMS
+
+AI Assistant
+
+AI Quiz Tool
+
+AI Summary Generator
+
+Report Section
+
+Only static UI components load.
+
+⚙️ SUMMARY OF SYSTEM STATUS
+Module	Working	Partially	Not Working
+Dashboard	⛔	✅	⛔
+Student Mgmt	⛔	✅	⛔
+Attendance	✅	✅	
+Photo Upload		✅	⛔
+Class Mgmt	✅		⛔
+Staff Mgmt	✅	✅	⛔
+HSS	✅	✅	⛔
+Fees	✅	✅	⛔
+Accounts	✅	✅	
+Certificates	✅	✅	⛔
+Vehicle			⛔
+AI / CMS / Report			⛔
+🚨 TOP-PRIORITY FIXES NEEDED
+
+Fix all non-functional buttons (Quick Action, Import, Upload, Save)
+
+Implement form validations (Student, HSS, Staff)
+
+Enable department filter logic in staff attendance
+
+Integrate photo upload validation + feedback toasts
+
+Fix HSS status transitions (Draft → Issued)
+
+React state sync issues between Dashboard ↔ Admission
+
+Enable Fee Module CRUD operations
+
+Fix DatePicker restriction (Accounts module)
+
+✅ Final Recommendations
+
+Run frontend debugging (React DevTools → Console Logs)
+
+Check API binding failures (FastAPI endpoints returning 200/400)
+
+Use toast.success / error handlers for all actions
+
+Re-test with autoscale deployment after fixing Replit build type
+
+Maintain Changelog for all fixed items for next regression test
+
+🔖 Prepared for: Replit Agent / MaxTech DevOps
+📄 Report Prepared by: Farid
+🧠 Purpose: To resolve Replit build deployment + backend API non-binding issues in School ERP Production.

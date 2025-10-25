@@ -1,0 +1,77 @@
+Hello Replit Team,
+
+I’ve tested the Accounts Module in my ERP system, and several key functionalities are missing or non-functional.
+
+🔴 Current Issues:
+
+Transaction Buttons:
+
+Add Transaction → Opens form but data is not saved to backend.
+
+Edit → Not updating records.
+
+Print → Not generating printable/exportable receipts.
+
+Export Table → No export file generated (Excel/PDF missing).
+
+Dashboard Metrics:
+
+Opening Balance, Closing Balance, Total Income, and Total Expenses are static.
+
+They do not update after adding/editing/deleting transactions.
+
+Transaction History:
+
+Transactions are not persisting to the database.
+
+On page reload, data is lost.
+
+✅ Expected Behavior:
+
+Add Transaction:
+
+Should allow adding both Income (student fees, grants, donations) and Expenses (salaries, bills, utilities).
+
+On save → Transaction saved to database, instantly reflected in Transaction History + Dashboard metrics.
+
+Edit Transaction:
+
+Should allow updating description, category, amount, and payment method.
+
+Changes should be persisted and metrics recalculated.
+
+Print / Export:
+
+Print → Generate PDF/printable transaction slips.
+
+Export Table → Export full transaction history to Excel/PDF with proper formatting.
+
+Dashboard Calculations:
+
+Opening Balance → Carried from previous period.
+
+Closing Balance → Auto-calculated: Opening Balance + Total Income – Total Expenses.
+
+Total Income / Expenses → Aggregated from all transactions.
+
+Net Balance → Must update instantly after every transaction.
+
+Filters (Day/Month/Year/Category/Type):
+
+Should allow filtering transactions by date range, category (Fees, Utilities, Salaries), and type (Income/Expense).
+
+Dashboard should refresh dynamically with filtered totals.
+
+🎯 My Request:
+
+Please enable full Accounts Module functionality with backend integration so that:
+
+All transactions persist in the database.
+
+Dashboard metrics auto-refresh in real-time.
+
+Add/Edit/Delete/Print/Export buttons are fully operational.
+
+Reports (Excel/PDF) are downloadable with proper formatting.
+
+This will make the Accounts module a complete financial management tool, aligned with ERP standards.

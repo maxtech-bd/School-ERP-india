@@ -1,0 +1,60 @@
+Subject: Certificates → “Transfer Certificate” selection does nothing after modal
+
+Environment:
+Replit preview · School ERP → Certificates page
+
+Steps to reproduce:
+
+Go to Certificates page.
+
+Click Generate Certificate (modal opens).
+
+Click Transfer Certificate in the modal.
+
+Actual result:
+
+Nothing happens: the modal stays on the same screen, no form/wizard opens, no navigation, no errors shown.
+
+No network requests are fired (or if they are, there’s no UI response).
+
+Expected behavior:
+
+After selecting Transfer Certificate, the app should proceed to the TC creation flow. Either:
+
+Open a TC Wizard (stepper) inside the modal, or
+
+Close the modal and navigate to a new TC page (e.g., /certificates/transfer/new) that shows:
+
+Student selection (search by name/admission no)
+
+Certificate details (admission no, date of admission, last class/section, date of leaving, reason, conduct/remarks, template selector)
+
+Preview & Generate
+
+On Generate, show success toast and redirect back to Certificates list with the new record visible.
+
+If no templates exist, show a friendly prompt to create/select a template (not a dead-end).
+
+What to check (suggested fix points):
+
+Click handler in the modal options: is the onClick for Transfer Certificate wired to navigation or the next modal step?
+
+Route/state: verify a route exists and is reachable (e.g., /certificates/transfer/new) or the compound modal step is implemented.
+
+Guard rails: if templates or prerequisites are missing, show a guided message instead of doing nothing.
+
+Console & Network tab: look for suppressed errors or blocked navigation; verify an API/template bootstrap call isn’t failing silently.
+
+Accessibility overlay: confirm the modal isn’t blocking pointer events to the next UI.
+
+Acceptance criteria:
+
+Selecting Transfer Certificate reliably opens the TC creation flow.
+
+Users can select a student, fill details, select template, preview, and generate.
+
+Success toast shows and the new certificate appears in the list with View / Download PDF / Print actions.
+
+All error states show clear messages (e.g., “No templates found—add one to continue”).
+
+Thanks!

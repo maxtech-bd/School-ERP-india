@@ -1,0 +1,96 @@
+Subject: HSS → Enroll Student shows blank page (no component rendered)
+
+Hi Replit Team,
+
+In my School ERP app, clicking HSS Module → Enroll Student opens a completely blank view—no header, no wizard, nothing. (Screenshot attached.)
+
+Expected
+
+Route /hss/enroll (or /hss/enroll/new) should render the Enrollment screen/wizard:
+
+Step 1: Student lookup or create
+
+Step 2: Academic year, stream/group, class, section
+
+Step 3: Subject selection (with limits)
+
+Step 4: Documents (photo/TC/marksheet)
+
+Step 5: Fees & summary → Submit creates an enrollments record and redirects to details/register with a success toast.
+
+Actual
+
+Page is blank; nothing renders.
+
+Likely causes
+
+Route not mapped (e.g., missing <Route path="enroll" element={<HssEnrollLanding/>} />).
+
+Component import fails or lazy import chunk not loading (check network tab).
+
+Guard/catch-all route intercepting (e.g., ProtectedRoute or Route path="*" placed earlier).
+
+Runtime error suppressed (React error boundary or silent promise rejection).
+
+Button navigates to a path that doesn’t exist (e.g., /hss/enroll vs /hss/enroll/new).
+
+Suggested fixes
+
+1) Hook up the button
+
+// HSS Module header button
+<Button type="button" onClick={() => navigate("/hss/enroll")}>
+  New Enrollment
+</Button>
+
+
+2) Define the routes
+
+<Route path="/hss">
+  <Route index element={<HssDashboard />} />
+  <Route path="enroll" element={
+    <ProtectedRoute roles={['admin','super_admin']}>
+      <HssEnrollLanding /> {/* or NewEnrollmentWizard */}
+    </ProtectedRoute>
+  } />
+  <Route path="enroll/new" element={
+    <ProtectedRoute roles={['admin','super_admin']}>
+      <NewEnrollmentWizard />
+    </ProtectedRoute>
+  } />
+</Route>
+
+
+3) Guard behavior
+
+On 401 → redirect to /login (not dashboard)
+
+On 403 → /403
+
+Do not redirect authorized users away from /hss/enroll
+
+4) Quick diagnostics
+
+Open Console & Network when clicking the menu: any 404 chunk, import error, or React error?
+
+Temporarily render a placeholder:
+
+export default function HssEnrollLanding() {
+  return <div data-test="enroll-ready">Enrollment screen loaded</div>;
+}
+
+
+If this shows, the route works and the issue is inside the wizard component.
+
+5) Backend endpoints to enable (if not already)
+
+GET  /api/hss/lookups          // years, streams, classes, sections, subjects
+POST /api/hss/enrollments      // create enrollment
+GET  /api/hss/enrollments/:id  // view
+POST /api/files                // uploads
+
+
+Could you wire up the route/component so Enroll Student renders the enrollment wizard and persists data as above?
+
+Thanks,
+Farid
