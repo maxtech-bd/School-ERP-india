@@ -15973,11 +15973,13 @@ async def ai_chat(
     2. Uses GPT-4o-mini with context from CMS or standalone if no match
     """
     try:
-        from openai import AsyncOpenAI
+        # from openai import AsyncOpenAI
+        import openai
         import base64
         
         # Initialize OpenAI client
-        openai_client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        # openai_client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         
         question = request.get("question", "")
         question_type = request.get("type", "text")  # text, image, voice
