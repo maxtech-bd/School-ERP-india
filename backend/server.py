@@ -10,6 +10,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import logging
 import uuid
@@ -30,6 +31,13 @@ from twilio.rest import Client
 import io
 import pandas as pd
 import csv
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # বা নির্দিষ্ট frontend URL দিতে পারো
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
