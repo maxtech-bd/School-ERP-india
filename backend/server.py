@@ -170,6 +170,28 @@ class UserLogin(BaseModel):
     password: str
     tenant_id: Optional[str] = None
 
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class UserPasswordReset(BaseModel):
+    new_password: str
+
+class AuditLog(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: Optional[str] = None
+    admin_id: str
+    admin_name: str
+    action: str  # "user_created", "user_updated", "user_suspended", "user_activated", "password_reset", "system_reset"
+    target_user_id: Optional[str] = None
+    target_user_name: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+    ip_address: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 class Tenant(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
@@ -1346,6 +1368,302 @@ async def login_user(login_data: UserLogin):
 @api_router.get("/auth/me")
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
+
+# ==================== USER MANAGEMENT (ADMIN ONLY) ====================
+
+async def log_admin_action(
+    tenant_id: str,
+    admin_id: str,
+    admin_name: str,
+    action: str,
+    target_user_id: Optional[str] = None,
+    target_user_name: Optional[str] = None,
+    details: Optional[Dict[str, Any]] = None,
+    school_id: Optional[str] = None,
+    ip_address: Optional[str] = None
+):
+    """Helper function to log admin actions for audit trail"""
+    audit_log = AuditLog(
+        tenant_id=tenant_id,
+        school_id=school_id,
+        admin_id=admin_id,
+        admin_name=admin_name,
+        action=action,
+        target_user_id=target_user_id,
+        target_user_name=target_user_name,
+        details=details,
+        ip_address=ip_address
+    )
+    await db.audit_logs.insert_one(audit_log.dict())
+    logging.info(f"Audit Log: {admin_name} performed {action} on user {target_user_name or 'N/A'}")
+
+@api_router.get("/admin/users")
+async def get_all_users(current_user: User = Depends(get_current_user)):
+    """Get all users in the system (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can access user management")
+    
+    # Get all users in the tenant
+    users = await db.users.find({"tenant_id": current_user.tenant_id}).to_list(1000)
+    
+    # Remove password_hash from response
+    for user in users:
+        user.pop("password_hash", None)
+    
+    return {"users": users}
+
+@api_router.post("/admin/users")
+async def create_user_by_admin(
+    user_data: UserCreate,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new user (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can create users")
+    
+    # Check if user already exists
+    existing_user = await db.users.find_one({
+        "tenant_id": current_user.tenant_id,
+        "$or": [
+            {"email": user_data.email},
+            {"username": user_data.username}
+        ]
+    })
+    
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email or username already exists")
+    
+    # Hash password and create user
+    hashed_password = hash_password(user_data.password)
+    user_dict = user_data.dict()
+    del user_dict["password"]
+    user_dict["tenant_id"] = current_user.tenant_id
+    
+    user = User(**user_dict)
+    user_doc = user.dict()
+    user_doc["password_hash"] = hashed_password
+    
+    await db.users.insert_one(user_doc)
+    
+    # Log admin action
+    await log_admin_action(
+        tenant_id=current_user.tenant_id,
+        admin_id=current_user.id,
+        admin_name=current_user.full_name,
+        action="user_created",
+        target_user_id=user.id,
+        target_user_name=user.full_name,
+        details={"role": user.role, "email": user.email},
+        school_id=current_user.school_id,
+        ip_address=request.client.host if request.client else None
+    )
+    
+    return {"message": "User created successfully", "user_id": user.id}
+
+@api_router.put("/admin/users/{user_id}")
+async def update_user(
+    user_id: str,
+    user_data: UserUpdate,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user details (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can update users")
+    
+    # Find the user
+    existing_user = await db.users.find_one({
+        "id": user_id,
+        "tenant_id": current_user.tenant_id
+    })
+    
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prepare update data
+    update_data = {k: v for k, v in user_data.dict().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    update_data["updated_at"] = datetime.utcnow()
+    
+    # Update user
+    await db.users.update_one(
+        {"id": user_id, "tenant_id": current_user.tenant_id},
+        {"$set": update_data}
+    )
+    
+    # Log admin action
+    await log_admin_action(
+        tenant_id=current_user.tenant_id,
+        admin_id=current_user.id,
+        admin_name=current_user.full_name,
+        action="user_updated",
+        target_user_id=user_id,
+        target_user_name=existing_user.get("full_name"),
+        details=update_data,
+        school_id=current_user.school_id,
+        ip_address=request.client.host if request.client else None
+    )
+    
+    return {"message": "User updated successfully"}
+
+@api_router.patch("/admin/users/{user_id}/status")
+async def change_user_status(
+    user_id: str,
+    status_data: Dict[str, bool],
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Suspend or activate a user (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can change user status")
+    
+    # Prevent admin from suspending themselves
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="You cannot change your own status")
+    
+    # Find the user
+    existing_user = await db.users.find_one({
+        "id": user_id,
+        "tenant_id": current_user.tenant_id
+    })
+    
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    is_active = status_data.get("is_active")
+    if is_active is None:
+        raise HTTPException(status_code=400, detail="is_active field is required")
+    
+    # Update user status
+    await db.users.update_one(
+        {"id": user_id, "tenant_id": current_user.tenant_id},
+        {"$set": {"is_active": is_active, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Log admin action
+    action = "user_activated" if is_active else "user_suspended"
+    await log_admin_action(
+        tenant_id=current_user.tenant_id,
+        admin_id=current_user.id,
+        admin_name=current_user.full_name,
+        action=action,
+        target_user_id=user_id,
+        target_user_name=existing_user.get("full_name"),
+        details={"is_active": is_active},
+        school_id=current_user.school_id,
+        ip_address=request.client.host if request.client else None
+    )
+    
+    status_text = "activated" if is_active else "suspended"
+    return {"message": f"User {status_text} successfully"}
+
+@api_router.post("/admin/users/{user_id}/reset-password")
+async def reset_user_password(
+    user_id: str,
+    password_data: Dict[str, str],
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Reset user password (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can reset passwords")
+    
+    # Find the user
+    existing_user = await db.users.find_one({
+        "id": user_id,
+        "tenant_id": current_user.tenant_id
+    })
+    
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_password = password_data.get("new_password")
+    if not new_password or len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Hash new password
+    hashed_password = hash_password(new_password)
+    
+    # Update password
+    await db.users.update_one(
+        {"id": user_id, "tenant_id": current_user.tenant_id},
+        {"$set": {"password_hash": hashed_password, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Log admin action
+    await log_admin_action(
+        tenant_id=current_user.tenant_id,
+        admin_id=current_user.id,
+        admin_name=current_user.full_name,
+        action="password_reset",
+        target_user_id=user_id,
+        target_user_name=existing_user.get("full_name"),
+        details={"reset_by": "admin"},
+        school_id=current_user.school_id,
+        ip_address=request.client.host if request.client else None
+    )
+    
+    return {"message": "Password reset successfully"}
+
+@api_router.get("/admin/audit-logs")
+async def get_audit_logs(
+    limit: int = 100,
+    current_user: User = Depends(get_current_user)
+):
+    """Get audit logs (System Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can view audit logs")
+    
+    logs = await db.audit_logs.find(
+        {"tenant_id": current_user.tenant_id}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return {"logs": logs}
+
+@api_router.post("/system/reset")
+async def system_reset(
+    confirmation_data: Dict[str, str],
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Reset system data (Super Admin only) - Clear student data and logs, preserve users"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only System Admins can perform system reset")
+    
+    # Require confirmation
+    confirmation = confirmation_data.get("confirmation")
+    if confirmation != "CONFIRM_RESET":
+        raise HTTPException(status_code=400, detail="Invalid confirmation. Use 'CONFIRM_RESET' to proceed")
+    
+    try:
+        # Delete student data (not users)
+        await db.students.delete_many({"tenant_id": current_user.tenant_id})
+        await db.attendance.delete_many({"tenant_id": current_user.tenant_id})
+        await db.fees.delete_many({"tenant_id": current_user.tenant_id})
+        await db.student_fees.delete_many({"tenant_id": current_user.tenant_id})
+        await db.fee_payments.delete_many({"tenant_id": current_user.tenant_id})
+        await db.student_route_assignments.delete_many({"tenant_id": current_user.tenant_id})
+        
+        # Log admin action
+        await log_admin_action(
+            tenant_id=current_user.tenant_id,
+            admin_id=current_user.id,
+            admin_name=current_user.full_name,
+            action="system_reset",
+            details={"reset_type": "student_data_and_logs"},
+            school_id=current_user.school_id,
+            ip_address=request.client.host if request.client else None
+        )
+        
+        return {"message": "System reset completed successfully. Student data and logs cleared."}
+        
+    except Exception as e:
+        logging.error(f"System reset failed: {e}")
+        raise HTTPException(status_code=500, detail=f"System reset failed: {str(e)}")
 
 # ==================== TENANT MANAGEMENT ====================
 

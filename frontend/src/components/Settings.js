@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import UserManagement from './UserManagement';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -47,7 +48,8 @@ const Settings = () => {
       '/settings/curriculum': 'curriculum',
       '/settings/institution': 'institution',
       '/settings/staff': 'staff-settings',
-      '/settings/permissions': 'permissions'
+      '/settings/permissions': 'permissions',
+      '/settings/users': 'user-management'
     };
     return tabMap[pathname] || 'academic';
   };
@@ -68,7 +70,8 @@ const Settings = () => {
       'curriculum': '/settings/curriculum',
       'institution': '/settings/institution',
       'staff-settings': '/settings/staff',
-      'permissions': '/settings/permissions'
+      'permissions': '/settings/permissions',
+      'user-management': '/settings/users'
     };
     setActiveTab(value);
     navigate(pathMap[value] || '/settings');
@@ -1939,7 +1942,7 @@ const Settings = () => {
 
       {/* Settings Categories Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="academic">Academic Periods</TabsTrigger>
           <TabsTrigger value="classes">Manage Classes</TabsTrigger>
           <TabsTrigger value="timetable">Time Table</TabsTrigger>
@@ -1948,6 +1951,7 @@ const Settings = () => {
           <TabsTrigger value="institution">Institution</TabsTrigger>
           <TabsTrigger value="staff-settings">Staff Settings</TabsTrigger>
           <TabsTrigger value="permissions">Permissions</TabsTrigger>
+          <TabsTrigger value="user-management">User Management</TabsTrigger>
         </TabsList>
 
         <TabsContent value="academic" className="space-y-4">
@@ -2156,6 +2160,10 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="user-management" className="space-y-4">
+          <UserManagement />
         </TabsContent>
       </Tabs>
 
