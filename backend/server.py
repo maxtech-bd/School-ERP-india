@@ -1043,10 +1043,13 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         tenant_id: str = payload.get("tenant_id")
         school_id: str = payload.get("school_id")  # Added school_id support
         
+        logging.info(f"DEBUG JWT Token - user_id: {user_id}, tenant_id: {tenant_id}")
+        
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid authentication credentials")
         
         user = await db.users.find_one({"id": user_id, "tenant_id": tenant_id})
+        logging.info(f"DEBUG MongoDB Query - Looking for user with id='{user_id}', found: {user is not None}")
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         
