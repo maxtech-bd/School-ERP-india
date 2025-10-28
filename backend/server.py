@@ -1836,7 +1836,7 @@ async def get_students(
 
 @api_router.post("/students", response_model=Student)
 async def create_student(student_data: StudentCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Use school_id from JWT context first, then fallback
