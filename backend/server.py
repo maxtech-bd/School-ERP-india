@@ -1868,7 +1868,7 @@ async def update_student(
     student_data: StudentCreate,
     current_user: User = Depends(get_current_user)
 ):
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     existing_student = await db.students.find_one({
@@ -1899,7 +1899,7 @@ async def delete_student(
     student_id: str,
     current_user: User = Depends(get_current_user)
 ):
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     existing_student = await db.students.find_one({
@@ -1924,7 +1924,7 @@ async def bulk_photo_upload(
     current_user: User = Depends(get_current_user)
 ):
     """Upload multiple student photos. File names should match admission numbers."""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     uploaded_count = 0
@@ -1995,7 +1995,7 @@ async def import_students(
     current_user: User = Depends(get_current_user)
 ):
     """Import students from CSV or Excel file"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     try:
@@ -2440,7 +2440,7 @@ async def get_tags(
 @api_router.post("/tags", response_model=Tag)
 async def create_tag(tag_data: TagCreate, current_user: User = Depends(get_current_user)):
     """Create a new tag"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if tag with same name exists
@@ -2478,7 +2478,7 @@ async def update_tag(
     current_user: User = Depends(get_current_user)
 ):
     """Update a tag"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     existing_tag = await db.tags.find_one({
@@ -2517,7 +2517,7 @@ async def update_tag(
 @api_router.delete("/tags/{tag_id}")
 async def delete_tag(tag_id: str, current_user: User = Depends(get_current_user)):
     """Delete a tag"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     existing_tag = await db.tags.find_one({
@@ -2553,7 +2553,7 @@ async def assign_tag_to_student(
     current_user: User = Depends(get_current_user)
 ):
     """Assign a tag to a student"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Verify student exists
@@ -2589,7 +2589,7 @@ async def remove_tag_from_student(
     current_user: User = Depends(get_current_user)
 ):
     """Remove a tag from a student"""
-    if current_user.role not in ["admin", "teacher"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Remove tag from student
@@ -2607,7 +2607,7 @@ async def assign_tag_to_staff(
     current_user: User = Depends(get_current_user)
 ):
     """Assign a tag to a staff member"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Verify staff exists
@@ -2643,7 +2643,7 @@ async def remove_tag_from_staff(
     current_user: User = Depends(get_current_user)
 ):
     """Remove a tag from a staff member"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Remove tag from staff
@@ -5203,7 +5203,7 @@ async def get_sections(class_id: Optional[str] = None, current_user: User = Depe
 
 @api_router.post("/sections", response_model=Section)
 async def create_section(section_data: SectionCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Use school_id from JWT context first, then fallback
@@ -5232,7 +5232,7 @@ async def create_section(section_data: SectionCreate, current_user: User = Depen
 @api_router.put("/classes/{class_id}", response_model=Class)
 async def update_class(class_id: str, class_data: ClassUpdate, current_user: User = Depends(get_current_user)):
     """Update an existing class"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if class exists and belongs to the current tenant
@@ -5267,7 +5267,7 @@ async def update_class(class_id: str, class_data: ClassUpdate, current_user: Use
 @api_router.delete("/classes/{class_id}")
 async def delete_class(class_id: str, current_user: User = Depends(get_current_user)):
     """Delete a class (soft delete by setting is_active to False)"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if class exists and belongs to the current tenant
@@ -5312,7 +5312,7 @@ async def get_timetable_by_class(class_id: str, current_user: User = Depends(get
 @api_router.post("/timetables", response_model=Timetable)
 async def create_timetable(timetable_data: TimetableCreate, current_user: User = Depends(get_current_user)):
     """Create a new timetable"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Get school_id from JWT context first, then fallback
@@ -5401,7 +5401,7 @@ async def create_timetable(timetable_data: TimetableCreate, current_user: User =
 @api_router.put("/timetables/{timetable_id}", response_model=Timetable)
 async def update_timetable(timetable_id: str, timetable_data: TimetableUpdate, current_user: User = Depends(get_current_user)):
     """Update an existing timetable"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if timetable exists and belongs to the current tenant
@@ -5438,7 +5438,7 @@ async def update_timetable(timetable_id: str, timetable_data: TimetableUpdate, c
 @api_router.delete("/timetables/{timetable_id}")
 async def delete_timetable(timetable_id: str, current_user: User = Depends(get_current_user)):
     """Delete a timetable (soft delete by setting is_active to False)"""
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if timetable exists and belongs to the current tenant
