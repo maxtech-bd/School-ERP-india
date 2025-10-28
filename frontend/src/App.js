@@ -182,11 +182,13 @@ const Layout = ({ children }) => {
   
   const isLoginPage = location.pathname === '/login';
   
-  // Prevent scroll-to-top on route change
+  // Smooth scroll to top on route change
   React.useEffect(() => {
     if (mainRef.current && !isLoginPage) {
-      // Preserve scroll position - don't auto-scroll to top
-      return;
+      mainRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   }, [location.pathname, isLoginPage]);
   
