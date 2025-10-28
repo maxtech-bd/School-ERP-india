@@ -1,0 +1,19 @@
+services:
+  - type: static_site
+    name: maxtech-school-erp-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    
+    # SPA routing - redirect all routes to index.html
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    
+    # Environment variables for React
+    envVars:
+      - key: REACT_APP_API_URL
+        value: /api
+      - key: NODE_VERSION
+        value: 20
