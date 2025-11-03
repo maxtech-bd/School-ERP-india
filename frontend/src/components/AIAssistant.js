@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Bot, Send, Mic, Image as ImageIcon, FileText, Volume2, User, Loader, Sparkles } from 'lucide-react';
+import { Bot, Send, Mic, Volume2, User, Loader, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
@@ -11,10 +11,8 @@ export default function AIAssistant() {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [stats, setStats] = useState(null);
+  const [answerSource, setAnswerSource] = useState(''); // '' = All, 'Academic Book', 'Reference Book'
   
-  const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const messagesEndRef = useRef(null);
@@ -27,29 +25,12 @@ export default function AIAssistant() {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/ai-engine/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setStats(response.data);
-    } catch (error) {
-      console.error('Error fetching AI stats:', error);
-    }
-  };
-
   const sendMessage = async () => {
-    if (!inputMessage.trim() && !selectedImage) return;
+    if (!inputMessage.trim()) return;
 
     const userMessage = {
       role: 'user',
       content: inputMessage,
-      image: selectedImage,
       timestamp: new Date().toISOString()
     };
 
@@ -61,11 +42,12 @@ export default function AIAssistant() {
       
       let requestData = {
         question: inputMessage,
-        type: selectedImage ? 'image' : 'text'
+        type: 'text'
       };
 
-      if (selectedImage) {
-        requestData.image = selectedImage.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+      // Add answer source filter if selected
+      if (answerSource) {
+        requestData.answer_source = answerSource;
       }
 
       const response = await axios.post(
@@ -79,14 +61,14 @@ export default function AIAssistant() {
       const aiMessage = {
         role: 'assistant',
         content: response.data.answer,
+        tags: response.data.tags,
+        source: response.data.source,
         tokens: response.data.tokens_used,
         timestamp: response.data.timestamp
       };
 
       setMessages(prev => [...prev, aiMessage]);
       setInputMessage('');
-      setSelectedImage(null);
-      fetchStats();
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = {
@@ -101,53 +83,6 @@ export default function AIAssistant() {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleOCR = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await axios.post(
-        `${API_BASE_URL}/ai-engine/ocr`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-
-      const ocrMessage = {
-        role: 'system',
-        content: `📄 OCR Result:\n\n${response.data.extracted_text}`,
-        timestamp: response.data.timestamp
-      };
-
-      setMessages(prev => [...prev, ocrMessage]);
-      setInputMessage(response.data.extracted_text);
-    } catch (error) {
-      console.error('Error with OCR:', error);
-      alert('OCR processing failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const startRecording = async () => {
     try {
@@ -238,50 +173,29 @@ export default function AIAssistant() {
             <Sparkles className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
-            <p className="text-gray-600">Ask questions, analyze images, or use voice commands</p>
+            <h1 className="text-2xl font-bold text-gray-900">GiNi AI Assistant</h1>
+            <p className="text-gray-600">Ask academic questions and get tag-based answers</p>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Queries</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total_queries}</p>
-                </div>
-                <Bot className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Tokens Used</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total_tokens.toLocaleString()}</p>
-                </div>
-                <Sparkles className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Active Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.unique_users}</p>
-                </div>
-                <User className="h-8 w-8 text-emerald-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Answer Source Filter */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center space-x-4">
+            <label className="text-sm font-medium text-gray-700">Answer Source:</label>
+            <select
+              value={answerSource}
+              onChange={(e) => setAnswerSource(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">All Sources</option>
+              <option value="Academic Book">Academic Books Only</option>
+              <option value="Reference Book">Reference Books Only</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Chat Interface */}
       <Card className="h-[500px] flex flex-col">
@@ -310,23 +224,58 @@ export default function AIAssistant() {
               {message.role !== 'user' && (
                 <div className="flex-shrink-0">
                   <div className="p-2 bg-purple-100 rounded-full">
-                    {message.role === 'system' ? (
-                      <FileText className="h-4 w-4 text-purple-600" />
-                    ) : (
-                      <Bot className="h-4 w-4 text-purple-600" />
-                    )}
+                    <Bot className="h-4 w-4 text-purple-600" />
                   </div>
                 </div>
               )}
               
               <div className={`max-w-[70%] ${message.role === 'user' ? 'bg-emerald-500 text-white' : message.error ? 'bg-red-50 text-red-900' : 'bg-gray-100 text-gray-900'} rounded-lg p-3`}>
-                {message.image && (
-                  <img src={message.image} alt="Upload" className="max-w-full rounded mb-2" />
-                )}
                 <p className="whitespace-pre-wrap">{message.content}</p>
-                {message.tokens && (
-                  <p className="text-xs mt-1 opacity-70">{message.tokens} tokens</p>
+                
+                {/* Display Tags for AI Assistant Responses */}
+                {message.role === 'assistant' && message.tags && !message.error && (
+                  <div className="mt-3 pt-3 border-t border-gray-300">
+                    <p className="text-xs font-semibold mb-2 text-gray-600">📚 Source Tags:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {message.tags.subject && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                          Subject: {message.tags.subject}
+                        </span>
+                      )}
+                      {message.tags.chapter && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                          Chapter: {message.tags.chapter}
+                        </span>
+                      )}
+                      {message.tags.topic && (
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
+                          Topic: {message.tags.topic}
+                        </span>
+                      )}
+                      {message.tags.academic_book && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
+                          📖 Academic Book: {message.tags.academic_book}
+                        </span>
+                      )}
+                      {message.tags.reference_book && (
+                        <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">
+                          📚 Reference Book: {message.tags.reference_book}
+                        </span>
+                      )}
+                      {message.tags.qa_knowledge_base && (
+                        <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                          ❓ Q&A Knowledge Base
+                        </span>
+                      )}
+                      {message.tags.previous_papers && (
+                        <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs">
+                          📝 Previous Papers: {message.tags.previous_papers}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )}
+                
                 {message.role === 'assistant' && !message.error && (
                   <button
                     onClick={() => playVoiceResponse(message.content)}
@@ -366,61 +315,14 @@ export default function AIAssistant() {
         
         {/* Input Area */}
         <div className="border-t p-4">
-          {selectedImage && (
-            <div className="mb-2">
-              <div className="relative inline-block">
-                <img src={selectedImage} alt="Selected" className="max-h-20 rounded" />
-                <button
-                  onClick={() => setSelectedImage(null)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          )}
-          
           <div className="flex space-x-2">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-              accept="image/*"
-              className="hidden"
-            />
-            
-            <input
-              type="file"
-              id="ocr-upload"
-              onChange={handleOCR}
-              accept="image/*"
-              className="hidden"
-            />
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading}
-            >
-              <ImageIcon className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById('ocr-upload')?.click()}
-              disabled={loading}
-            >
-              <FileText className="h-4 w-4" />
-            </Button>
-            
             <Button
               variant="outline"
               size="sm"
               onClick={isRecording ? stopRecording : startRecording}
               disabled={loading}
               className={isRecording ? 'bg-red-100' : ''}
+              title="Voice Input"
             >
               <Mic className={`h-4 w-4 ${isRecording ? 'text-red-600 animate-pulse' : ''}`} />
             </Button>
@@ -430,14 +332,14 @@ export default function AIAssistant() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Ask me anything..."
+              placeholder="Ask academic questions..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               disabled={loading}
             />
             
             <Button
               onClick={sendMessage}
-              disabled={loading || (!inputMessage.trim() && !selectedImage)}
+              disabled={loading || !inputMessage.trim()}
               className="bg-purple-600 hover:bg-purple-700"
             >
               <Send className="h-4 w-4" />

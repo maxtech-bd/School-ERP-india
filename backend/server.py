@@ -16406,49 +16406,65 @@ async def ai_chat(
             }
             
             if answer_source == "Academic Book":
-                # Search ONLY in Academic Books
+                # Search ONLY in Academic Books and their chapters
                 print(f"📚 Searching ONLY in Academic Books...")
-                book_results = await db.academic_books.find({
+                
+                # Search in book chapters for Academic Books
+                chapter_results = await db.book_chapters.find({
                     **search_filter,
+                    "book_type": "academic",
                     "$or": [
-                        {"book_name": {"$regex": question, "$options": "i"}},
-                        {"description": {"$regex": question, "$options": "i"}}
+                        {"chapter_name": {"$regex": question, "$options": "i"}},
+                        {"content": {"$regex": question, "$options": "i"}},
+                        {"keywords": {"$regex": question, "$options": "i"}}
                     ]
                 }).limit(3).to_list(length=3)
                 
-                # Convert academic book results to Q&A format
-                for book in book_results:
+                for chapter in chapter_results:
+                    # Get book name
+                    book = await db.academic_books.find_one({"_id": chapter.get("book_id")})
+                    book_name = book.get("book_name") if book else "Academic Book"
+                    
                     qa_results.append({
                         "question": question,
-                        "answer": f"From Academic Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
-                        "subject": book.get("subject"),
-                        "class_standard": book.get("class_standard"),
-                        "chapter": book.get("chapter_name"),
-                        "book_id": str(book.get("_id")),
-                        "book_type": "Academic Book"
+                        "answer": chapter.get("content", f"Chapter: {chapter.get('chapter_name')}"),
+                        "subject": chapter.get("subject"),
+                        "class_standard": chapter.get("class_standard"),
+                        "chapter_name": chapter.get("chapter_name"),
+                        "book_name": book_name,
+                        "book_type": "Academic Book",
+                        "source_type": "Academic Book"
                     })
                     
             elif answer_source == "Reference Book":
-                # Search ONLY in Reference Books
+                # Search ONLY in Reference Books and their chapters
                 print(f"📖 Searching ONLY in Reference Books...")
-                ref_results = await db.reference_books.find({
+                
+                # Search in book chapters for Reference Books
+                chapter_results = await db.book_chapters.find({
                     **search_filter,
+                    "book_type": "reference",
                     "$or": [
-                        {"book_name": {"$regex": question, "$options": "i"}},
-                        {"description": {"$regex": question, "$options": "i"}}
+                        {"chapter_name": {"$regex": question, "$options": "i"}},
+                        {"content": {"$regex": question, "$options": "i"}},
+                        {"keywords": {"$regex": question, "$options": "i"}}
                     ]
                 }).limit(3).to_list(length=3)
                 
-                # Convert reference book results to Q&A format
-                for book in ref_results:
+                for chapter in chapter_results:
+                    # Get book name
+                    book = await db.reference_books.find_one({"_id": chapter.get("book_id")})
+                    book_name = book.get("book_name") if book else "Reference Book"
+                    
                     qa_results.append({
                         "question": question,
-                        "answer": f"From Reference Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
-                        "subject": book.get("subject"),
-                        "class_standard": book.get("class_standard"),
-                        "chapter": book.get("chapter_name"),
-                        "book_id": str(book.get("_id")),
-                        "book_type": "Reference Book"
+                        "answer": chapter.get("content", f"Chapter: {chapter.get('chapter_name')}"),
+                        "subject": chapter.get("subject"),
+                        "class_standard": chapter.get("class_standard"),
+                        "chapter_name": chapter.get("chapter_name"),
+                        "book_name": book_name,
+                        "book_type": "Reference Book",
+                        "source_type": "Reference Book"
                     })
                     
             else:
@@ -16523,19 +16539,21 @@ async def ai_chat(
                     
                     # Extract tags from best match
                     response_tags["subject"] = best_match.get("subject")
-                    response_tags["chapter"] = best_match.get("chapter") or best_match.get("chapter_name")
-                    response_tags["topic"] = best_match.get("topic")
+                    response_tags["chapter"] = best_match.get("chapter_name") or best_match.get("chapter")
+                    response_tags["topic"] = best_match.get("topic") or best_match.get("topic_title")
                     
-                    # Identify source type
+                    # Identify source type and populate correct tag
                     source_type = best_match.get("source_type", best_match.get("book_type", ""))
-                    if "Academic Book" in source_type:
-                        response_tags["academic_book"] = best_match.get("book_name") or "Academic Book"
-                    elif "Reference Book" in source_type:
-                        response_tags["reference_book"] = best_match.get("book_name") or "Reference Book"
+                    book_name = best_match.get("book_name")
+                    
+                    if "Academic Book" in source_type or source_type == "academic":
+                        response_tags["academic_book"] = book_name if book_name else "Academic Curriculum Book"
+                    elif "Reference Book" in source_type or source_type == "reference":
+                        response_tags["reference_book"] = book_name if book_name else "Reference Book"
                     elif "Q&A Knowledge Base" in source_type:
                         response_tags["qa_knowledge_base"] = "Q&A Knowledge Base"
-                    elif "Previous" in source_type:
-                        response_tags["previous_papers"] = best_match.get("exam_year")
+                    elif "Previous" in source_type or best_match.get("exam_year"):
+                        response_tags["previous_papers"] = best_match.get("exam_year") or "Previous Year Paper"
                     
                     # Log the CMS hit for analytics
                     await db.ai_logs.insert_one({
