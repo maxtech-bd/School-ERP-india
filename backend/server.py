@@ -16338,9 +16338,10 @@ async def ai_chat(
     current_user: User = Depends(get_current_user)
 ):
     """
-    AI Assistant chat endpoint with RAG (Retrieval Augmented Generation)
+    GiNi AI Assistant (Updated) - GPT-4o-mini with Tag-Based Responses and Source Filtering
     1. Searches CMS database for relevant academic content
-    2. Uses GPT-4o-mini with context from CMS or standalone if no match
+    2. Returns structured tag-based responses (Subject, Chapter, Topic, Book Type, etc.)
+    3. Filters answers by selected source (Academic Books OR Reference Books)
     """
     try:
         from openai import AsyncOpenAI
@@ -16350,24 +16351,31 @@ async def ai_chat(
         openai_client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         
         question = request.get("question", "")
-        question_type = request.get("type", "text")  # text, image, voice
-        image_data = request.get("image")  # base64 encoded image
+        question_type = request.get("type", "text")  # text, voice (image/OCR removed)
+        answer_source = request.get("answer_source")  # "Academic Book" or "Reference Book" filter
         subject = request.get("subject")  # Optional subject filter
         class_standard = request.get("class_standard")  # Optional class filter
         
         # DEBUG: Log incoming request
-        print(f"========== AI CHAT REQUEST ==========")
+        print(f"========== GINI AI CHAT REQUEST ==========")
         print(f"User: {current_user.full_name}")
         print(f"Question: {question}")
         print(f"Type: {question_type}")
+        print(f"Answer Source Filter: {answer_source}")
         print(f"Tenant: {current_user.tenant_id}, School: {current_user.school_id}")
-        print(f"=====================================")
-        logger.info(f"AI CHAT - User: {current_user.full_name}, Question: '{question}', Type: {question_type}")
+        print(f"==========================================")
+        logger.info(f"GiNi AI - User: {current_user.full_name}, Question: '{question}', Type: {question_type}, Source: {answer_source}")
         
-        # STEP 1: RAG - Search CMS database for relevant content
-        cms_context = ""
-        cms_matches = []
-        source = "ai_model"  # Default source
+        # STEP 1: RAG - Search CMS database with source filtering
+        response_tags = {
+            "subject": None,
+            "chapter": None,
+            "topic": None,
+            "academic_book": None,
+            "reference_book": None,
+            "qa_knowledge_base": None,
+            "previous_papers": None
+        }
         
         if question and question_type == "text":  # RAG only for text questions
             search_filter = {
@@ -16382,24 +16390,116 @@ async def ai_chat(
                 search_filter["class_standard"] = class_standard
             
             # DEBUG: Log search parameters
-            print(f"🔍 RAG SEARCH - Question: '{question}'")
-            print(f"🔍 RAG FILTER: {search_filter}")
-            logger.info(f"🔍 RAG SEARCH - User: {current_user.full_name}, Question: '{question}'")
-            logger.info(f"🔍 RAG FILTER: {search_filter}")
+            print(f"🔍 RAG SEARCH - Question: '{question}', Source Filter: {answer_source}")
+            logger.info(f"🔍 RAG SEARCH - Question: '{question}', Source Filter: {answer_source}")
             
-            # Build the MongoDB query
-            mongo_query = {
-                **search_filter,
+            # STEP 2: Search based on Answer Source selection
+            qa_results = []
+            
+            # Build search query
+            text_search = {
                 "$or": [
                     {"question": {"$regex": question, "$options": "i"}},
                     {"keywords": {"$regex": question, "$options": "i"}},
                     {"answer": {"$regex": question, "$options": "i"}}
                 ]
             }
-            print(f"🔍 MONGO QUERY: {mongo_query}")
             
-            # Search Q&A pairs first (highest priority)
-            qa_results = await db.qa_pairs.find(mongo_query).limit(3).to_list(length=3)
+            if answer_source == "Academic Book":
+                # Search ONLY in Academic Books
+                print(f"📚 Searching ONLY in Academic Books...")
+                book_results = await db.academic_books.find({
+                    **search_filter,
+                    "$or": [
+                        {"book_name": {"$regex": question, "$options": "i"}},
+                        {"description": {"$regex": question, "$options": "i"}}
+                    ]
+                }).limit(3).to_list(length=3)
+                
+                # Convert academic book results to Q&A format
+                for book in book_results:
+                    qa_results.append({
+                        "question": question,
+                        "answer": f"From Academic Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
+                        "subject": book.get("subject"),
+                        "class_standard": book.get("class_standard"),
+                        "chapter": book.get("chapter_name"),
+                        "book_id": str(book.get("_id")),
+                        "book_type": "Academic Book"
+                    })
+                    
+            elif answer_source == "Reference Book":
+                # Search ONLY in Reference Books
+                print(f"📖 Searching ONLY in Reference Books...")
+                ref_results = await db.reference_books.find({
+                    **search_filter,
+                    "$or": [
+                        {"book_name": {"$regex": question, "$options": "i"}},
+                        {"description": {"$regex": question, "$options": "i"}}
+                    ]
+                }).limit(3).to_list(length=3)
+                
+                # Convert reference book results to Q&A format
+                for book in ref_results:
+                    qa_results.append({
+                        "question": question,
+                        "answer": f"From Reference Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
+                        "subject": book.get("subject"),
+                        "class_standard": book.get("class_standard"),
+                        "chapter": book.get("chapter_name"),
+                        "book_id": str(book.get("_id")),
+                        "book_type": "Reference Book"
+                    })
+                    
+            else:
+                # No filter - Search across all sources
+                print(f"🔍 Searching across ALL sources...")
+                
+                # Q&A Knowledge Base
+                qa_kb_results = await db.qa_knowledge_base.find({**search_filter, **text_search}).limit(2).to_list(length=2)
+                for qa in qa_kb_results:
+                    qa["source_type"] = "Q&A Knowledge Base"
+                    qa_results.append(qa)
+                
+                # Academic Books
+                academic_results = await db.academic_books.find({
+                    **search_filter,
+                    "$or": [
+                        {"book_name": {"$regex": question, "$options": "i"}},
+                        {"description": {"$regex": question, "$options": "i"}}
+                    ]
+                }).limit(1).to_list(length=1)
+                
+                for book in academic_results:
+                    qa_results.append({
+                        "question": question,
+                        "answer": f"From Academic Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
+                        "subject": book.get("subject"),
+                        "class_standard": book.get("class_standard"),
+                        "chapter": book.get("chapter_name"),
+                        "book_type": "Academic Book",
+                        "source_type": "Academic Book"
+                    })
+                
+                # Reference Books
+                reference_results = await db.reference_books.find({
+                    **search_filter,
+                    "$or": [
+                        {"book_name": {"$regex": question, "$options": "i"}},
+                        {"description": {"$regex": question, "$options": "i"}}
+                    ]
+                }).limit(1).to_list(length=1)
+                
+                for book in reference_results:
+                    qa_results.append({
+                        "question": question,
+                        "answer": f"From Reference Book '{book.get('book_name')}': {book.get('description', 'No description available')}",
+                        "subject": book.get("subject"),
+                        "class_standard": book.get("class_standard"),
+                        "chapter": book.get("chapter_name"),
+                        "book_type": "Reference Book",
+                        "source_type": "Reference Book"
+                    })
             
             # DEBUG: Log CMS results
             print(f"📊 CMS RESULTS: Found {len(qa_results)} Q&A pairs")
@@ -16409,29 +16509,33 @@ async def ai_chat(
                 print(f"✅ CMS MATCH: {qa_results[0].get('question', 'No question')}")
                 logger.info(f"✅ CMS MATCH: {qa_results[0].get('question', 'No question')}")
             else:
-                print(f"⚠️ CMS returned 0 results for query: '{question}'")
-                logger.warning(f"⚠️ CMS returned 0 results for query: '{question}'")
-                
-                # Log total Q&A pairs in database for debugging
-                total_qa = await db.qa_pairs.count_documents({"tenant_id": current_user.tenant_id})
-                total_qa_all = await db.qa_pairs.count_documents({})
-                print(f"📈 Total Q&A pairs in tenant: {total_qa}, Total in DB: {total_qa_all}")
-                logger.warning(f"📈 Total Q&A pairs in tenant: {total_qa}, Total in DB: {total_qa_all}")
-                
-                # Get a sample Q&A to see structure
-                sample_qa = await db.qa_pairs.find_one({"tenant_id": current_user.tenant_id})
-                if sample_qa:
-                    print(f"📝 Sample Q&A: {sample_qa.get('question', 'N/A')}, is_active: {sample_qa.get('is_active', 'MISSING')}")
-                    logger.warning(f"📝 Sample Q&A structure: has is_active={sample_qa.get('is_active', 'MISSING')}")
+                print(f"⚠️ CMS returned 0 results for query: '{question}' with source filter: {answer_source}")
+                logger.warning(f"⚠️ CMS returned 0 results for query: '{question}' with source filter: {answer_source}")
             
-            # STEP 2: If CMS match found, return it DIRECTLY (no GPT call)
+            # STEP 3: If CMS match found, extract tags and return with answer
             if qa_results:
                 best_match = qa_results[0]
                 cms_answer = best_match.get('answer', '').strip()
                 
                 if cms_answer:
-                    print(f"✅ CMS MATCH FOUND - Returning direct answer (no GPT used)")
+                    print(f"✅ CMS MATCH FOUND - Returning direct answer with tags (no GPT used)")
                     logger.info(f"✅ CMS MATCH FOUND - Returning direct CMS answer (no GPT call)")
+                    
+                    # Extract tags from best match
+                    response_tags["subject"] = best_match.get("subject")
+                    response_tags["chapter"] = best_match.get("chapter") or best_match.get("chapter_name")
+                    response_tags["topic"] = best_match.get("topic")
+                    
+                    # Identify source type
+                    source_type = best_match.get("source_type", best_match.get("book_type", ""))
+                    if "Academic Book" in source_type:
+                        response_tags["academic_book"] = best_match.get("book_name") or "Academic Book"
+                    elif "Reference Book" in source_type:
+                        response_tags["reference_book"] = best_match.get("book_name") or "Reference Book"
+                    elif "Q&A Knowledge Base" in source_type:
+                        response_tags["qa_knowledge_base"] = "Q&A Knowledge Base"
+                    elif "Previous" in source_type:
+                        response_tags["previous_papers"] = best_match.get("exam_year")
                     
                     # Log the CMS hit for analytics
                     await db.ai_logs.insert_one({
@@ -16446,6 +16550,8 @@ async def ai_chat(
                         "model": "CMS",
                         "tokens_used": 0,
                         "source": "CMS",
+                        "answer_source_filter": answer_source,
+                        "tags": response_tags,
                         "cms_matches_count": len(qa_results),
                         "created_at": datetime.now(timezone.utc)
                     })
@@ -16455,17 +16561,18 @@ async def ai_chat(
                         "answer": cms_answer,
                         "question": question,
                         "source": "CMS",
+                        "tags": response_tags,
                         "cms_matches": len(qa_results),
                         "tokens_used": 0,
                         "timestamp": datetime.now().isoformat()
                     }
         
-        # STEP 3: No CMS match - Fallback to GPT-4o-mini
+        # STEP 4: No CMS match - Fallback to GPT-4o-mini
         print(f"⚠️ CMS NOT FOUND - Sending to GPT-4o-mini")
         logger.info(f"⚠️ No CMS match - Using GPT-4o-mini fallback")
         
         # Build GPT prompt with strict academic-only restriction
-        system_prompt = """You are a School Academic Assistant designed exclusively for educational purposes.
+        system_prompt = """You are GiNi, a School Academic Assistant designed exclusively for educational purposes.
 
 STRICT RULES - YOU MUST FOLLOW THESE:
 1. You may ONLY answer questions related to academic or syllabus subjects:
@@ -16483,28 +16590,15 @@ STRICT RULES - YOU MUST FOLLOW THESE:
    - Simplified summaries for better understanding  
    - Step-by-step explanations when needed
 
-Remember: You are a SCHOOL assistant. Stay strictly within academic boundaries."""
+Remember: You are GiNi, a SCHOOL assistant. Stay strictly within academic boundaries."""
         
         messages = [{"role": "system", "content": system_prompt}]
         
-        # Handle image-based questions (OCR)
-        if question_type == "image" and image_data:
-            messages.append({
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": question or "What is shown in this image?"},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
-                    }
-                ]
-            })
-        else:
-            # Text-based question
-            messages.append({
-                "role": "user",
-                "content": question
-            })
+        # Text-based question only (image/OCR removed as per buyer requirement)
+        messages.append({
+            "role": "user",
+            "content": question
+        })
         
         # STEP 4: Get AI response from GPT
         response = await openai_client.chat.completions.create(
@@ -16536,6 +16630,8 @@ Remember: You are a SCHOOL assistant. Stay strictly within academic boundaries."
             "model": "gpt-4o-mini",
             "tokens_used": response.usage.total_tokens,
             "source": response_source,
+            "answer_source_filter": answer_source,
+            "tags": response_tags,
             "cms_matches_count": 0,
             "is_restricted": is_restricted,
             "restriction_reason": "Non-academic question blocked by AI model" if is_restricted else None,
@@ -16552,6 +16648,7 @@ Remember: You are a SCHOOL assistant. Stay strictly within academic boundaries."
             "answer": ai_answer,
             "question": question,
             "source": response_source,
+            "tags": response_tags,  # Include tags (will be empty for GPT fallback)
             "cms_matches": 0,
             "tokens_used": response.usage.total_tokens,
             "is_restricted": is_restricted,
