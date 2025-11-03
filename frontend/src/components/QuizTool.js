@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BookOpen, Play, RefreshCw, Save, Send, Award, Clock, Target } from 'lucide-react';
+import { BookOpen, Play, RefreshCw, Save, Send, Award, Clock, Target, Pause, PlayCircle, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
@@ -26,6 +26,12 @@ const QuizTool = () => {
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
   const [studentResults, setStudentResults] = useState(null);
+  const [progressData, setProgressData] = useState(null);
+  
+  // Timer state
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerPaused, setTimerPaused] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
   
   const classes = ['9', '10', '11', '12'];
   const subjects = ['Physics', 'Chemistry', 'Biology', 'Math', 'English', 'Computer Science'];
@@ -54,6 +60,9 @@ const QuizTool = () => {
       setQuizStartTime(new Date().toISOString());
       setAnswers({});
       setResults(null);
+      setElapsedTime(0);
+      setTimerRunning(true);
+      setTimerPaused(false);
       setActiveTab('quiz');
       toast.success(`Quiz generated with ${response.data.total_questions} questions!`);
     } catch (error) {
@@ -76,6 +85,10 @@ const QuizTool = () => {
       );
       if (!confirmSubmit) return;
     }
+    
+    // Stop timer when submitting
+    setTimerRunning(false);
+    setTimerPaused(false);
     
     setLoading(true);
     try {
@@ -124,15 +137,66 @@ const QuizTool = () => {
       
       setStudentResults(response.data);
     } catch (error) {
-      toast.error('Failed to fetch results');
+      toast.error('Failed to fetch quiz history');
+      console.error(error);
+    }
+    setLoading(false);
+  };
+
+  // Fetch progress report
+  const fetchProgressReport = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      const user = JSON.parse(userStr);
+      
+      const response = await axios.get(
+        `${API_BASE_URL}/quiz/progress/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      setProgressData(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch progress report');
       console.error(error);
     }
     setLoading(false);
   };
   
+  // Timer effect
   useEffect(() => {
+    let interval = null;
+    if (timerRunning && !timerPaused) {
+      interval = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [timerRunning, timerPaused]);
+  
+  // Format time as MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Stop timer when switching away from quiz tab
+  useEffect(() => {
+    if (activeTab !== 'quiz' && timerRunning) {
+      setTimerRunning(false);
+      setTimerPaused(false);
+    }
+    
     if (activeTab === 'history') {
       fetchStudentResults();
+    } else if (activeTab === 'progress') {
+      fetchProgressReport();
     }
   }, [activeTab]);
   
@@ -195,6 +259,17 @@ const QuizTool = () => {
           >
             <Clock size={18} />
             History
+          </button>
+          <button
+            onClick={() => setActiveTab('progress')}
+            className={`${
+              activeTab === 'progress'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+          >
+            <TrendingUp size={18} />
+            Progress Report
           </button>
         </nav>
       </div>
@@ -335,15 +410,72 @@ const QuizTool = () => {
                 {currentQuiz.total_questions} Questions · {currentQuiz.duration_minutes} Minutes
               </p>
             </div>
-            <button
-              onClick={handleGenerateQuiz}
-              disabled={loading}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
-            >
-              <RefreshCw size={18} />
-              Regenerate
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Timer Display */}
+              <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
+                <Clock size={20} className="text-blue-600" />
+                <span className="font-mono font-bold text-lg text-blue-600">
+                  {formatTime(elapsedTime)}
+                </span>
+              </div>
+              
+              {/* Pause/Continue Timer */}
+              {timerPaused ? (
+                <button
+                  onClick={() => setTimerPaused(false)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                  <PlayCircle size={18} />
+                  Continue
+                </button>
+              ) : (
+                <button
+                  onClick={() => setTimerPaused(true)}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2"
+                >
+                  <Pause size={18} />
+                  Pause
+                </button>
+              )}
+              
+              {/* Stop Quiz Button */}
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to stop the quiz? Your progress will not be saved.')) {
+                    setTimerRunning(false);
+                    setTimerPaused(false);
+                    setElapsedTime(0);
+                    setCurrentQuiz(null);
+                    setAnswers({});
+                    setActiveTab('generate');
+                    toast.info('Quiz stopped');
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+              >
+                <Clock size={18} />
+                Stop Quiz
+              </button>
+              
+              <button
+                onClick={handleGenerateQuiz}
+                disabled={loading}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
+              >
+                <RefreshCw size={18} />
+                Regenerate
+              </button>
+            </div>
           </div>
+          
+          {/* Paused State Overlay */}
+          {timerPaused && (
+            <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <p className="text-orange-800 font-semibold text-center">
+                ⏸ Quiz Paused - Click "Continue" to resume
+              </p>
+            </div>
+          )}
           
           {/* Questions */}
           <div className="space-y-6">
@@ -449,12 +581,174 @@ const QuizTool = () => {
         </div>
       )}
       
+      {/* Progress Report Tab */}
+      {activeTab === 'progress' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-6">Overall Progress Report</h2>
+          
+          {loading ? (
+            <div className="text-center py-12 text-gray-500">Loading progress data...</div>
+          ) : progressData && progressData.overall.total_quizzes > 0 ? (
+            <>
+              {/* Overall Statistics */}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-6 mb-6">
+                <h3 className="text-xl font-bold mb-4">Overall Performance</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <div className="text-sm opacity-90">Total Quizzes</div>
+                    <div className="text-3xl font-bold">{progressData.overall.total_quizzes}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm opacity-90">Average Score</div>
+                    <div className="text-3xl font-bold">{progressData.overall.average_score}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm opacity-90">Best Score</div>
+                    <div className="text-3xl font-bold">{progressData.overall.best_score}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm opacity-90">Accuracy</div>
+                    <div className="text-3xl font-bold">{progressData.overall.accuracy}%</div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-white/20">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="opacity-90">Correct Answers:</span>{' '}
+                      <span className="font-semibold">{progressData.overall.total_correct}</span>
+                    </div>
+                    <div>
+                      <span className="opacity-90">Wrong Answers:</span>{' '}
+                      <span className="font-semibold">{progressData.overall.total_wrong}</span>
+                    </div>
+                    <div>
+                      <span className="opacity-90">Total Questions:</span>{' '}
+                      <span className="font-semibold">{progressData.overall.total_questions}</span>
+                    </div>
+                    {progressData.overall.last_attempt && (
+                      <div>
+                        <span className="opacity-90">Last Attempt:</span>{' '}
+                        <span className="font-semibold">
+                          {new Date(progressData.overall.last_attempt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Subject-wise Breakdown */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Subject-wise Performance</h3>
+                <div className="space-y-4">
+                  {progressData.subject_breakdown.map((subject, idx) => (
+                    <div key={idx} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-semibold text-gray-900">{subject.subject}</h4>
+                        <span className="text-2xl font-bold text-blue-600">{subject.average_score}%</span>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                        <div
+                          className={`h-3 rounded-full ${
+                            subject.average_score >= 80 ? 'bg-green-500' :
+                            subject.average_score >= 60 ? 'bg-blue-500' :
+                            'bg-orange-500'
+                          }`}
+                          style={{ width: `${subject.average_score}%` }}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-4 gap-4 text-sm text-gray-600">
+                        <div>
+                          <span className="font-medium">Quizzes:</span> {subject.total_quizzes}
+                        </div>
+                        <div>
+                          <span className="font-medium">Best:</span>{' '}
+                          <span className="text-green-600">{subject.best_score}%</span>
+                        </div>
+                        <div>
+                          <span className="font-medium">Accuracy:</span> {subject.accuracy}%
+                        </div>
+                        <div>
+                          <span className="font-medium">Questions:</span>{' '}
+                          <span className="text-green-600">{subject.correct_answers}</span>/
+                          <span className="text-red-600">{subject.wrong_answers}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chapter-wise Breakdown */}
+              {progressData.chapter_breakdown.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Chapter-wise Performance</h3>
+                  <div className="space-y-4">
+                    {progressData.chapter_breakdown.map((chapter, idx) => (
+                      <div key={idx} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-3">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{chapter.chapter}</h4>
+                            <p className="text-xs text-gray-500">{chapter.subject}</p>
+                          </div>
+                          <span className="text-2xl font-bold text-purple-600">{chapter.average_score}%</span>
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                          <div
+                            className={`h-3 rounded-full ${
+                              chapter.average_score >= 80 ? 'bg-green-500' :
+                              chapter.average_score >= 60 ? 'bg-purple-500' :
+                              'bg-orange-500'
+                            }`}
+                            style={{ width: `${chapter.average_score}%` }}
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-4 gap-4 text-sm text-gray-600">
+                          <div>
+                            <span className="font-medium">Quizzes:</span> {chapter.total_quizzes}
+                          </div>
+                          <div>
+                            <span className="font-medium">Best:</span>{' '}
+                            <span className="text-green-600">{chapter.best_score}%</span>
+                          </div>
+                          <div>
+                            <span className="font-medium">Accuracy:</span> {chapter.accuracy}%
+                          </div>
+                          <div>
+                            <span className="font-medium">Questions:</span>{' '}
+                            <span className="text-green-600">{chapter.correct_answers}</span>/
+                            <span className="text-red-600">{chapter.wrong_answers}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No quiz data available yet. Complete some quizzes to see your progress!</p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* History Tab */}
       {activeTab === 'history' && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Quiz History</h2>
           
-          {studentResults && studentResults.total_quizzes > 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-gray-500">Loading history...</div>
+          ) : studentResults && studentResults.total_quizzes > 0 ? (
             <>
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
@@ -472,20 +766,50 @@ const QuizTool = () => {
                 </div>
               </div>
               
-              {/* Submission List */}
+              {/* Enhanced Submission List */}
               <div className="space-y-3">
-                {studentResults.submissions.slice(0, 10).map((sub, idx) => (
-                  <div key={sub.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">Quiz #{studentResults.total_quizzes - idx}</h4>
-                        <p className="text-sm text-gray-600">
-                          {new Date(sub.created_at).toLocaleDateString()} · {sub.time_taken_minutes.toFixed(1)} minutes
-                        </p>
+                {studentResults.submissions.map((sub, idx) => (
+                  <div key={sub.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            {sub.subject}
+                          </h4>
+                          {sub.chapter && sub.chapter !== 'N/A' && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                              {sub.chapter}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+                          <div>
+                            <span className="font-medium">Date & Time:</span> {new Date(sub.created_at).toLocaleString()}
+                          </div>
+                          <div>
+                            <span className="font-medium">Score:</span>{' '}
+                            <span className="text-blue-600 font-semibold">{sub.percentage}%</span> (Grade: {sub.grade})
+                          </div>
+                          <div>
+                            <span className="font-medium">Correct:</span>{' '}
+                            <span className="text-green-600">{sub.correct_answers}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium">Wrong:</span>{' '}
+                            <span className="text-red-600">{sub.wrong_answers}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xl font-bold text-blue-600">{sub.percentage}%</div>
-                        <div className="text-sm text-gray-600">Grade: {sub.grade}</div>
+                      
+                      <div className="text-right ml-4">
+                        <div className={`text-3xl font-bold ${
+                          sub.percentage >= 80 ? 'text-green-600' : 
+                          sub.percentage >= 60 ? 'text-blue-600' : 
+                          'text-orange-600'
+                        }`}>
+                          {sub.percentage}%
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -495,7 +819,7 @@ const QuizTool = () => {
           ) : (
             <div className="text-center py-12 text-gray-500">
               <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p>No quiz history yet. Start practicing!</p>
+              <p>No quiz attempts yet. Complete a quiz to see your progress here!</p>
             </div>
           )}
         </div>

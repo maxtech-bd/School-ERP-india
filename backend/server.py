@@ -17467,7 +17467,7 @@ async def submit_quiz(
         submitted_at = datetime.now(timezone.utc)
         time_taken = (submitted_at - started_at).total_seconds() / 60  # minutes
         
-        # Save submission
+        # Save submission with quiz metadata (subject, chapter, topic)
         submission_id = str(uuid.uuid4())
         submission_doc = {
             "id": submission_id,
@@ -17478,12 +17478,17 @@ async def submit_quiz(
             "student_id": current_user.id,
             "student_name": current_user.full_name,
             "student_class": quiz.get("class_standard"),
+            "subject": quiz.get("subject", ""),
+            "chapter": quiz.get("chapter", ""),
+            "topic": quiz.get("topic", ""),
             "started_at": started_at,
             "submitted_at": submitted_at,
             "time_taken_minutes": round(time_taken, 2),
             "answers": graded_answers,
             "total_marks": total_marks,
             "marks_obtained": marks_obtained,
+            "correct_answers": sum(1 for a in graded_answers if a["is_correct"]),
+            "wrong_answers": sum(1 for a in graded_answers if not a["is_correct"]),
             "percentage": round(percentage, 2),
             "grade": grade,
             "status": "graded",
@@ -17519,7 +17524,7 @@ async def get_quiz_results(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get student quiz results and progress
+    Get student quiz results and progress (history tab)
     """
     try:
         # Fetch all quiz submissions for student
@@ -17532,7 +17537,21 @@ async def get_quiz_results(
         
         submissions = []
         async for sub in submissions_cursor:
-            submissions.append(sub)
+            # Convert datetime to ISO string for JSON serialization
+            sub_copy = {
+                "id": str(sub.get("_id", sub.get("id", ""))),
+                "subject": sub.get("subject", "N/A"),
+                "chapter": sub.get("chapter", "N/A"),
+                "topic": sub.get("topic", ""),
+                "percentage": sub.get("percentage", 0),
+                "grade": sub.get("grade", "F"),
+                "correct_answers": sub.get("correct_answers", 0),
+                "wrong_answers": sub.get("wrong_answers", 0),
+                "total_questions": sub.get("correct_answers", 0) + sub.get("wrong_answers", 0),
+                "time_taken_minutes": sub.get("time_taken_minutes", 0),
+                "created_at": sub["created_at"].isoformat() if isinstance(sub.get("created_at"), datetime) else sub.get("created_at")
+            }
+            submissions.append(sub_copy)
         
         # Calculate statistics
         total_quizzes = len(submissions)
@@ -17554,6 +17573,137 @@ async def get_quiz_results(
     except Exception as e:
         logger.error(f"Quiz results error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch quiz results")
+
+@api_router.get("/quiz/progress/{student_id}")
+async def get_quiz_progress(
+    student_id: str,
+    filter_by: Optional[str] = None,  # 'subject' or 'chapter'
+    filter_value: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get overall progress report with subject/chapter filtering
+    """
+    try:
+        # Build query
+        query = {
+            "tenant_id": current_user.tenant_id,
+            "school_id": current_user.school_id,
+            "student_id": student_id,
+            "assessment_type": "quiz"
+        }
+        
+        # Apply filter
+        if filter_by == "subject" and filter_value:
+            query["subject"] = filter_value
+        elif filter_by == "chapter" and filter_value:
+            query["chapter"] = filter_value
+        
+        # Fetch all submissions
+        submissions_cursor = db.assessment_submissions.find(query).sort("created_at", -1)
+        submissions = await submissions_cursor.to_list(length=1000)
+        
+        # Overall statistics
+        total_quizzes = len(submissions)
+        avg_score = sum(s.get("percentage", 0) for s in submissions) / total_quizzes if total_quizzes > 0 else 0
+        best_score = max((s.get("percentage", 0) for s in submissions), default=0)
+        total_correct = sum(s.get("correct_answers", 0) for s in submissions)
+        total_wrong = sum(s.get("wrong_answers", 0) for s in submissions)
+        total_questions = total_correct + total_wrong
+        accuracy = (total_correct / total_questions * 100) if total_questions > 0 else 0
+        last_attempt = submissions[0]["created_at"].isoformat() if submissions and isinstance(submissions[0].get("created_at"), datetime) else None
+        
+        # Subject-wise breakdown
+        subject_stats = {}
+        for sub in submissions:
+            subject = sub.get("subject", "N/A")
+            if subject not in subject_stats:
+                subject_stats[subject] = {
+                    "subject": subject,
+                    "total_quizzes": 0,
+                    "total_correct": 0,
+                    "total_wrong": 0,
+                    "scores": []
+                }
+            subject_stats[subject]["total_quizzes"] += 1
+            subject_stats[subject]["total_correct"] += sub.get("correct_answers", 0)
+            subject_stats[subject]["total_wrong"] += sub.get("wrong_answers", 0)
+            subject_stats[subject]["scores"].append(sub.get("percentage", 0))
+        
+        # Calculate subject averages and accuracy
+        subject_breakdown = []
+        for subject, stats in subject_stats.items():
+            avg = sum(stats["scores"]) / len(stats["scores"]) if stats["scores"] else 0
+            total_qs = stats["total_correct"] + stats["total_wrong"]
+            acc = (stats["total_correct"] / total_qs * 100) if total_qs > 0 else 0
+            subject_breakdown.append({
+                "subject": subject,
+                "total_quizzes": stats["total_quizzes"],
+                "average_score": round(avg, 2),
+                "best_score": max(stats["scores"]) if stats["scores"] else 0,
+                "accuracy": round(acc, 2),
+                "total_questions": total_qs,
+                "correct_answers": stats["total_correct"],
+                "wrong_answers": stats["total_wrong"]
+            })
+        
+        # Chapter-wise breakdown
+        chapter_stats = {}
+        for sub in submissions:
+            chapter = sub.get("chapter", "N/A")
+            if chapter and chapter != "N/A":
+                if chapter not in chapter_stats:
+                    chapter_stats[chapter] = {
+                        "chapter": chapter,
+                        "subject": sub.get("subject", "N/A"),
+                        "total_quizzes": 0,
+                        "total_correct": 0,
+                        "total_wrong": 0,
+                        "scores": []
+                    }
+                chapter_stats[chapter]["total_quizzes"] += 1
+                chapter_stats[chapter]["total_correct"] += sub.get("correct_answers", 0)
+                chapter_stats[chapter]["total_wrong"] += sub.get("wrong_answers", 0)
+                chapter_stats[chapter]["scores"].append(sub.get("percentage", 0))
+        
+        # Calculate chapter averages and accuracy
+        chapter_breakdown = []
+        for chapter, stats in chapter_stats.items():
+            avg = sum(stats["scores"]) / len(stats["scores"]) if stats["scores"] else 0
+            total_qs = stats["total_correct"] + stats["total_wrong"]
+            acc = (stats["total_correct"] / total_qs * 100) if total_qs > 0 else 0
+            chapter_breakdown.append({
+                "chapter": chapter,
+                "subject": stats["subject"],
+                "total_quizzes": stats["total_quizzes"],
+                "average_score": round(avg, 2),
+                "best_score": max(stats["scores"]) if stats["scores"] else 0,
+                "accuracy": round(acc, 2),
+                "total_questions": total_qs,
+                "correct_answers": stats["total_correct"],
+                "wrong_answers": stats["total_wrong"]
+            })
+        
+        return {
+            "success": True,
+            "overall": {
+                "total_quizzes": total_quizzes,
+                "average_score": round(avg_score, 2),
+                "best_score": round(best_score, 2),
+                "accuracy": round(accuracy, 2),
+                "total_correct": total_correct,
+                "total_wrong": total_wrong,
+                "total_questions": total_questions,
+                "last_attempt": last_attempt
+            },
+            "subject_breakdown": sorted(subject_breakdown, key=lambda x: x["average_score"], reverse=True),
+            "chapter_breakdown": sorted(chapter_breakdown, key=lambda x: x["average_score"], reverse=True),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Quiz progress error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch quiz progress")
 
 # Test Generator APIs (Teacher/Admin Panel)
 
