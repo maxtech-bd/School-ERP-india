@@ -26,9 +26,10 @@ Preferred communication style: Simple, everyday language.
 - **Comprehensive Modules**: Student admissions, attendance, fee management, curriculum, transport, biometric device integration, staff management, certificate generation, and AI modules.
 - **AI Assistant Module**: GPT-4o-mini powered chatbot with multi-modal capabilities (text, OCR, voice input/output), academic focus, CMS-first approach, RAG, Academic CMS for knowledge base management.
 - **AI Quiz Tool (Student Panel)**: AI-powered quiz generation with customizable filters, learning dimension tags, CMS-first question selection, auto-grading, instant feedback, and quiz history.
-- **AI Test Generator (Teacher/Admin Panel)**: AI-powered test generation with curriculum alignment, mixed question types, preview/edit, scheduling, draft mode, and auto-grading.
+- **AI Test Generator (Teacher/Admin Panel)**: AI-powered test generation with curriculum alignment, mixed question types, inline question editing, preview/edit, maximum marks configuration per subject, scheduling, draft mode, and auto-grading. Teachers can edit questions directly with save/cancel controls.
 - **AI Summary Generator**: Generates structured summaries for academic content using a 3-tier RAG CMS-first strategy.
 - **AI Notes Generator**: Generates detailed study notes with examples and practice questions using a 3-tier RAG CMS-first strategy.
+- **GiNi School Dashboard**: Professional analytics dashboard with real-time usage statistics for all AI modules (AI Assistant, Quiz, Test Generator, Summary, Notes). Features include: 4 summary cards (Total Students Using AI, Total AI Interactions, Active Classes, Weekly Growth), dynamic filters (Week/Month, Class, Subject), module tabs for drill-down analysis, three interactive charts (Usage Trend line chart, Class-wise bar chart, Subject-wise bar chart), detailed data table, and export options (PDF, Excel, Share Report). Fully responsive design matching buyer specifications.
 - **Professional Reporting**: Robust report generation with PDF/Excel export, school-branded templates, and dynamic school information.
 - **Fee Engine**: Manages fee configuration, automatic student fee generation, payment collection, and real-time fee due tracking.
 - **Student Route Assignment**: Allows assigning students to transport routes with dynamic route and boarding point selection.
