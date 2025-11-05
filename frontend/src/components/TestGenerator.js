@@ -18,11 +18,16 @@ const TestGenerator = () => {
     topic: '',
     difficulty_level: 'medium',
     num_questions: 10,
+    max_marks: 100,
     tags: []
   });
   
   // Generated test
   const [generatedTest, setGeneratedTest] = useState(null);
+  
+  // Question editing
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [editedQuestion, setEditedQuestion] = useState(null);
   
   // Scheduling
   const [scheduleForm, setScheduleForm] = useState({
@@ -88,6 +93,83 @@ const TestGenerator = () => {
       fetchTests();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to publish test');
+      console.error(error);
+    }
+    setLoading(false);
+  };
+  
+  // Start editing a question
+  const handleEditQuestion = (question) => {
+    setEditingQuestionId(question.id);
+    setEditedQuestion({...question});
+  };
+  
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingQuestionId(null);
+    setEditedQuestion(null);
+  };
+  
+  // Save edited question
+  const handleSaveQuestion = async () => {
+    if (!editedQuestion) return;
+    
+    // Validation
+    if (!editedQuestion.question_text.trim()) {
+      toast.error('Question text cannot be empty');
+      return;
+    }
+    if (!editedQuestion.correct_answer.trim()) {
+      toast.error('Correct answer cannot be empty');
+      return;
+    }
+    if (editedQuestion.marks <= 0) {
+      toast.error('Marks must be greater than 0');
+      return;
+    }
+    
+    // Validate MCQ options
+    if (editedQuestion.question_type === 'mcq') {
+      if (!editedQuestion.options || editedQuestion.options.length === 0) {
+        toast.error('MCQ questions must have options');
+        return;
+      }
+      const hasEmptyOption = editedQuestion.options.some(opt => !opt.text.trim());
+      if (hasEmptyOption) {
+        toast.error('All options must have text');
+        return;
+      }
+    }
+    
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${API_BASE_URL}/test/question/${editedQuestion.id}`,
+        {
+          question_text: editedQuestion.question_text,
+          options: editedQuestion.options,
+          correct_answer: editedQuestion.correct_answer,
+          marks: editedQuestion.marks,
+          question_type: editedQuestion.question_type,
+          learning_tag: editedQuestion.learning_tag
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      // Update local state
+      const updatedQuestions = generatedTest.questions.map(q =>
+        q.id === editedQuestion.id ? editedQuestion : q
+      );
+      setGeneratedTest({...generatedTest, questions: updatedQuestions});
+      
+      toast.success('Question updated successfully!');
+      setEditingQuestionId(null);
+      setEditedQuestion(null);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update question');
       console.error(error);
     }
     setLoading(false);
@@ -256,6 +338,19 @@ const TestGenerator = () => {
                 className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
+            
+            {/* Maximum Marks */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Maximum Marks</label>
+              <input
+                type="number"
+                min="10"
+                max="500"
+                value={testForm.max_marks}
+                onChange={(e) => setTestForm({...testForm, max_marks: parseInt(e.target.value)})}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
           </div>
           
           {/* Learning Tags */}
@@ -311,7 +406,7 @@ const TestGenerator = () => {
               <div>
                 <h2 className="text-xl font-semibold">{generatedTest.title}</h2>
                 <p className="text-sm text-gray-600">
-                  {generatedTest.total_questions} Questions · Status: {generatedTest.status}
+                  {generatedTest.total_questions} Questions · Maximum Marks: {generatedTest.max_marks || 100} · Status: {generatedTest.status}
                 </p>
               </div>
               <button
@@ -356,54 +451,174 @@ const TestGenerator = () => {
             <div className="space-y-4">
               {generatedTest.questions.map((q, idx) => (
                 <div key={q.id} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium">Q{idx + 1}.</span>
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                          {q.learning_tag}
-                        </span>
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                          {q.marks} marks
-                        </span>
+                  {editingQuestionId === q.id && editedQuestion ? (
+                    // Edit Mode
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Q{idx + 1}.</span>
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                            {editedQuestion.learning_tag}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleSaveQuestion}
+                            disabled={loading}
+                            className="px-3 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-gray-400 text-sm"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-gray-800 mb-2">{q.question_text}</p>
                       
-                      {/* Options for MCQ */}
-                      {q.question_type === 'mcq' && q.options && q.options.length > 0 && (
-                        <div className="mt-2 space-y-1">
-                          {q.options.map((opt) => (
-                            <div
-                              key={opt.id}
-                              className={`text-sm px-3 py-2 rounded ${
-                                opt.id === q.correct_answer
-                                  ? 'bg-emerald-50 border border-emerald-300 font-medium'
-                                  : 'bg-gray-50'
-                              }`}
-                            >
-                              {opt.id}. {opt.text}
-                              {opt.id === q.correct_answer && (
-                                <span className="ml-2 text-emerald-600">✓ Correct</span>
-                              )}
+                      {/* Question Text */}
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Question Text</label>
+                        <textarea
+                          value={editedQuestion.question_text}
+                          onChange={(e) => setEditedQuestion({...editedQuestion, question_text: e.target.value})}
+                          className="w-full px-3 py-2 border rounded-lg"
+                          rows="3"
+                        />
+                      </div>
+                      
+                      {/* Marks */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Marks</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={editedQuestion.marks}
+                            onChange={(e) => setEditedQuestion({...editedQuestion, marks: parseInt(e.target.value)})}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Question Type</label>
+                          <select
+                            value={editedQuestion.question_type}
+                            onChange={(e) => setEditedQuestion({...editedQuestion, question_type: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          >
+                            <option value="mcq">Multiple Choice</option>
+                            <option value="short_answer">Short Answer</option>
+                            <option value="long_answer">Long Answer</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      {/* MCQ Options */}
+                      {editedQuestion.question_type === 'mcq' && (
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Options</label>
+                          {editedQuestion.options && editedQuestion.options.map((opt, optIdx) => (
+                            <div key={opt.id} className="flex items-center gap-2 mb-2">
+                              <span className="font-medium">{opt.id}.</span>
+                              <input
+                                type="text"
+                                value={opt.text}
+                                onChange={(e) => {
+                                  const newOptions = [...editedQuestion.options];
+                                  newOptions[optIdx].text = e.target.value;
+                                  setEditedQuestion({...editedQuestion, options: newOptions});
+                                }}
+                                className="flex-1 px-3 py-2 border rounded-lg"
+                              />
+                              <input
+                                type="radio"
+                                name="correct_answer"
+                                checked={editedQuestion.correct_answer === opt.id}
+                                onChange={() => setEditedQuestion({...editedQuestion, correct_answer: opt.id})}
+                                className="w-5 h-5"
+                              />
+                              <span className="text-sm text-gray-600">Correct</span>
                             </div>
                           ))}
                         </div>
                       )}
                       
-                      {/* Answer for non-MCQ */}
-                      {q.question_type !== 'mcq' && (
-                        <div className="mt-2 text-sm bg-emerald-50 border border-emerald-200 rounded p-2">
-                          <span className="font-medium text-emerald-700">Answer:</span> {q.correct_answer}
+                      {/* Non-MCQ Answer */}
+                      {editedQuestion.question_type !== 'mcq' && (
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Correct Answer</label>
+                          <textarea
+                            value={editedQuestion.correct_answer}
+                            onChange={(e) => setEditedQuestion({...editedQuestion, correct_answer: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-lg"
+                            rows="2"
+                          />
                         </div>
                       )}
                     </div>
-                    <button
-                      className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded"
-                      title="Remove question"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
+                  ) : (
+                    // View Mode
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium">Q{idx + 1}.</span>
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                            {q.learning_tag}
+                          </span>
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                            {q.marks} marks
+                          </span>
+                        </div>
+                        <p className="text-gray-800 mb-2">{q.question_text}</p>
+                        
+                        {/* Options for MCQ */}
+                        {q.question_type === 'mcq' && q.options && q.options.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {q.options.map((opt) => (
+                              <div
+                                key={opt.id}
+                                className={`text-sm px-3 py-2 rounded ${
+                                  opt.id === q.correct_answer
+                                    ? 'bg-emerald-50 border border-emerald-300 font-medium'
+                                    : 'bg-gray-50'
+                                }`}
+                              >
+                                {opt.id}. {opt.text}
+                                {opt.id === q.correct_answer && (
+                                  <span className="ml-2 text-emerald-600">✓ Correct</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Answer for non-MCQ */}
+                        {q.question_type !== 'mcq' && (
+                          <div className="mt-2 text-sm bg-emerald-50 border border-emerald-200 rounded p-2">
+                            <span className="font-medium text-emerald-700">Answer:</span> {q.correct_answer}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => handleEditQuestion(q)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                          title="Edit question"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          className="p-2 text-red-600 hover:bg-red-50 rounded"
+                          title="Remove question"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -423,23 +638,32 @@ const TestGenerator = () => {
         </div>
       )}
       
-      {/* All Tests Tab */}
+      {/* All Tests Tab (History) */}
       {activeTab === 'list' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">All Tests</h2>
+          <h2 className="text-lg font-semibold mb-4">Test History</h2>
           
-          {tests.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-gray-500">
+              <p>Loading tests...</p>
+            </div>
+          ) : tests.length > 0 ? (
             <div className="space-y-3">
               {tests.map((test) => (
                 <div key={test.id} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-medium">{test.title}</h4>
-                      <p className="text-sm text-gray-600">
-                        {test.total_questions} Questions · {test.difficulty_level} Level
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className={`text-xs px-2 py-1 rounded ${
+                    <div className="flex-1">
+                      <h4 className="font-medium text-lg">{test.title || `${test.subject} Test`}</h4>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-sm text-gray-600">
+                        <p><span className="font-medium">Subject:</span> {test.subject}</p>
+                        <p><span className="font-medium">Total Questions:</span> {test.total_questions}</p>
+                        <p><span className="font-medium">Maximum Marks:</span> {test.max_marks || 100}</p>
+                        <p><span className="font-medium">Difficulty:</span> {test.difficulty_level}</p>
+                        <p><span className="font-medium">Date & Time:</span> {new Date(test.created_at).toLocaleString()}</p>
+                        <p><span className="font-medium">Created By:</span> {test.created_by_name}</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${
                           test.status === 'published'
                             ? 'bg-emerald-100 text-emerald-700'
                             : test.status === 'draft'
@@ -456,10 +680,6 @@ const TestGenerator = () => {
                         )}
                       </div>
                     </div>
-                    <div className="text-right text-sm text-gray-600">
-                      <p>Created by: {test.created_by_name}</p>
-                      <p>{new Date(test.created_at).toLocaleDateString()}</p>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -467,7 +687,7 @@ const TestGenerator = () => {
           ) : (
             <div className="text-center py-12 text-gray-500">
               <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p>No tests created yet. Start by generating a test!</p>
+              <p className="font-medium">No tests found. Generate a new test to view history here!</p>
             </div>
           )}
         </div>

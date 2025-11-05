@@ -17730,6 +17730,7 @@ async def generate_test(
         topic = request.get("topic")
         difficulty_level = request.get("difficulty_level", "medium")
         num_questions = request.get("num_questions", 10)
+        max_marks = request.get("max_marks", 100)
         tags = request.get("tags", [])
         
         print(f"========== TEST GENERATION REQUEST ==========")
@@ -17994,6 +17995,7 @@ Format as JSON array:
             "topic": topic or "",
             "difficulty_level": difficulty_level,
             "total_questions": len(questions),
+            "max_marks": max_marks,
             "duration_minutes": len(questions) * 3,
             "tags": tags,
             "generated_by": generated_by,
@@ -18127,6 +18129,99 @@ async def list_tests(
     except Exception as e:
         logger.error(f"Test list error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch tests")
+
+@api_router.put("/test/question/{question_id}")
+async def update_test_question(
+    question_id: str,
+    request: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Update an individual test question
+    """
+    try:
+        # Only teachers and admins can edit questions
+        if current_user.role not in ["teacher", "admin", "super_admin"]:
+            raise HTTPException(status_code=403, detail="Only teachers and admins can edit questions")
+        
+        # Extract update fields
+        update_data = {}
+        question_type = request.get("question_type")
+        
+        if "question_text" in request:
+            if not request["question_text"].strip():
+                raise HTTPException(status_code=400, detail="Question text cannot be empty")
+            update_data["question_text"] = request["question_text"]
+        
+        if "options" in request:
+            update_data["options"] = request["options"]
+        
+        if "correct_answer" in request:
+            if not request["correct_answer"].strip():
+                raise HTTPException(status_code=400, detail="Correct answer cannot be empty")
+            update_data["correct_answer"] = request["correct_answer"]
+        
+        if "marks" in request:
+            if request["marks"] <= 0:
+                raise HTTPException(status_code=400, detail="Marks must be greater than 0")
+            update_data["marks"] = request["marks"]
+        
+        if "question_type" in request:
+            update_data["question_type"] = request["question_type"]
+        
+        if "difficulty_level" in request:
+            update_data["difficulty_level"] = request["difficulty_level"]
+        
+        if "learning_tag" in request:
+            update_data["learning_tag"] = request["learning_tag"]
+        
+        # Validate MCQ questions
+        if question_type == "mcq":
+            options = request.get("options", [])
+            if not options or len(options) == 0:
+                raise HTTPException(status_code=400, detail="MCQ questions must have options")
+            
+            for opt in options:
+                if not opt.get("text", "").strip():
+                    raise HTTPException(status_code=400, detail="All MCQ options must have text")
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        # Update the question
+        result = await db.assessment_questions.update_one(
+            {
+                "id": question_id,
+                "tenant_id": current_user.tenant_id,
+                "school_id": current_user.school_id
+            },
+            {"$set": update_data}
+        )
+        
+        # Check if question exists (matched_count == 0 means not found)
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Question not found")
+        
+        # If matched but not modified, it means no changes were made (success, but informational)
+        if result.modified_count == 0:
+            print(f"ℹ️ Question {question_id} matched but no changes detected")
+        
+        print(f"✅ Question updated: {question_id}")
+        
+        return {
+            "success": True,
+            "question_id": question_id,
+            "message": "Question updated successfully",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Question update error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update question")
 
 @api_router.post("/test/submit")
 async def submit_test(
