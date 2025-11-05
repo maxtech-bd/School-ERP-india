@@ -80,6 +80,23 @@ DEFAULT_SCHOOL_ID = "demo-school-001"
 app = FastAPI(title="School ERP API", version="1.0.0")
 api_router = APIRouter(prefix="/api")
 
+# Root route redirect to help users find the frontend
+@app.get("/")
+async def root():
+    """
+    Root endpoint - redirects users to the frontend application.
+    This API runs on port 8000 and serves only API endpoints.
+    The frontend UI is accessible on port 5000 (or via the Replit webview).
+    """
+    return {
+        "message": "Welcome to MaxTech BD School ERP API",
+        "status": "running",
+        "version": "1.0.0",
+        "frontend_access": "Please access the application via the Replit Webview or port 5000",
+        "api_docs": "/docs",
+        "api_endpoints": "/api/*"
+    }
+
 # ==================== TENANT CONTEXT ====================
 
 class TenantContext:
