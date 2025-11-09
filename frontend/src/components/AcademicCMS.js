@@ -382,7 +382,7 @@ const AcademicCMS = () => {
       const response = await axios.get(`${API_BASE_URL}/cms/reference-books`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setReferenceBooks(response.data.books || []);
+      setReferenceBooks(response.data || []);
     } catch (error) {
       toast.error('Failed to load reference books');
       console.error(error);
@@ -458,7 +458,7 @@ const AcademicCMS = () => {
       const response = await axios.get(`${API_BASE_URL}/cms/previous-year-papers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setPreviousPapers(response.data.papers || []);
+      setPreviousPapers(response.data || []);
     } catch (error) {
       toast.error('Failed to load previous year papers');
       console.error(error);
