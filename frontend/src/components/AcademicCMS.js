@@ -97,7 +97,7 @@ const AcademicCMS = () => {
     subject: '',
     class_standard: '',
     chapter: '',
-    exam_year: new Date().getFullYear(),
+    exam_year: new Date().getFullYear().toString(),
     paper_type: 'Final Exam',
     file_url: ''
   });
@@ -493,7 +493,7 @@ const AcademicCMS = () => {
         subject: '',
         class_standard: '',
         chapter: '',
-        exam_year: new Date().getFullYear(),
+        exam_year: new Date().getFullYear().toString(),
         paper_type: 'Final Exam',
         file_url: ''
       });
@@ -1433,7 +1433,7 @@ const AcademicCMS = () => {
                       type="number"
                       placeholder="Exam Year *"
                       value={paperForm.exam_year}
-                      onChange={(e) => setPaperForm({...paperForm, exam_year: parseInt(e.target.value)})}
+                      onChange={(e) => setPaperForm({...paperForm, exam_year: e.target.value})}
                       className="w-full px-3 py-2 border rounded-lg"
                       min="2000"
                       max={new Date().getFullYear()}

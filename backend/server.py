@@ -41,6 +41,49 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# ==================== MongoDB Serialization Utility ====================
+def sanitize_mongo_data(data: Any) -> Any:
+    """
+    Recursively sanitize MongoDB documents for JSON serialization.
+    - Removes '_id' field (ObjectId cannot be serialized)
+    - Converts datetime objects to ISO strings
+    - Handles single documents, lists, and nested structures
+    """
+    from bson import ObjectId
+    
+    if data is None:
+        return None
+    
+    if isinstance(data, list):
+        return [sanitize_mongo_data(item) for item in data]
+    
+    if isinstance(data, dict):
+        clean_doc = {}
+        for key, value in data.items():
+            # Skip MongoDB's internal _id field
+            if key == '_id':
+                continue
+            # Recursively sanitize nested structures
+            if isinstance(value, dict):
+                clean_doc[key] = sanitize_mongo_data(value)
+            elif isinstance(value, list):
+                clean_doc[key] = sanitize_mongo_data(value)
+            elif isinstance(value, ObjectId):
+                clean_doc[key] = str(value)
+            elif isinstance(value, datetime):
+                clean_doc[key] = value.isoformat()
+            else:
+                clean_doc[key] = value
+        return clean_doc
+    
+    # Handle ObjectId and datetime at root level
+    if isinstance(data, ObjectId):
+        return str(data)
+    if isinstance(data, datetime):
+        return data.isoformat()
+    
+    return data
+
 # Security
 security = HTTPBearer()
 
@@ -19242,7 +19285,7 @@ async def get_academic_books(
             query["subject"] = subject
         
         books = await db.academic_books.find(query).sort("class_standard", 1).to_list(1000)
-        return books
+        return sanitize_mongo_data(books)
     except Exception as e:
         logger.error(f"Error fetching academic books: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch academic books")
@@ -19270,7 +19313,7 @@ async def create_academic_book(
         })
         
         await db.academic_books.insert_one(book_data)
-        return book_data
+        return sanitize_mongo_data(book_data)
     except Exception as e:
         logger.error(f"Error creating academic book: {e}")
         raise HTTPException(status_code=500, detail="Failed to create academic book")
@@ -19351,7 +19394,7 @@ async def get_reference_books(
             query["subject"] = subject
         
         books = await db.reference_books.find(query).sort("class_standard", 1).to_list(1000)
-        return books
+        return sanitize_mongo_data(books)
     except Exception as e:
         logger.error(f"Error fetching reference books: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch reference books")
@@ -19379,10 +19422,7 @@ async def create_reference_book(
         })
         
         result = await db.reference_books.insert_one(book_data)
-        # Remove MongoDB _id before returning
-        if '_id' in book_data:
-            del book_data['_id']
-        return book_data
+        return sanitize_mongo_data(book_data)
     except Exception as e:
         logger.error(f"Error creating reference book: {e}")
         raise HTTPException(status_code=500, detail="Failed to create reference book")
@@ -19685,7 +19725,7 @@ async def get_previous_year_papers(
             query["paper_type"] = paper_type
         
         papers = await db.previous_year_papers.find(query).sort("exam_year", -1).to_list(1000)
-        return papers
+        return sanitize_mongo_data(papers)
     except Exception as e:
         logger.error(f"Error fetching previous year papers: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch previous year papers")
@@ -19713,10 +19753,7 @@ async def create_previous_year_paper(
         })
         
         result = await db.previous_year_papers.insert_one(paper_data)
-        # Remove MongoDB _id before returning
-        if '_id' in paper_data:
-            del paper_data['_id']
-        return paper_data
+        return sanitize_mongo_data(paper_data)
     except Exception as e:
         logger.error(f"Error creating previous year paper: {e}")
         raise HTTPException(status_code=500, detail="Failed to create previous year paper")
