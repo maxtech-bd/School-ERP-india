@@ -5324,17 +5324,19 @@ async def upload_file(
         # Determine resource type based on file type
         resource_type = "image" if file.content_type.startswith("image/") else "raw"
         
-        # Extract clean filename without extension
+        # Extract filename components
         original_filename = Path(file.filename).stem
         file_extension = Path(file.filename).suffix
         
-        # Upload to Cloudinary with tenant-specific folder and explicit filename
+        # Upload to Cloudinary with tenant-specific folder and explicit filename (including extension)
         folder = f"school-erp/{current_user.tenant_id}"
+        unique_filename = f"{original_filename}_{uuid.uuid4().hex[:8]}{file_extension}"
+        
         upload_result = cloudinary.uploader.upload(
             io.BytesIO(file_content),
             folder=folder,
             resource_type=resource_type,
-            public_id=f"{original_filename}_{uuid.uuid4().hex[:8]}",
+            public_id=unique_filename,
             overwrite=False
         )
         
