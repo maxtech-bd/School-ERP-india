@@ -1019,6 +1019,9 @@ class ReferenceBookCreate(BaseModel):
     description: Optional[str] = None
     cover_image_url: Optional[str] = None
     pdf_url: Optional[str] = None
+    file_url: Optional[str] = None
+    chapter: Optional[str] = None
+    board: Optional[str] = None
 
 # Chapter model (shared by both Academic and Reference Books)
 class BookChapter(BaseModel):
@@ -1135,6 +1138,8 @@ class PreviousYearPaperCreate(BaseModel):
     total_marks: Optional[int] = None
     description: Optional[str] = None
     pdf_url: Optional[str] = None
+    file_url: Optional[str] = None
+    chapter: Optional[str] = None
 
 # Questions and Solutions for Previous Year Papers
 class PaperQuestion(BaseModel):
@@ -5319,14 +5324,18 @@ async def upload_file(
         # Determine resource type based on file type
         resource_type = "image" if file.content_type.startswith("image/") else "raw"
         
-        # Upload to Cloudinary with tenant-specific folder
+        # Extract clean filename without extension
+        original_filename = Path(file.filename).stem
+        file_extension = Path(file.filename).suffix
+        
+        # Upload to Cloudinary with tenant-specific folder and explicit filename
         folder = f"school-erp/{current_user.tenant_id}"
         upload_result = cloudinary.uploader.upload(
             io.BytesIO(file_content),
             folder=folder,
             resource_type=resource_type,
-            use_filename=True,
-            unique_filename=True
+            public_id=f"{original_filename}_{uuid.uuid4().hex[:8]}",
+            overwrite=False
         )
         
         # Extract file URL and public ID from Cloudinary response
