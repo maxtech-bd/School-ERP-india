@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   BookOpen,
   Sparkles,
@@ -33,11 +33,7 @@ const AISummary = () => {
   const [filterSubject, setFilterSubject] = useState("");
   const [filterChapter, setFilterChapter] = useState(""); // NEW: chapter-wise filter
 
-  useEffect(() => {
-    fetchSummaries();
-  }, [filterClass, filterSubject, filterChapter, fetchSummaries]); // include chapter in dependency
-
-  const fetchSummaries = async () => {
+  const fetchSummaries = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -59,7 +55,11 @@ const AISummary = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterClass, filterSubject, filterChapter]);
+
+  useEffect(() => {
+    fetchSummaries();
+  }, [fetchSummaries]);
 
   const handleGenerate = async () => {
     if (!formData.class_standard || !formData.subject) {

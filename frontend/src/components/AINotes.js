@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   FileText,
   Sparkles,
@@ -29,11 +29,7 @@ const AINotes = () => {
   const [filterSubject, setFilterSubject] = useState("");
   const [filterChapter, setFilterChapter] = useState(""); // NEW: chapter filter
 
-  useEffect(() => {
-    fetchNotes();
-  }, [filterClass, filterSubject, filterChapter, fetchNotes]); // include chapter
-
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -58,7 +54,11 @@ const AINotes = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterClass, filterSubject, filterChapter]);
+
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   const handleGenerate = async () => {
     if (!formData.class_standard || !formData.subject) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   Activity,
@@ -36,22 +36,7 @@ export default function AILogs() {
     reference_books: [],
   });
 
-  useEffect(() => {
-    fetchFilterOptions();
-    fetchLogs();
-  }, [
-    contentSource,
-    subject,
-    chapter,
-    topic,
-    referenceBook,
-    sortOrder,
-    currentPage,
-    fetchFilterOptions,
-    fetchLogs,
-  ]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -83,9 +68,9 @@ export default function AILogs() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [contentSource, subject, chapter, topic, referenceBook, sortOrder, currentPage]);
 
-  const fetchFilterOptions = async () => {
+  const fetchFilterOptions = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const params = new URLSearchParams();
@@ -124,7 +109,12 @@ export default function AILogs() {
         reference_books: [],
       });
     }
-  };
+  }, [contentSource, subject, chapter, referenceBook]);
+
+  useEffect(() => {
+    fetchFilterOptions();
+    fetchLogs();
+  }, [fetchFilterOptions, fetchLogs]);
 
   const resetFilters = () => {
     setContentSource("");

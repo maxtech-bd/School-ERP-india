@@ -18809,6 +18809,7 @@ Use simple language and include definitions where necessary."""
 async def list_summaries(
     class_standard: Optional[str] = None,
     subject: Optional[str] = None,
+    chapter: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     """Get list of generated summaries with filters"""
@@ -18823,6 +18824,8 @@ async def list_summaries(
             filter_query["class_standard"] = class_standard
         if subject:
             filter_query["subject"] = subject
+        if chapter:
+            filter_query["chapter"] = chapter
         
         summaries_cursor = db.ai_summaries.find(filter_query).sort("created_at", -1).limit(50)
         summaries = []
@@ -19144,6 +19147,7 @@ Use clear language, proper formatting, and include diagrams descriptions where h
 async def list_notes(
     class_standard: Optional[str] = None,
     subject: Optional[str] = None,
+    chapter: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     """Get list of generated notes with filters"""
@@ -19158,6 +19162,8 @@ async def list_notes(
             filter_query["class_standard"] = class_standard
         if subject:
             filter_query["subject"] = subject
+        if chapter:
+            filter_query["chapter"] = chapter
         
         notes_cursor = db.ai_notes.find(filter_query).sort("created_at", -1).limit(50)
         notes = []
