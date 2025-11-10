@@ -149,7 +149,7 @@ const AcademicCMS = () => {
       const response = await axios.get(`${API_BASE_URL}/cms/qa-pairs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setQaPairs(response.data.qa_pairs || []);
+      setQaPairs(response.data || []);  // Backend returns array directly, not wrapped
     } catch (error) {
       toast.error("Failed to load Q&A pairs");
       console.error(error);

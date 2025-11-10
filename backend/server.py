@@ -16303,15 +16303,21 @@ async def bulk_upload_qa_pairs(
         
         # Validate required columns (aligned with QAKnowledgeBaseCreate model)
         required_columns = ['question', 'answer', 'class_standard', 'subject', 'chapter_topic']
-        missing_columns = [col for col in required_columns if col.lower().replace('_', ' ') not in [c.lower().replace('_', ' ') for c in df.columns]]
+        df_columns_lower = [c.lower().strip() for c in df.columns]
+        missing_columns = []
+        for col in required_columns:
+            # Check both with underscore and with space
+            if col.lower() not in df_columns_lower and col.lower().replace('_', ' ') not in df_columns_lower:
+                missing_columns.append(col)
+        
         if missing_columns:
             raise HTTPException(
                 status_code=400, 
-                detail=f"Missing required columns: {', '.join(required_columns)}. Please download the sample template."
+                detail=f"Missing required columns: {', '.join(missing_columns)}. File has: {', '.join(df.columns.tolist())}. Please download the sample template."
             )
         
-        # Normalize column names to lowercase
-        df.columns = [col.lower().strip() for col in df.columns]
+        # Normalize column names to lowercase and replace spaces with underscores for consistency
+        df.columns = [col.lower().strip().replace(' ', '_') for col in df.columns]
         
         # Process and validate rows
         successful_count = 0
