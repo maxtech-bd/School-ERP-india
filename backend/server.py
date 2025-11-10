@@ -19931,6 +19931,105 @@ async def delete_paper_question(
         logger.error(f"Error deleting paper question: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete paper question")
 
+# ==================== Q&A KNOWLEDGE BASE MANAGEMENT ====================
+
+@api_router.get("/cms/qa-pairs")
+async def get_qa_pairs(current_user: User = Depends(get_current_user)):
+    """Get all Q&A knowledge base entries"""
+    try:
+        query = {
+            "tenant_id": current_user.tenant_id,
+            "school_id": current_user.school_id,
+            "is_active": True
+        }
+        qa_pairs = await db.qa_knowledge_base.find(query).to_list(1000)
+        return sanitize_mongo_data(qa_pairs)
+    except Exception as e:
+        logger.error(f"Error fetching Q&A pairs: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch Q&A pairs")
+
+@api_router.post("/cms/qa-pairs")
+async def create_qa_pair(
+    qa_data: QAKnowledgeBaseCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new Q&A knowledge base entry"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher"]:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        qa_dict = qa_data.dict()
+        qa_dict.update({
+            "id": str(uuid.uuid4()),
+            "tenant_id": current_user.tenant_id,
+            "school_id": current_user.school_id,
+            "tags": ["Q&A Knowledge Base"],
+            "is_active": True,
+            "created_by": current_user.id,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        })
+        
+        result = await db.qa_knowledge_base.insert_one(qa_dict)
+        return sanitize_mongo_data(qa_dict)
+    except Exception as e:
+        logger.error(f"Error creating Q&A pair: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create Q&A pair")
+
+@api_router.put("/cms/qa-pairs/{qa_id}")
+async def update_qa_pair(
+    qa_id: str,
+    qa_data: QAKnowledgeBaseCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a Q&A knowledge base entry"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher"]:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        update_data = qa_data.dict()
+        update_data["updated_at"] = datetime.utcnow()
+        
+        result = await db.qa_knowledge_base.update_one(
+            {"id": qa_id, "tenant_id": current_user.tenant_id, "school_id": current_user.school_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Q&A pair not found")
+        
+        return {"message": "Q&A pair updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating Q&A pair: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update Q&A pair")
+
+@api_router.delete("/cms/qa-pairs/{qa_id}")
+async def delete_qa_pair(
+    qa_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a Q&A knowledge base entry (soft delete)"""
+    try:
+        if current_user.role not in ["super_admin", "admin"]:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        result = await db.qa_knowledge_base.update_one(
+            {"id": qa_id, "tenant_id": current_user.tenant_id, "school_id": current_user.school_id},
+            {"$set": {"is_active": False, "updated_at": datetime.utcnow()}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Q&A pair not found")
+        
+        return {"message": "Q&A pair deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting Q&A pair: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete Q&A pair")
+
 # ==================== CMS DASHBOARD & HIERARCHICAL NAVIGATION ====================
 
 @api_router.get("/cms/dashboard")
