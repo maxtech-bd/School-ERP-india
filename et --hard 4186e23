@@ -1,0 +1,62 @@
+* [33mfaf5120[m[33m ([m[1;31morigin/update-branch[m[33m, [m[1;32mupdate-branch[m[33m)[m update
+* [33m7bb58cb[m Transitioned from Plan to Build mode
+* [33mb366eff[m Saved progress at the end of the loop
+* [33m00f55dd[m Saved progress at the end of the loop
+* [33m6cebdf7[m Add management of Q&A knowledge base entries and their content
+* [33ma592ef3[m update
+* [33mbaa6566[m Add cloudinary dependency to requirements.txt
+[31m|[m * [33m418e623[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Save all local updates before rebase
+[31m|[m [32m|[m *   [33m4482808[m[33m ([m[1;32mreplit-agent[m[33m)[m Improve handling of Q&A knowledge base uploads and displays
+[31m|[m [32m|[m [33m|[m[32m\[m  
+[31m|[m [32m|[m [33m|[m[32m/[m  
+[31m|[m [32m|[m[32m/[m[33m|[m   
+[31m|[m * [33m|[m [33m278092d[m[33m ([m[1;31mgitsafe-backup/main[m[33m)[m Improve handling of Q&A knowledge base uploads and displays
+[31m|[m [34m|[m *   [33m5f1ac62[m Update UI components and state management for academic content
+[31m|[m [34m|[m [35m|[m[34m\[m  
+[31m|[m [34m|[m [35m|[m[34m/[m  
+[31m|[m [34m|[m[34m/[m[35m|[m   
+[31m|[m * [35m|[m [33m4a661c8[m Update UI components and state management for academic content
+[31m|[m [36m|[m *   [33mf2f7f08[m Saved progress at the end of the loop
+[31m|[m [36m|[m [1;31m|[m[36m\[m  
+[31m|[m [36m|[m [1;31m|[m[36m/[m  
+[31m|[m [36m|[m[36m/[m[1;31m|[m   
+[31m|[m * [1;31m|[m [33m5bb4917[m Saved progress at the end of the loop
+[31m|[m [1;32m|[m *   [33m765f76a[m Add file upload functionality for academic books
+[31m|[m [1;32m|[m [1;33m|[m[1;32m\[m  
+[31m|[m [1;32m|[m [1;33m|[m[1;32m/[m  
+[31m|[m [1;32m|[m[1;32m/[m[1;33m|[m   
+[31m|[m * [1;33m|[m [33m94e3ef1[m Add file upload functionality for academic books
+[31m|[m [1;34m|[m *   [33m2bd08b0[m Update bulk upload functionality to include new required fields
+[31m|[m [1;34m|[m [1;35m|[m[1;34m\[m  
+[31m|[m [1;34m|[m [1;35m|[m[1;34m/[m  
+[31m|[m [1;34m|[m[1;34m/[m[1;35m|[m   
+[31m|[m * [1;35m|[m [33me01f939[m Update bulk upload functionality to include new required fields
+[31m|[m [1;36m|[m *   [33m08d2671[m Update form and API for Q&A and book uploads
+[31m|[m [1;36m|[m [31m|[m[1;36m\[m  
+[31m|[m [1;36m|[m [31m|[m[1;36m/[m  
+[31m|[m [1;36m|[m[1;36m/[m[31m|[m   
+[31m|[m * [31m|[m [33m1565adf[m Update form and API for Q&A and book uploads
+[31m|[m [32m|[m *   [33m1b9d59e[m Transitioned from Plan to Build mode
+[31m|[m [32m|[m [33m|[m[32m\[m  
+[31m|[m [32m|[m [33m|[m[32m/[m  
+[31m|[m [32m|[m[32m/[m[33m|[m   
+[31m|[m * [33m|[m [33m3701384[m Transitioned from Plan to Build mode
+[31m|[m [34m|[m *   [33md90311a[m Saved progress at the end of the loop
+[31m|[m [34m|[m [35m|[m[34m\[m  
+[31m|[m [34m|[m [35m|[m[34m/[m  
+[31m|[m [34m|[m[34m/[m[35m|[m   
+[31m|[m * [35m|[m [33m52a72a2[m Saved progress at the end of the loop
+[31m|[m [36m|[m *   [33md0af29a[m Saved progress at the end of the loop
+[31m|[m [36m|[m [1;31m|[m[36m\[m  
+[31m|[m [36m|[m [1;31m|[m[36m/[m  
+[31m|[m [36m|[m[36m/[m[1;31m|[m   
+[31m|[m * [1;31m|[m [33mfc95ebe[m Saved progress at the end of the loop
+[31m|[m [1;32m|[m *   [33m207fc70[m Add management of Q&A knowledge base entries and their content
+[31m|[m [1;32m|[m [1;33m|[m[1;32m\[m  
+[31m|[m [1;32m|[m [1;33m|[m[1;32m/[m  
+[31m|[m [1;32m|[m[1;32m/[m[1;33m|[m   
+[31m|[m * [1;33m|[m [33m3496986[m Add management of Q&A knowledge base entries and their content
+[31m|[m [1;34m|[m *   [33mf92c206[m Add cloud file storage integration for media uploads and management
+[31m|[m [1;34m|[m [1;35m|[m[1;34m\[m  
+[31m|[m [1;34m|[m [1;35m|[m[1;34m/[m  
+[31m|[m [1;34m|[m[1;34m/[m[1;35m|[m   

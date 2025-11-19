@@ -1,0 +1,59 @@
+[33mfaf5120[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mupdate-branch[m[33m, [m[1;31morigin/update-branch[m[33m)[m update
+[33m7bb58cb[m Transitioned from Plan to Build mode
+[33mb366eff[m Saved progress at the end of the loop
+[33m00f55dd[m Saved progress at the end of the loop
+[33m6cebdf7[m Add management of Q&A knowledge base entries and their content
+[33ma592ef3[m update
+[33mbaa6566[m Add cloudinary dependency to requirements.txt
+[33m1e3c30f[m Improve file uploads to include public access and overwrite options
+[33m7fffed7[m Saved progress at the end of the loop
+[33m6435332[m Update file upload to include correct file extension
+[33m8bebb21[m Improve file upload functionality by adding support for image files
+[33mbd90498[m Add new fields and improve file upload handling for books
+[33m8cdd74d[m Add images to enhance documentation and user understanding
+[33m43f475d[m Upload files to Cloudinary using byte streams
+[33m47c9666[m Update image assets for a better user experience
+[33m1b4cc7e[m Saved progress at the end of the loop
+[33m5c1c81a[m Saved progress at the end of the loop
+[33m84bcba7[m Add ability to upload various types of files directly to the website interface
+[33maecf3d3[m Update how reference book and previous year paper data is displayed
+[33m96044e3[m Add image upload functionality using Cloudinary
+[33meb31dd5[m Add Cloudinary integration for enhanced file uploads
+[33m2a1c26b[m Saved progress at the end of the loop
+[33m5955d09[m Add utility to serialize MongoDB data and fix exam year input type
+[33mddc05e6[m Improve data handling for creating reference books and papers
+[33m0175ba1[m Improve error messages displayed to users during content management
+[33m8978090[m Saved progress at the end of the loop
+[33mc4e314e[m Add functionality to organize reference books and previous year papers by class and subject
+[33ma65013e[m Improve component performance by optimizing asynchronous data fetching
+[33m22a86b1[m Add chapter filtering to AI log, notes, and summary features
+[33me4adf4b[m Saved progress after completing a task
+[33mce56bbf[m Improve data fetching by including necessary functions in dependency arrays
+[33m54774c0[m Add chapter filters to AI modules and expand content source filtering
+[33mbfbf73e[m Saved progress at the end of the loop
+[33m17ba191[m Enhance academic content management and AI module features
+[33mb130e4d[m Update academic content module with hierarchical navigation and improved filtering
+[33m63ddb26[m Add reference books and previous question papers to academic content
+[33mdd94677[m Update file upload limits and accepted file types
+[33md202676[m Transitioned from Plan to Build mode
+[33m42d8088[m Add default super admin user for initial setup
+[33mfde350b[m Implement mobile shop inventory and billing automation features
+[33m57bad76[m Push all updates from last 3 days — GiNi Dashboard, AI Test Generator, Activity Logs, and Quiz fixes
+[33me20cf75[m Add detailed analytics dashboard for AI module usage
+[33m4a7d97c[m Add ability to download data from tables to CSV files
+[33mc90ca9b[m Enhance dashboard with new data visualizations and interactive features
+[33m21f93de[m Add new image asset for visual content
+[33m88b686b[m Add a root endpoint to display API status and frontend access information
+[33m4e55270[m Update dependencies to their latest stable versions
+[33m18ff796[m Add an image file to the project's assets
+[33me0d1642[m Add improved accessibility features to enhance user experience
+[33m7acabf8[m Enhance test generation and dashboard analytics features
+[33m32a44ba[m Update documentation for all project modules and components
+[33m35480e4[m Restored to 'a67516160faa73b38596769268bd0932d6a3944f'
+[33me781ab0[m Add an image file to support project documentation
+[33ma8bfc6b[m Update documentation with latest project guidelines and best practices
+[33m0042da3[m Add new image asset for the application interface
+[33me26e79a[m Improve question editing and add subject-wise maximum marks for tests
+[33m1f8b632[m Improve test generation and editing features
+[33ma675161[m Improve quiz history display and add progress reporting
+[33m1ec0bac[m Improve quiz tool with history, progress reports, and timer functionality
