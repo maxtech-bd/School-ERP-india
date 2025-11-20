@@ -27,7 +27,7 @@ export default function AILogs() {
   const [sortOrder, setSortOrder] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Available filter options (initialize as arrays to avoid undefined)
+  // Available filter options
   const [filterOptions, setFilterOptions] = useState({
     content_sources: [],
     subjects: [],
@@ -68,7 +68,15 @@ export default function AILogs() {
     } finally {
       setLoading(false);
     }
-  }, [contentSource, subject, chapter, topic, referenceBook, sortOrder, currentPage]);
+  }, [
+    contentSource,
+    subject,
+    chapter,
+    topic,
+    referenceBook,
+    sortOrder,
+    currentPage,
+  ]);
 
   const fetchFilterOptions = useCallback(async () => {
     try {
@@ -122,6 +130,7 @@ export default function AILogs() {
     setChapter("");
     setTopic("");
     setReferenceBook("");
+    setSortOrder("latest");
     setCurrentPage(1);
   };
 
@@ -140,6 +149,11 @@ export default function AILogs() {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // Merge fixed sources (All/Academic/Reference) with dynamic API sources
+  const dynamicSources = (filterOptions.content_sources || []).filter(
+    (s) => s !== "Academic Book" && s !== "Reference Book",
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -168,7 +182,7 @@ export default function AILogs() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Filter className="h-5 w-5" />
-            <span>Filter by Content Source & Tags</span>
+            <span>Filter by Content Source &amp; Tags</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -190,8 +204,13 @@ export default function AILogs() {
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
+                {/* Fixed options from screenshot */}
                 <option value="">All Sources</option>
-                {(filterOptions.content_sources || []).map((source) => (
+                <option value="Academic Book">Academic Books</option>
+                <option value="Reference Book">Reference Books</option>
+
+                {/* Any other backend-defined sources */}
+                {dynamicSources.map((source) => (
                   <option key={source} value={source}>
                     {source}
                   </option>
@@ -403,7 +422,7 @@ export default function AILogs() {
                             )}
                             {tags.qa_knowledge_base && (
                               <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                                ❓ Q&A Knowledge Base
+                                ❓ Q&amp;A Knowledge Base
                               </span>
                             )}
                             {tags.previous_papers && (
