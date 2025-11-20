@@ -232,6 +232,7 @@ const QuizTool = () => {
   };
 
   // Stop timer when switching away from quiz tab + fetch data on tab change
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (activeTab !== "quiz" && timerRunning) {
       setTimerRunning(false);
@@ -243,8 +244,8 @@ const QuizTool = () => {
     } else if (activeTab === "progress") {
       fetchProgressReport();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   // Helpers for progress tab (subject + chapter breakdown)
   const subjectChapterCounts =
