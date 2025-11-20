@@ -4,7 +4,6 @@ import {
   BookOpen,
   Play,
   RefreshCw,
-  Save,
   Send,
   Award,
   Clock,
@@ -21,6 +20,10 @@ const API_BASE_URL =
 const QuizTool = () => {
   const [activeTab, setActiveTab] = useState("generate");
   const [loading, setLoading] = useState(false);
+
+  // Class list from API
+  const [classOptions, setClassOptions] = useState([]);
+  const [classLoading, setClassLoading] = useState(false);
 
   // Quiz generation filters
   const [filters, setFilters] = useState({
@@ -41,7 +44,7 @@ const QuizTool = () => {
   const [studentResults, setStudentResults] = useState(null);
   const [progressData, setProgressData] = useState(null);
 
-  // For screenshot-style progress UI
+  // Progress UI
   const [selectedProgressSubject, setSelectedProgressSubject] = useState(null);
 
   // Timer state
@@ -49,7 +52,6 @@ const QuizTool = () => {
   const [timerPaused, setTimerPaused] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const classes = ["9", "10", "11", "12"];
   const subjects = [
     "Physics",
     "Chemistry",
@@ -67,7 +69,38 @@ const QuizTool = () => {
     "Skills",
   ];
 
-  // Generate quiz
+  // --------- Fetch Classes from API ----------
+  const fetchClasses = async () => {
+    try {
+      setClassLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_BASE_URL}/classes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const classesFromApi = response.data || [];
+      const uniqueById = {};
+      classesFromApi.forEach((cls) => {
+        if (!uniqueById[cls.id]) {
+          uniqueById[cls.id] = cls;
+        }
+      });
+      setClassOptions(Object.values(uniqueById));
+    } catch (error) {
+      console.error("Failed to fetch classes", error);
+      toast.error(
+        error.response?.data?.detail || "Failed to load classes from server",
+      );
+    } finally {
+      setClassLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  // --------- Generate Quiz ----------
   const handleGenerateQuiz = async () => {
     if (!filters.class_standard || !filters.subject) {
       toast.error("Please select class and subject");
@@ -103,7 +136,7 @@ const QuizTool = () => {
     setLoading(false);
   };
 
-  // Submit quiz
+  // --------- Submit Quiz ----------
   const handleSubmitQuiz = async () => {
     if (!currentQuiz) return;
 
@@ -117,7 +150,6 @@ const QuizTool = () => {
       if (!confirmSubmit) return;
     }
 
-    // Stop timer when submitting
     setTimerRunning(false);
     setTimerPaused(false);
 
@@ -126,8 +158,7 @@ const QuizTool = () => {
       const token = localStorage.getItem("token");
       const formattedAnswers = currentQuiz.questions.map((q) => ({
         question_id: q.id,
-        // For MCQ we store the selected option ID (e.g. "A") as student_answer
-        // For short-answer we store the typed text
+        // For MCQ we store selected option (e.g. "A"); for text, the typed answer
         student_answer: answers[q.id] || "",
       }));
 
@@ -153,7 +184,7 @@ const QuizTool = () => {
     setLoading(false);
   };
 
-  // Fetch student results (history)
+  // --------- Fetch History ----------
   const fetchStudentResults = async () => {
     setLoading(true);
     try {
@@ -176,7 +207,7 @@ const QuizTool = () => {
     setLoading(false);
   };
 
-  // Fetch progress report (for progress tab)
+  // --------- Fetch Progress ----------
   const fetchProgressReport = async () => {
     setLoading(true);
     try {
@@ -193,7 +224,6 @@ const QuizTool = () => {
 
       setProgressData(response.data || null);
 
-      // Auto-select first subject for progress view
       const subjectList = response.data?.subject_breakdown || [];
       if (subjectList.length > 0) {
         setSelectedProgressSubject(subjectList[0].subject);
@@ -207,22 +237,19 @@ const QuizTool = () => {
     setLoading(false);
   };
 
-  // Timer effect
+  // --------- Timer Effect ----------
   useEffect(() => {
     let interval = null;
     if (timerRunning && !timerPaused) {
       interval = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
-    } else if (interval) {
-      clearInterval(interval);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [timerRunning, timerPaused]);
 
-  // Format time as MM:SS
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -231,8 +258,7 @@ const QuizTool = () => {
       .padStart(2, "0")}`;
   };
 
-  // Stop timer when switching away from quiz tab + fetch data on tab change
-  /* eslint-disable react-hooks/exhaustive-deps */
+  // --------- Tab Change Side Effects ----------
   useEffect(() => {
     if (activeTab !== "quiz" && timerRunning) {
       setTimerRunning(false);
@@ -244,10 +270,9 @@ const QuizTool = () => {
     } else if (activeTab === "progress") {
       fetchProgressReport();
     }
-  }, [activeTab]);
-  /* eslint-enable react-hooks/exhaustive-deps */
+  }, [activeTab, timerRunning]);
 
-  // Helpers for progress tab (subject + chapter breakdown)
+  // --------- Progress Helpers ----------
   const subjectChapterCounts =
     progressData && progressData.subject_breakdown
       ? progressData.subject_breakdown.map((subj) => {
@@ -271,9 +296,8 @@ const QuizTool = () => {
         )
       : [];
 
-  // Helper: render options text safely for MCQs
+  // --------- MCQ Option Helper ----------
   const getOptionValueAndLabel = (opt, index) => {
-    // Backend MCQ format is usually: { id: "A", text: "..." }
     if (typeof opt === "string") {
       return {
         value: opt,
@@ -378,11 +402,14 @@ const QuizTool = () => {
                   setFilters({ ...filters, class_standard: e.target.value })
                 }
                 className="w-full px-3 py-2 border rounded-lg"
+                disabled={classLoading}
               >
-                <option value="">Select Class</option>
-                {classes.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                <option value="">
+                  {classLoading ? "Loading classes..." : "Select Class"}
+                </option>
+                {classOptions.map((c) => (
+                  <option key={c.id} value={c.standard}>
+                    {c.name || c.standard}
                   </option>
                 ))}
               </select>
@@ -539,7 +566,7 @@ const QuizTool = () => {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              {/* Timer Display */}
+              {/* Timer */}
               <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
                 <Clock size={20} className="text-blue-600" />
                 <span className="font-mono font-bold text-lg text-blue-600">
@@ -547,7 +574,7 @@ const QuizTool = () => {
                 </span>
               </div>
 
-              {/* Pause/Continue Timer */}
+              {/* Pause / Continue */}
               {timerPaused ? (
                 <button
                   onClick={() => setTimerPaused(false)}
@@ -566,7 +593,7 @@ const QuizTool = () => {
                 </button>
               )}
 
-              {/* Stop Quiz Button */}
+              {/* Stop Quiz */}
               <button
                 onClick={() => {
                   if (
@@ -589,6 +616,7 @@ const QuizTool = () => {
                 Stop Quiz
               </button>
 
+              {/* Regenerate */}
               <button
                 onClick={handleGenerateQuiz}
                 disabled={loading}
@@ -600,7 +628,6 @@ const QuizTool = () => {
             </div>
           </div>
 
-          {/* Paused State Overlay */}
           {timerPaused && (
             <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
               <p className="text-orange-800 font-semibold text-center">
@@ -627,7 +654,6 @@ const QuizTool = () => {
                     </span>
                   </div>
 
-                  {/* MCQ MODE */}
                   {isMCQ ? (
                     <div className="space-y-2">
                       {Array.isArray(q.options) && q.options.length > 0 ? (
@@ -667,7 +693,6 @@ const QuizTool = () => {
                       )}
                     </div>
                   ) : (
-                    // SHORT-ANSWER MODE (fallback)
                     <textarea
                       value={answers[q.id] || ""}
                       onChange={(e) =>
@@ -698,7 +723,6 @@ const QuizTool = () => {
       {/* Results Tab */}
       {activeTab === "results" && results && (
         <div className="space-y-6">
-          {/* Score Card */}
           <div className="bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg shadow-lg p-6">
             <div className="flex justify-between items-center">
               <div>
@@ -733,7 +757,6 @@ const QuizTool = () => {
             </div>
           </div>
 
-          {/* Answer Review */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold mb-4">Answer Review</h3>
             <div className="space-y-4">
@@ -777,7 +800,7 @@ const QuizTool = () => {
         </div>
       )}
 
-      {/* Progress Report Tab – redesigned to match screenshot */}
+      {/* Progress Report Tab */}
       {activeTab === "progress" && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-6">Progress Report</h2>
@@ -790,7 +813,6 @@ const QuizTool = () => {
             progressData.overall &&
             progressData.overall.total_quizzes > 0 ? (
             <>
-              {/* Overall performance */}
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-6 mb-6">
                 <h3 className="text-xl font-bold mb-4">Overall Performance</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -821,7 +843,7 @@ const QuizTool = () => {
                 </div>
               </div>
 
-              {/* SUBJECT-WISE LIST */}
+              {/* Subject-wise list */}
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-2">
                   Subject-wise List
@@ -858,7 +880,7 @@ const QuizTool = () => {
                 )}
               </div>
 
-              {/* CHAPTER-WISE PROGRESS GRAPH */}
+              {/* Chapter-wise progress */}
               <div>
                 <h3 className="text-md font-semibold mb-2">
                   Chapter-wise Progress Graph
@@ -895,7 +917,6 @@ const QuizTool = () => {
                             key={`${chapter.subject}-${chapter.chapter}-${idx}`}
                             className="flex flex-col items-center text-center"
                           >
-                            {/* Circle "pie" style */}
                             <div
                               className={`relative w-20 h-20 rounded-full border-4 ${ringColor} flex items-center justify-center bg-gray-50`}
                             >
@@ -937,7 +958,6 @@ const QuizTool = () => {
             </div>
           ) : studentResults && studentResults.total_quizzes > 0 ? (
             <>
-              {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">
@@ -959,7 +979,6 @@ const QuizTool = () => {
                 </div>
               </div>
 
-              {/* Submission List */}
               <div className="space-y-3">
                 {studentResults.submissions.map((sub) => (
                   <div
