@@ -21,7 +21,8 @@ const LoginPage = () => {
     username: '',
     full_name: '',
     password: '',
-    role: 'admin'
+    role: 'admin',
+    school_code: ''
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -31,12 +32,18 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    if (!loginData.tenantId || loginData.tenantId.trim() === '') {
+      toast.error('School CODE is required');
+      return;
+    }
+    
     console.log('🔄 Login form submitted!', loginData);
     setLoading(true);
     
     try {
       console.log('🔄 Calling login function...');
-      const result = await login(loginData.username, loginData.password, loginData.tenantId || null);
+      const result = await login(loginData.username, loginData.password, loginData.tenantId);
       console.log('✅ Login result:', result);
       
       if (result.success) {
@@ -55,10 +62,16 @@ const LoginPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    if (!registerData.school_code || registerData.school_code.trim() === '') {
+      toast.error('School CODE is required');
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      const result = await register(registerData);
+      const result = await register({...registerData, tenant_id: registerData.school_code});
       
       if (result.success) {
         toast.success('Registration successful! Please login.');
@@ -163,15 +176,17 @@ const LoginPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="tenantId">School ID (Optional)</Label>
+                    <Label htmlFor="tenantId">School CODE <span className="text-red-500">*</span></Label>
                     <Input
                       id="tenantId"
                       type="text"
-                      placeholder="Leave blank for first-time setup"
+                      placeholder="Enter your school code"
                       value={loginData.tenantId}
                       onChange={(e) => setLoginData({...loginData, tenantId: e.target.value})}
+                      required
                       className="form-input"
                     />
+                    <p className="text-xs text-gray-500">School CODE is provided by your institution</p>
                   </div>
 
                   <Button 
@@ -250,6 +265,20 @@ const LoginPage = () => {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="reg_school_code">School CODE <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="reg_school_code"
+                      type="text"
+                      placeholder="Enter your school code"
+                      value={registerData.school_code}
+                      onChange={(e) => setRegisterData({...registerData, school_code: e.target.value})}
+                      required
+                      className="form-input"
+                    />
+                    <p className="text-xs text-gray-500">School CODE is provided by your institution (Settings → Institution)</p>
                   </div>
 
                   <Button 

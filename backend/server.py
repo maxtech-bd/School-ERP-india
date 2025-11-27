@@ -1631,11 +1631,11 @@ async def log_admin_action(
 
 @api_router.get("/admin/users")
 async def get_all_users(current_user: User = Depends(get_current_user)):
-    """Get all users in the system (System Admin only)"""
+    """Get all users in the system (System Admin and Admin only)"""
     logging.info(f"DEBUG: User {current_user.username} accessing /admin/users with role: '{current_user.role}' (type: {type(current_user.role)})")
-    if current_user.role != "super_admin":
-        logging.error(f"DEBUG: Access denied. Role '{current_user.role}' != 'super_admin'")
-        raise HTTPException(status_code=403, detail="Only System Admins can access user management")
+    if current_user.role not in ["super_admin", "admin"]:
+        logging.error(f"DEBUG: Access denied. Role '{current_user.role}' not in ['super_admin', 'admin']")
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can access user management")
     
     # Get all users in the tenant
     users = await db.users.find({"tenant_id": current_user.tenant_id}).to_list(1000)
@@ -1653,9 +1653,9 @@ async def create_user_by_admin(
     request: Request,
     current_user: User = Depends(get_current_user)
 ):
-    """Create a new user (System Admin only)"""
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403, detail="Only System Admins can create users")
+    """Create a new user (System Admin and Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can create users")
     
     # Check if user already exists
     existing_user = await db.users.find_one({
@@ -1703,9 +1703,9 @@ async def update_user(
     request: Request,
     current_user: User = Depends(get_current_user)
 ):
-    """Update user details (System Admin only)"""
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403, detail="Only System Admins can update users")
+    """Update user details (System Admin and Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can update users")
     
     # Find the user
     existing_user = await db.users.find_one({
@@ -1752,9 +1752,9 @@ async def change_user_status(
     request: Request,
     current_user: User = Depends(get_current_user)
 ):
-    """Suspend or activate a user (System Admin only)"""
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403, detail="Only System Admins can change user status")
+    """Suspend or activate a user (System Admin and Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can change user status")
     
     # Prevent admin from suspending themselves
     if user_id == current_user.id:
@@ -1803,9 +1803,9 @@ async def reset_user_password(
     request: Request,
     current_user: User = Depends(get_current_user)
 ):
-    """Reset user password (System Admin only)"""
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403, detail="Only System Admins can reset passwords")
+    """Reset user password (System Admin and Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can reset passwords")
     
     # Find the user
     existing_user = await db.users.find_one({
@@ -1849,9 +1849,9 @@ async def get_audit_logs(
     limit: int = 100,
     current_user: User = Depends(get_current_user)
 ):
-    """Get audit logs (System Admin only)"""
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403, detail="Only System Admins can view audit logs")
+    """Get audit logs (System Admin and Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only System Admins and Admins can view audit logs")
     
     logs = await db.audit_logs.find(
         {"tenant_id": current_user.tenant_id}
@@ -15516,7 +15516,7 @@ async def get_form_config(current_user: User = Depends(get_current_user)):
     """Get admission form configuration"""
     try:
         collection = db["admission_form_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "personalInfo": {"required": True, "fields": ["name", "dob", "gender", "address"]},
@@ -15544,14 +15544,14 @@ async def update_form_config(config: dict, current_user: User = Depends(get_curr
         # Prepare document for storage
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         # Upsert the configuration
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15574,7 +15574,7 @@ async def get_documents_config(current_user: User = Depends(get_current_user)):
     """Get documents configuration"""
     try:
         collection = db["admission_documents_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "documents": [
@@ -15603,13 +15603,13 @@ async def update_documents_config(config: dict, current_user: User = Depends(get
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15632,7 +15632,7 @@ async def get_fees_config(current_user: User = Depends(get_current_user)):
     """Get fee structure configuration"""
     try:
         collection = db["admission_fees_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "admissionFee": 5000,
@@ -15659,13 +15659,13 @@ async def update_fees_config(config: dict, current_user: User = Depends(get_curr
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15688,7 +15688,7 @@ async def get_portal_config(current_user: User = Depends(get_current_user)):
     """Get portal configuration"""
     try:
         collection = db["admission_portal_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "isEnabled": True,
@@ -15716,13 +15716,13 @@ async def update_portal_config(config: dict, current_user: User = Depends(get_cu
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15745,7 +15745,7 @@ async def get_notifications_config(current_user: User = Depends(get_current_user
     """Get notifications configuration"""
     try:
         collection = db["admission_notifications_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "emailEnabled": True,
@@ -15773,13 +15773,13 @@ async def update_notifications_config(config: dict, current_user: User = Depends
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15802,7 +15802,7 @@ async def get_academic_year_config(current_user: User = Depends(get_current_user
     """Get academic year configuration"""
     try:
         collection = db["admission_academic_year_config"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "currentYear": "2025-26",
@@ -15830,13 +15830,13 @@ async def update_academic_year_config(config: dict, current_user: User = Depends
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15859,7 +15859,7 @@ async def get_academic_year_settings(current_user: User = Depends(get_current_us
     """Get academic year settings"""
     try:
         collection = db["settings_academic_year"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "currentYear": "2024-25",
@@ -15886,13 +15886,13 @@ async def update_academic_year_settings(config: dict, current_user: User = Depen
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15914,7 +15914,7 @@ async def get_semester_system_settings(current_user: User = Depends(get_current_
     """Get semester system settings"""
     try:
         collection = db["settings_semester_system"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "systemType": "semester",
@@ -15942,13 +15942,13 @@ async def update_semester_system_settings(config: dict, current_user: User = Dep
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -15970,7 +15970,7 @@ async def get_holiday_calendar_settings(current_user: User = Depends(get_current
     """Get holiday calendar settings"""
     try:
         collection = db["settings_holidays"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "holidays": [
@@ -15997,13 +15997,13 @@ async def update_holiday_calendar_settings(config: dict, current_user: User = De
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
@@ -16025,7 +16025,7 @@ async def get_term_dates_settings(current_user: User = Depends(get_current_user)
     """Get term dates settings"""
     try:
         collection = db["settings_term_dates"]
-        config_doc = await collection.find_one({"tenant_id": "demo"})
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
         
         default_config = {
             "terms": [
@@ -16052,13 +16052,13 @@ async def update_term_dates_settings(config: dict, current_user: User = Depends(
         
         config_doc = {
             **config,
-            "tenant_id": "demo",
+            "tenant_id": current_user.tenant_id,
             "updatedBy": current_user.full_name,
             "updatedAt": datetime.now()
         }
         
         await collection.replace_one(
-            {"tenant_id": "demo"}, 
+            {"tenant_id": current_user.tenant_id}, 
             config_doc, 
             upsert=True
         )
