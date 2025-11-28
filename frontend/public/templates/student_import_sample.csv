@@ -1,5 +1,5 @@
-admission_no,roll_no,name,father_name,mother_name,date_of_birth,gender,class_id,section_id,phone,address,guardian_name,guardian_phone
-HSS001,001,John Smith,Robert Smith,Anna Smith,2008-05-12,Male,8,A,9876543210,New York,Robert Smith,9876543210
-HSS002,002,Sarah Johnson,David Johnson,Linda Johnson,2009-02-20,Female,8,A,9876543211,California,David Johnson,9876543211
-HSS003,003,Michael Brown,James Brown,Patricia Brown,2008-08-15,Male,8,B,9876543212,Texas,James Brown,9876543212
-HSS004,004,Emily Davis,William Davis,Jennifer Davis,2009-03-10,Female,8,B,9876543213,Florida,William Davis,9876543213
+admission_no,roll_no,name,father_name,mother_name,date_of_birth,gender,class_id,section_id,phone,email,address,guardian_name,guardian_phone
+HSS001,001,John Smith,Robert Smith,Anna Smith,2008-05-12,Male,8,A,9876543210,john.smith@email.com,123 Main Street New York,Robert Smith,9876543210
+HSS002,002,Sarah Johnson,David Johnson,Linda Johnson,2009-02-20,Female,8,A,9876543211,sarah.johnson@email.com,456 Oak Avenue California,David Johnson,9876543211
+HSS003,003,Michael Brown,James Brown,Patricia Brown,2008-08-15,Male,8,B,9876543212,michael.brown@email.com,789 Pine Road Texas,James Brown,9876543212
+HSS004,004,Emily Davis,William Davis,Jennifer Davis,2009-03-10,Female,8,B,9876543213,emily.davis@email.com,321 Elm Street Florida,William Davis,9876543213

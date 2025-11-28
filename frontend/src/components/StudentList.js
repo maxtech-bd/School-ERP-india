@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -503,23 +504,103 @@ const StudentList = () => {
     }
   };
 
-  const downloadSampleTemplate = () => {
-    // Sample CSV data for student import template
-    const sampleData = `admission_no,roll_no,name,father_name,mother_name,date_of_birth,gender,class_id,section_id,phone,email,address,guardian_name,guardian_phone
-STU001,1,John Doe,Robert Doe,Mary Doe,2010-05-15,Male,1,1,1234567890,john@example.com,123 Main St,Robert Doe,1234567890
-STU002,2,Jane Smith,Michael Smith,Sarah Smith,2011-03-22,Female,1,1,0987654321,jane@example.com,456 Oak Ave,Michael Smith,0987654321`;
+  const downloadSampleTemplate = (format = 'excel') => {
+    // Sample data for student import template with all required fields in exact order
+    const templateData = [
+      {
+        admission_no: 'HSS001',
+        roll_no: '001',
+        name: 'John Smith',
+        father_name: 'Robert Smith',
+        mother_name: 'Anna Smith',
+        date_of_birth: '2008-05-12',
+        gender: 'Male',
+        class_id: '8',
+        section_id: 'A',
+        phone: '9876543210',
+        email: 'john.smith@email.com',
+        address: '123 Main Street New York',
+        guardian_name: 'Robert Smith',
+        guardian_phone: '9876543210'
+      },
+      {
+        admission_no: 'HSS002',
+        roll_no: '002',
+        name: 'Sarah Johnson',
+        father_name: 'David Johnson',
+        mother_name: 'Linda Johnson',
+        date_of_birth: '2009-02-20',
+        gender: 'Female',
+        class_id: '8',
+        section_id: 'A',
+        phone: '9876543211',
+        email: 'sarah.johnson@email.com',
+        address: '456 Oak Avenue California',
+        guardian_name: 'David Johnson',
+        guardian_phone: '9876543211'
+      },
+      {
+        admission_no: 'HSS003',
+        roll_no: '003',
+        name: 'Michael Brown',
+        father_name: 'James Brown',
+        mother_name: 'Patricia Brown',
+        date_of_birth: '2008-08-15',
+        gender: 'Male',
+        class_id: '8',
+        section_id: 'B',
+        phone: '9876543212',
+        email: 'michael.brown@email.com',
+        address: '789 Pine Road Texas',
+        guardian_name: 'James Brown',
+        guardian_phone: '9876543212'
+      }
+    ];
 
-    // Create blob and download
-    const blob = new Blob([sampleData], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'student_import_template.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('📄 Sample template downloaded!');
+    if (format === 'excel') {
+      // Create Excel workbook
+      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Import Template');
+      
+      // Set column widths for better readability
+      worksheet['!cols'] = [
+        { wch: 15 }, // admission_no
+        { wch: 10 }, // roll_no
+        { wch: 20 }, // name
+        { wch: 18 }, // father_name
+        { wch: 18 }, // mother_name
+        { wch: 15 }, // date_of_birth
+        { wch: 10 }, // gender
+        { wch: 10 }, // class_id
+        { wch: 12 }, // section_id
+        { wch: 15 }, // phone
+        { wch: 25 }, // email
+        { wch: 30 }, // address
+        { wch: 18 }, // guardian_name
+        { wch: 15 }  // guardian_phone
+      ];
+      
+      // Download Excel file
+      XLSX.writeFile(workbook, 'student_import_template.xlsx');
+      toast.success('Excel template downloaded!');
+    } else {
+      // Create CSV
+      const headers = Object.keys(templateData[0]).join(',');
+      const rows = templateData.map(row => Object.values(row).join(','));
+      const csvContent = [headers, ...rows].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'student_import_template.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('CSV template downloaded!');
+    }
   };
 
   const handleExport = async (format) => {
@@ -825,15 +906,22 @@ STU002,2,Jane Smith,Michael Smith,Sarah Smith,2011-03-22,Female,1,1,0987654321,j
               <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
                 <li>File must be in CSV or Excel format (.csv, .xlsx, .xls)</li>
                 <li>First row should contain column headers</li>
-                <li>Required columns: Admission No, Roll No, Name, Father Name, Mother Name, Date of Birth, Gender, Class, Section, Phone, Guardian Name, Guardian Phone</li>
-                <li>Date format should be YYYY-MM-DD</li>
+                <li>Required columns: admission_no, roll_no, name, father_name, mother_name, date_of_birth, gender, class_id, section_id, phone, email, address, guardian_name, guardian_phone</li>
+                <li>Date format should be YYYY-MM-DD (e.g., 2008-05-15)</li>
+                <li>Gender values: Male or Female</li>
               </ul>
             </div>
             <div className="flex justify-between items-center">
-              <Button variant="outline" onClick={downloadSampleTemplate}>
-                <Download className="h-4 w-4 mr-2" />
-                Download Sample Template
-              </Button>
+              <div className="flex space-x-2">
+                <Button variant="outline" onClick={() => downloadSampleTemplate('excel')}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Excel Template
+                </Button>
+                <Button variant="outline" onClick={() => downloadSampleTemplate('csv')}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download CSV Template
+                </Button>
+              </div>
               <Button 
                 className="bg-emerald-500 hover:bg-emerald-600"
                 onClick={handleImportStudents}
