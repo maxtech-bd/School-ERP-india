@@ -27,7 +27,9 @@ import {
   Phone,
   Palette,
   Info,
-  Globe
+  Globe,
+  Coffee,
+  User
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -149,6 +151,21 @@ const Settings = () => {
     total_periods_per_day: 8,
     break_periods: [4, 7]
   });
+  
+  // Timetable Details View State
+  const [isViewTimetableDetailsModalOpen, setIsViewTimetableDetailsModalOpen] = useState(false);
+  const [isEditPeriodModalOpen, setIsEditPeriodModalOpen] = useState(false);
+  const [editingPeriod, setEditingPeriod] = useState(null);
+  const [editingDayIndex, setEditingDayIndex] = useState(null);
+  const [editingPeriodIndex, setEditingPeriodIndex] = useState(null);
+  const [periodFormData, setPeriodFormData] = useState({
+    subject: '',
+    teacher_name: '',
+    room_number: '',
+    start_time: '',
+    end_time: ''
+  });
+  const [teachers, setTeachers] = useState([]);
 
   // Grading System State
   const [isViewGradesModalOpen, setIsViewGradesModalOpen] = useState(false);
@@ -900,10 +917,128 @@ const Settings = () => {
     }
   };
 
-  const handleViewTimetableDetails = (timetable) => {
-    // For now, just show an alert with timetable info
-    // In the future, this could open a detailed weekly schedule modal
-    alert(`Timetable Details:\n\nClass: ${timetable.class_name}\nStandard: ${timetable.standard}\nAcademic Year: ${timetable.academic_year}\nTotal Periods: ${timetable.total_periods_per_day}\nBreak Periods: ${timetable.break_periods.join(', ')}\n\nDetailed weekly schedule view coming soon!`);
+  const handleViewTimetableDetails = async (timetable) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      // Fetch teachers for dropdown
+      const teachersResponse = await axios.get(`${API_BASE_URL}/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const teacherList = teachersResponse.data.filter(user => user.role === 'teacher');
+      setTeachers(teacherList);
+      
+      // Fetch subjects for this class
+      try {
+        const subjectsResponse = await axios.get(`${API_BASE_URL}/subjects`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSubjects(subjectsResponse.data);
+      } catch (err) {
+        console.log('No subjects found');
+      }
+      
+      setSelectedTimetable(timetable);
+      setIsViewTimetableDetailsModalOpen(true);
+    } catch (error) {
+      console.error('Error loading timetable details:', error);
+      toast.error('Failed to load timetable details');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleEditPeriod = (period, dayIndex, periodIndex) => {
+    setEditingPeriod(period);
+    setEditingDayIndex(dayIndex);
+    setEditingPeriodIndex(periodIndex);
+    setPeriodFormData({
+      subject: period.subject || '',
+      teacher_name: period.teacher_name || '',
+      room_number: period.room_number || '',
+      start_time: period.start_time || '',
+      end_time: period.end_time || ''
+    });
+    setIsEditPeriodModalOpen(true);
+  };
+  
+  const handleSavePeriod = async () => {
+    if (!selectedTimetable) return;
+    
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      // Create updated weekly schedule
+      const updatedWeeklySchedule = [...selectedTimetable.weekly_schedule];
+      const daySchedule = { ...updatedWeeklySchedule[editingDayIndex] };
+      const updatedPeriods = [...daySchedule.periods];
+      
+      updatedPeriods[editingPeriodIndex] = {
+        ...updatedPeriods[editingPeriodIndex],
+        subject: periodFormData.subject,
+        teacher_name: periodFormData.teacher_name,
+        room_number: periodFormData.room_number,
+        start_time: periodFormData.start_time,
+        end_time: periodFormData.end_time
+      };
+      
+      daySchedule.periods = updatedPeriods;
+      updatedWeeklySchedule[editingDayIndex] = daySchedule;
+      
+      // Update timetable in backend
+      await axios.put(`${API_BASE_URL}/timetables/${selectedTimetable.id}`, {
+        weekly_schedule: updatedWeeklySchedule
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Update local state
+      setSelectedTimetable({
+        ...selectedTimetable,
+        weekly_schedule: updatedWeeklySchedule
+      });
+      
+      setIsEditPeriodModalOpen(false);
+      toast.success('Period updated successfully!');
+      
+      // Refresh timetables list
+      handleViewTimetable();
+    } catch (error) {
+      console.error('Error updating period:', error);
+      toast.error('Failed to update period');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const getSubjectColor = (subject) => {
+    if (!subject || subject === 'Unassigned') return 'bg-gray-100 text-gray-500';
+    const colors = {
+      'Mathematics': 'bg-blue-100 text-blue-800',
+      'Math': 'bg-blue-100 text-blue-800',
+      'English': 'bg-green-100 text-green-800',
+      'Science': 'bg-purple-100 text-purple-800',
+      'Physics': 'bg-indigo-100 text-indigo-800',
+      'Chemistry': 'bg-pink-100 text-pink-800',
+      'Biology': 'bg-emerald-100 text-emerald-800',
+      'History': 'bg-amber-100 text-amber-800',
+      'Geography': 'bg-teal-100 text-teal-800',
+      'Computer': 'bg-cyan-100 text-cyan-800',
+      'Physical Education': 'bg-orange-100 text-orange-800',
+      'PE': 'bg-orange-100 text-orange-800',
+      'Art': 'bg-rose-100 text-rose-800',
+      'Music': 'bg-violet-100 text-violet-800',
+      'Bengali': 'bg-lime-100 text-lime-800',
+      'Hindi': 'bg-yellow-100 text-yellow-800',
+      'Social Studies': 'bg-slate-100 text-slate-800'
+    };
+    return colors[subject] || 'bg-sky-100 text-sky-800';
+  };
+  
+  const formatDayName = (day) => {
+    return day.charAt(0).toUpperCase() + day.slice(1);
   };
 
   // ==================== GRADING SYSTEM HANDLERS ====================
@@ -2764,6 +2899,284 @@ const Settings = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsViewTimetableModalOpen(false)}>Close</Button>
             <Button onClick={handleCreateSchedule} className="bg-emerald-500 hover:bg-emerald-600">Create Schedule</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Timetable Details Modal - Weekly Schedule View */}
+      <Dialog open={isViewTimetableDetailsModalOpen} onOpenChange={setIsViewTimetableDetailsModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Calendar className="h-6 w-6 text-emerald-600" />
+                <div>
+                  <span className="text-xl">Weekly Schedule - {selectedTimetable?.class_name}</span>
+                  <p className="text-sm font-normal text-gray-500 mt-1">
+                    {selectedTimetable?.standard} | Academic Year: {selectedTimetable?.academic_year} | Effective: {selectedTimetable?.effective_from}
+                  </p>
+                </div>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedTimetable && selectedTimetable.weekly_schedule && selectedTimetable.weekly_schedule.length > 0 ? (
+            <div className="mt-4">
+              {/* Legend */}
+              <div className="mb-4 flex flex-wrap items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm font-medium text-gray-700">Legend:</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-amber-200 rounded"></div>
+                  <span className="text-xs text-gray-600">Break</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-gray-100 rounded"></div>
+                  <span className="text-xs text-gray-600">Unassigned</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-blue-100 rounded"></div>
+                  <span className="text-xs text-gray-600">Assigned Subject</span>
+                </div>
+                <span className="text-xs text-gray-500 ml-auto">Click on any period to edit</span>
+              </div>
+              
+              {/* Weekly Schedule Table */}
+              <div className="border rounded-lg overflow-x-auto">
+                <table className="w-full min-w-[800px]">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-r w-20">
+                        Period
+                      </th>
+                      <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-r w-24">
+                        Time
+                      </th>
+                      {selectedTimetable.weekly_schedule.map((daySchedule, index) => (
+                        <th key={index} className="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider border-r last:border-r-0">
+                          {formatDayName(daySchedule.day)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {selectedTimetable.weekly_schedule[0]?.periods.map((_, periodIndex) => {
+                      const firstDayPeriod = selectedTimetable.weekly_schedule[0].periods[periodIndex];
+                      const isBreak = firstDayPeriod?.is_break;
+                      
+                      return (
+                        <tr key={periodIndex} className={isBreak ? 'bg-amber-50' : ''}>
+                          <td className="px-3 py-2 text-center font-semibold text-gray-700 border-r">
+                            {isBreak ? (
+                              <div className="flex items-center justify-center">
+                                <Coffee className="h-4 w-4 text-amber-600 mr-1" />
+                                <span className="text-amber-700">{firstDayPeriod?.break_name || 'Break'}</span>
+                              </div>
+                            ) : (
+                              <span>Period {firstDayPeriod?.period_number}</span>
+                            )}
+                          </td>
+                          <td className="px-2 py-2 text-xs text-gray-600 border-r whitespace-nowrap">
+                            <div className="flex flex-col items-center">
+                              <span>{firstDayPeriod?.start_time}</span>
+                              <span className="text-gray-400">-</span>
+                              <span>{firstDayPeriod?.end_time}</span>
+                            </div>
+                          </td>
+                          {selectedTimetable.weekly_schedule.map((daySchedule, dayIndex) => {
+                            const period = daySchedule.periods[periodIndex];
+                            
+                            if (period?.is_break) {
+                              return (
+                                <td key={dayIndex} className="px-2 py-2 text-center border-r last:border-r-0 bg-amber-100">
+                                  <div className="flex flex-col items-center justify-center h-full">
+                                    <Coffee className="h-5 w-5 text-amber-600 mb-1" />
+                                    <span className="text-xs font-medium text-amber-700">
+                                      {period.break_name || 'Break'}
+                                    </span>
+                                  </div>
+                                </td>
+                              );
+                            }
+                            
+                            return (
+                              <td 
+                                key={dayIndex} 
+                                className="px-2 py-2 border-r last:border-r-0 cursor-pointer hover:bg-gray-50 transition-colors"
+                                onClick={() => handleEditPeriod(period, dayIndex, periodIndex)}
+                              >
+                                <div className={`p-2 rounded-lg ${getSubjectColor(period?.subject)} min-h-[70px] flex flex-col justify-center`}>
+                                  <div className="font-medium text-sm text-center">
+                                    {period?.subject || 'Unassigned'}
+                                  </div>
+                                  {period?.teacher_name && (
+                                    <div className="text-xs text-center mt-1 opacity-75 flex items-center justify-center">
+                                      <User className="h-3 w-3 mr-1" />
+                                      {period.teacher_name}
+                                    </div>
+                                  )}
+                                  {period?.room_number && (
+                                    <div className="text-xs text-center mt-0.5 opacity-60">
+                                      Room: {period.room_number}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Summary */}
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <div className="text-xs text-blue-600 font-medium">Total Periods/Day</div>
+                  <div className="text-lg font-bold text-blue-800">{selectedTimetable.total_periods_per_day}</div>
+                </div>
+                <div className="bg-amber-50 p-3 rounded-lg">
+                  <div className="text-xs text-amber-600 font-medium">Break Periods</div>
+                  <div className="text-lg font-bold text-amber-800">{selectedTimetable.break_periods?.join(', ') || 'None'}</div>
+                </div>
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <div className="text-xs text-green-600 font-medium">Days/Week</div>
+                  <div className="text-lg font-bold text-green-800">{selectedTimetable.weekly_schedule.length}</div>
+                </div>
+                <div className="bg-purple-50 p-3 rounded-lg">
+                  <div className="text-xs text-purple-600 font-medium">Class Periods/Week</div>
+                  <div className="text-lg font-bold text-purple-800">
+                    {(selectedTimetable.total_periods_per_day - (selectedTimetable.break_periods?.length || 0)) * selectedTimetable.weekly_schedule.length}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Clock className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500 text-lg">No schedule data available</p>
+              <p className="text-gray-400 text-sm mt-2">Create a new schedule to start building the timetable</p>
+            </div>
+          )}
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsViewTimetableDetailsModalOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => {
+                setIsViewTimetableDetailsModalOpen(false);
+                handleEditSchedule(selectedTimetable);
+              }} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Schedule Settings
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Period Modal */}
+      <Dialog open={isEditPeriodModalOpen} onOpenChange={setIsEditPeriodModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Clock className="h-5 w-5 text-blue-600" />
+              <span>Edit Period {editingPeriod?.period_number}</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="periodSubject">Subject *</Label>
+              <Select 
+                value={periodFormData.subject} 
+                onValueChange={(value) => setPeriodFormData({ ...periodFormData, subject: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Unassigned">Unassigned</SelectItem>
+                  <SelectItem value="Mathematics">Mathematics</SelectItem>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="Science">Science</SelectItem>
+                  <SelectItem value="Physics">Physics</SelectItem>
+                  <SelectItem value="Chemistry">Chemistry</SelectItem>
+                  <SelectItem value="Biology">Biology</SelectItem>
+                  <SelectItem value="History">History</SelectItem>
+                  <SelectItem value="Geography">Geography</SelectItem>
+                  <SelectItem value="Computer">Computer</SelectItem>
+                  <SelectItem value="Physical Education">Physical Education</SelectItem>
+                  <SelectItem value="Art">Art</SelectItem>
+                  <SelectItem value="Music">Music</SelectItem>
+                  <SelectItem value="Bengali">Bengali</SelectItem>
+                  <SelectItem value="Hindi">Hindi</SelectItem>
+                  <SelectItem value="Social Studies">Social Studies</SelectItem>
+                  {subjects.filter(s => !['Mathematics', 'English', 'Science', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'Computer', 'Physical Education', 'Art', 'Music', 'Bengali', 'Hindi', 'Social Studies'].includes(s.subject_name)).map((subject) => (
+                    <SelectItem key={subject.id} value={subject.subject_name}>
+                      {subject.subject_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="periodTeacher">Teacher</Label>
+              <Select 
+                value={periodFormData.teacher_name} 
+                onValueChange={(value) => setPeriodFormData({ ...periodFormData, teacher_name: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a teacher" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No teacher assigned</SelectItem>
+                  {teachers.map((teacher) => (
+                    <SelectItem key={teacher.id} value={teacher.full_name}>
+                      {teacher.full_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="periodRoom">Room Number</Label>
+              <Input
+                id="periodRoom"
+                value={periodFormData.room_number}
+                onChange={(e) => setPeriodFormData({ ...periodFormData, room_number: e.target.value })}
+                placeholder="e.g., Room 101, Lab 2"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="periodStartTime">Start Time</Label>
+                <Input
+                  id="periodStartTime"
+                  type="time"
+                  value={periodFormData.start_time}
+                  onChange={(e) => setPeriodFormData({ ...periodFormData, start_time: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="periodEndTime">End Time</Label>
+                <Input
+                  id="periodEndTime"
+                  type="time"
+                  value={periodFormData.end_time}
+                  onChange={(e) => setPeriodFormData({ ...periodFormData, end_time: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditPeriodModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSavePeriod} disabled={loading} className="bg-emerald-500 hover:bg-emerald-600">
+              {loading ? 'Saving...' : 'Save Period'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
