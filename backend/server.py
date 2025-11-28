@@ -592,6 +592,8 @@ class Class(BaseModel):
     school_id: str
     name: str
     standard: str
+    sections: List[str] = Field(default_factory=lambda: ['A'])
+    description: Optional[str] = None
     class_teacher_id: Optional[str] = None
     max_students: int = 60
     is_active: bool = True
@@ -601,12 +603,16 @@ class Class(BaseModel):
 class ClassCreate(BaseModel):
     name: str
     standard: str
+    sections: List[str] = Field(default_factory=lambda: ['A'])
+    description: Optional[str] = None
     class_teacher_id: Optional[str] = None
     max_students: int = 60
 
 class ClassUpdate(BaseModel):
     name: Optional[str] = None
     standard: Optional[str] = None
+    sections: Optional[List[str]] = None
+    description: Optional[str] = None
     class_teacher_id: Optional[str] = None
     max_students: Optional[int] = None
 
@@ -5395,7 +5401,17 @@ async def get_leave_types(current_user: User = Depends(get_current_user)):
 async def get_classes(current_user: User = Depends(get_current_user)):
     query = {"tenant_id": current_user.tenant_id, "is_active": True}
     classes = await db.classes.find(query).to_list(1000)
-    return [Class(**cls) for cls in classes]
+    
+    # Ensure all classes have sections field (for backward compatibility)
+    result = []
+    for cls in classes:
+        if 'sections' not in cls or not cls.get('sections'):
+            cls['sections'] = ['A']  # Default section
+        if 'description' not in cls:
+            cls['description'] = ''
+        result.append(Class(**cls))
+    
+    return result
 
 @api_router.post("/classes", response_model=Class)
 async def create_class(class_data: ClassCreate, current_user: User = Depends(get_current_user)):

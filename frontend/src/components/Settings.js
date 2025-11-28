@@ -531,6 +531,8 @@ const Settings = () => {
       const classData = {
         name: classFormData.name.trim(),
         standard: classFormData.standard,
+        sections: classFormData.sections || ['A'],
+        description: classFormData.description || '',
         max_students: 60, // Default value
         class_teacher_id: null // No teacher assigned initially
       };
@@ -597,6 +599,8 @@ const Settings = () => {
       const updateData = {
         name: classFormData.name.trim(),
         standard: classFormData.standard,
+        sections: classFormData.sections || ['A'],
+        description: classFormData.description || '',
         max_students: 60 // Keep existing or default
       };
       
