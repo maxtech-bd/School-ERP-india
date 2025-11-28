@@ -2452,7 +2452,9 @@ const Settings = () => {
                             ))}
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-sm text-gray-500 max-w-xs truncate">{cls.description}</td>
+                        <td className="px-4 py-4 text-sm text-gray-500 max-w-xs truncate">
+                          {cls.description || <span className="text-gray-400 italic">No description</span>}
+                        </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="flex space-x-2">
                             <Button
