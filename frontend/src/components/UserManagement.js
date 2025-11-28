@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   Shield,
   Mail,
-  User
+  User,
+  Trash2
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -29,8 +30,10 @@ const UserManagement = () => {
   const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
   const [isStatusConfirmModalOpen, setIsStatusConfirmModalOpen] = useState(false);
   const [isAuditLogModalOpen, setIsAuditLogModalOpen] = useState(false);
+  const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
+  const [deleteUserData, setDeleteUserData] = useState(null);
   
   // Form data for create/edit
   const [userFormData, setUserFormData] = useState({
@@ -291,6 +294,40 @@ const UserManagement = () => {
     setIsAuditLogModalOpen(true);
   };
   
+  // Open delete confirmation
+  const handleOpenDeleteUser = (user) => {
+    setDeleteUserData(user);
+    setIsDeleteConfirmModalOpen(true);
+  };
+  
+  // Confirm delete user
+  const handleConfirmDeleteUser = async () => {
+    if (!deleteUserData) return;
+    
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      await axios.delete(`${API_BASE_URL}/admin/users/${deleteUserData.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('User deleted successfully!');
+      setIsDeleteConfirmModalOpen(false);
+      setDeleteUserData(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Failed to delete user');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -391,6 +428,17 @@ const UserManagement = () => {
                             >
                               <UserCheck className="h-3 w-3 mr-1" />
                               Activate
+                            </Button>
+                          )}
+                          {user.role !== 'super_admin' && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="bg-red-600 hover:bg-red-700"
+                              onClick={() => handleOpenDeleteUser(user)}
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              Delete
                             </Button>
                           )}
                         </div>
@@ -646,6 +694,47 @@ const UserManagement = () => {
               </table>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Confirmation Modal */}
+      <Dialog open={isDeleteConfirmModalOpen} onOpenChange={setIsDeleteConfirmModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Delete User Permanently
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700 mb-4">
+              Are you sure you want to <strong className="text-red-600">permanently delete</strong> this user?
+            </p>
+            {deleteUserData && (
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <p><strong>Name:</strong> {deleteUserData.full_name}</p>
+                <p><strong>Email:</strong> {deleteUserData.email}</p>
+                <p><strong>Username:</strong> {deleteUserData.username}</p>
+                <p><strong>Role:</strong> {deleteUserData.role?.replace('_', ' ').toUpperCase()}</p>
+              </div>
+            )}
+            <p className="text-red-500 text-sm mt-4">
+              This action cannot be undone. The user will be permanently removed from the system.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteConfirmModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDeleteUser}
+              disabled={loading}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {loading ? 'Deleting...' : 'Delete Permanently'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

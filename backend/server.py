@@ -1802,6 +1802,59 @@ async def change_user_status(
     status_text = "activated" if is_active else "suspended"
     return {"message": f"User {status_text} successfully"}
 
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Permanently delete a user (Super Admin only)"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Only Super Admins can delete users")
+    
+    # Prevent admin from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="You cannot delete your own account")
+    
+    # Find the user
+    existing_user = await db.users.find_one({
+        "id": user_id,
+        "tenant_id": current_user.tenant_id
+    })
+    
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent deletion of other super_admin accounts
+    if existing_user.get("role") == "super_admin":
+        raise HTTPException(status_code=400, detail="Cannot delete Super Admin accounts")
+    
+    # Permanently delete the user
+    await db.users.delete_one({
+        "id": user_id,
+        "tenant_id": current_user.tenant_id
+    })
+    
+    # Log admin action
+    await log_admin_action(
+        tenant_id=current_user.tenant_id,
+        admin_id=current_user.id,
+        admin_name=current_user.full_name,
+        action="user_deleted",
+        target_user_id=user_id,
+        target_user_name=existing_user.get("full_name"),
+        details={
+            "deleted_user_email": existing_user.get("email"),
+            "deleted_user_role": existing_user.get("role"),
+            "deleted_user_username": existing_user.get("username")
+        },
+        school_id=current_user.school_id,
+        ip_address=request.client.host if request.client else None
+    )
+    
+    logging.info(f"User {existing_user.get('full_name')} deleted by {current_user.full_name}")
+    return {"message": "User deleted successfully"}
+
 @api_router.post("/admin/users/{user_id}/reset-password")
 async def reset_user_password(
     user_id: str,
