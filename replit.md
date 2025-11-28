@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Fee Engine**: Manages fee configuration, automatic student fee generation, payment collection, and real-time fee due tracking.
 - **Student Route Assignment**: Allows assigning students to transport routes with dynamic route and boarding point selection.
 - **User Management and Admin Control System**: Comprehensive system for super_admins to manage users, reset passwords, suspend/activate accounts, and view audit logs, secured with role-based access and audit logging.
+- **Calendar Module**: School calendar management system with monthly view, event filtering, and role-based permissions. Features include: (1) Monthly calendar view with event markers and navigation, (2) Event types: holidays, school events, functions, exams, meetings, sports events, cultural events, (3) Add/Edit/Delete events with modals (Admin only), (4) Role-based permissions: Admins have full CRUD access, Teachers/Students have view-only access, (5) Upcoming events sidebar, (6) Color-coded event types for easy visualization, (7) Tenant isolation with strict verification on all write operations.
 
 ## System Design Choices
 - **Build Tooling**: Create React App with Craco and Webpack customization.
