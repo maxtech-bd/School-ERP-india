@@ -2221,6 +2221,57 @@ async def delete_student(
     
     return {"message": "Student deleted successfully", "id": student_id}
 
+@api_router.post("/students/{student_id}/photo")
+async def upload_student_photo(
+    student_id: str,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload a photo for a specific student"""
+    if current_user.role not in ["super_admin", "admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Find student
+    student = await db.students.find_one({
+        "id": student_id,
+        "tenant_id": current_user.tenant_id,
+        "is_active": True
+    })
+    
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed")
+    
+    # Validate file size (2MB max)
+    file_content = await file.read()
+    if len(file_content) > 2 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File size exceeds 2MB limit")
+    
+    # Create tenant-specific directory
+    tenant_dir = UPLOAD_DIR / current_user.tenant_id / "students"
+    tenant_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix if file.filename else '.jpg'
+    unique_filename = f"{student['admission_no']}_{uuid.uuid4()}{file_extension}"
+    
+    # Save file
+    file_path = tenant_dir / unique_filename
+    with open(file_path, "wb") as buffer:
+        buffer.write(file_content)
+    
+    # Update student photo_url
+    file_url = f"/uploads/{current_user.tenant_id}/students/{unique_filename}"
+    await db.students.update_one(
+        {"id": student_id, "tenant_id": current_user.tenant_id},
+        {"$set": {"photo_url": file_url, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "Photo uploaded successfully", "photo_url": file_url}
+
 @api_router.post("/students/bulk-photo-upload")
 async def bulk_photo_upload(
     files: List[UploadFile] = File(...),

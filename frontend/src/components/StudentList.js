@@ -89,6 +89,8 @@ const StudentList = () => {
   const [isSavingSection, setIsSavingSection] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
 
   const getCurrentView = () => {
     const path = location.pathname;
@@ -270,20 +272,59 @@ const StudentList = () => {
     }
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Photo size should be less than 2MB');
+        return;
+      }
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let studentId = null;
       if (editingStudent) {
         await axios.put(`${API}/students/${editingStudent.id}`, formData);
+        studentId = editingStudent.id;
         toast.success('Student updated successfully');
-        await fetchData();
+      } else {
+        const response = await axios.post(`${API}/students`, formData);
+        studentId = response.data.id;
+        toast.success('Student added successfully');
+      }
+      
+      if (photoFile && studentId) {
+        const photoFormData = new FormData();
+        photoFormData.append('file', photoFile);
+        try {
+          await axios.post(`${API}/students/${studentId}/photo`, photoFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } catch (photoError) {
+          console.error('Failed to upload photo:', photoError);
+          toast.warning('Student saved but photo upload failed');
+        }
+      }
+      
+      await fetchData();
+      if (editingStudent) {
         setIsAddModalOpen(false);
       } else {
-        await axios.post(`${API}/students`, formData);
-        toast.success('Student added successfully');
-        await fetchData();
         setIsAddStudentModalOpen(false);
       }
       
@@ -315,6 +356,8 @@ const StudentList = () => {
       guardian_phone: student.guardian_phone
     });
     setEditingStudent(student);
+    setPhotoFile(null);
+    setPhotoPreview(student.photo_url || '');
     setIsAddModalOpen(true);
   };
 
@@ -362,6 +405,8 @@ const StudentList = () => {
     setBirthYear('');
     setBirthMonth('');
     setBirthDay('');
+    setPhotoFile(null);
+    setPhotoPreview('');
   };
 
   const handleBulkPhotoUpload = async () => {
@@ -1411,6 +1456,35 @@ const StudentList = () => {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Photo Upload Section */}
+            <div className="flex flex-col items-center space-y-3 pb-4 border-b">
+              <div className="relative">
+                {photoPreview ? (
+                  <img 
+                    src={photoPreview} 
+                    alt="Student" 
+                    className="w-24 h-24 rounded-full object-cover border-4 border-emerald-100"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-gray-200">
+                    <Camera className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <Label htmlFor="student-photo" className="cursor-pointer">
+                <div className="flex items-center space-x-2 text-emerald-600 hover:text-emerald-700">
+                  <Camera className="h-4 w-4" />
+                  <span>{photoPreview ? 'Change Photo' : 'Upload Photo'}</span>
+                </div>
+                <Input
+                  id="student-photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </Label>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="add_admission_no">Admission Number *</Label>
@@ -1765,6 +1839,35 @@ const StudentList = () => {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Photo Upload Section */}
+            <div className="flex flex-col items-center space-y-3 pb-4 border-b">
+              <div className="relative">
+                {photoPreview || editingStudent?.photo_url ? (
+                  <img 
+                    src={photoPreview || editingStudent?.photo_url} 
+                    alt="Student" 
+                    className="w-24 h-24 rounded-full object-cover border-4 border-emerald-100"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-gray-200">
+                    <Camera className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <Label htmlFor="edit-student-photo" className="cursor-pointer">
+                <div className="flex items-center space-x-2 text-emerald-600 hover:text-emerald-700">
+                  <Camera className="h-4 w-4" />
+                  <span>{photoPreview || editingStudent?.photo_url ? 'Change Photo' : 'Upload Photo'}</span>
+                </div>
+                <Input
+                  id="edit-student-photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </Label>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="admission_no">Admission Number *</Label>
