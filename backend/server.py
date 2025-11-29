@@ -20575,6 +20575,22 @@ async def get_academic_books(
             query["subject"] = subject
         
         books = await db.academic_books.find(query).sort("class_standard", 1).to_list(1000)
+        
+        # Enrich books with chapter count from book_chapters collection
+        for book in books:
+            book_id = book.get("id")
+            if book_id:
+                # Count chapters from separate collection
+                db_chapter_count = await db.book_chapters.count_documents({
+                    "book_id": book_id,
+                    "book_type": "academic",
+                    "is_active": True
+                })
+                # Use embedded chapters count if available, otherwise use db count
+                embedded_chapters = book.get("chapters", [])
+                book["chapter_count"] = db_chapter_count if db_chapter_count > 0 else len(embedded_chapters)
+                book["has_chapters"] = book["chapter_count"] > 0
+        
         return sanitize_mongo_data(books)
     except Exception as e:
         logger.error(f"Error fetching academic books: {e}")
@@ -20684,6 +20700,22 @@ async def get_reference_books(
             query["subject"] = subject
         
         books = await db.reference_books.find(query).sort("class_standard", 1).to_list(1000)
+        
+        # Enrich books with chapter count from book_chapters collection
+        for book in books:
+            book_id = book.get("id")
+            if book_id:
+                # Count chapters from separate collection
+                db_chapter_count = await db.book_chapters.count_documents({
+                    "book_id": book_id,
+                    "book_type": "reference",
+                    "is_active": True
+                })
+                # Use embedded chapters count if available, otherwise use db count
+                embedded_chapters = book.get("chapters", [])
+                book["chapter_count"] = db_chapter_count if db_chapter_count > 0 else len(embedded_chapters)
+                book["has_chapters"] = book["chapter_count"] > 0
+        
         return sanitize_mongo_data(books)
     except Exception as e:
         logger.error(f"Error fetching reference books: {e}")

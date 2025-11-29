@@ -1433,32 +1433,37 @@ const AcademicCMS = () => {
                         <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                           {book.subject}
                         </span>
-                        {(book.chapters?.length || 0) > 0 && (
+                        {(book.chapter_count || book.chapters?.length || 0) > 0 && (
                           <span className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded">
-                            {book.chapters.length} Chapters
+                            {book.chapter_count || book.chapters?.length} Chapters
+                          </span>
+                        )}
+                        {book.pdf_url && !book.has_chapters && !(book.chapters?.length > 0) && (
+                          <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">
+                            Full Book
                           </span>
                         )}
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {book.pdf_url && (
+                        {book.pdf_url && !book.has_chapters && !(book.chapters?.length > 0) && (
                           <a
                             href={book.pdf_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded hover:bg-orange-200"
+                            className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs px-3 py-1.5 rounded hover:bg-orange-600"
                           >
-                            <Eye className="w-3 h-3" />
-                            View Book
+                            <BookOpen className="w-3 h-3" />
+                            Full Book
                           </a>
                         )}
-                        {book.chapters && book.chapters.length > 0 && (
+                        {(book.has_chapters || (book.chapters && book.chapters.length > 0)) && (
                           <button
                             type="button"
                             onClick={() => openChaptersModal(book, "academic")}
-                            className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded hover:bg-emerald-200"
+                            className="inline-flex items-center gap-1 bg-emerald-500 text-white text-xs px-3 py-1.5 rounded hover:bg-emerald-600"
                           >
                             <BookOpen className="w-3 h-3" />
-                            View Chapters
+                            View Chapters ({book.chapter_count || book.chapters?.length})
                           </button>
                         )}
                       </div>
@@ -1729,37 +1734,43 @@ const AcademicCMS = () => {
                       </div>
                       <p className="text-sm text-gray-600">by {book.author}</p>
                       <div className="mt-2 flex gap-2 flex-wrap">
-                        {(book.chapters?.length || 0) > 0 && (
+                        <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                          Class {book.class_standard}
+                        </span>
+                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {book.subject}
+                        </span>
+                        {(book.chapter_count || book.chapters?.length || 0) > 0 && (
                           <span className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded">
-                            {book.chapters.length} Chapters
+                            {book.chapter_count || book.chapters?.length} Chapters
                           </span>
                         )}
-                        {book.pdf_url && (
+                        {book.pdf_url && !book.has_chapters && !(book.chapters?.length > 0) && (
                           <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">
-                            Full Book File
+                            Full Book
                           </span>
                         )}
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {book.pdf_url && (
+                        {book.pdf_url && !book.has_chapters && !(book.chapters?.length > 0) && (
                           <a
                             href={book.pdf_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded hover:bg-orange-200"
+                            className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs px-3 py-1.5 rounded hover:bg-orange-600"
                           >
-                            <Eye className="w-3 h-3" />
-                            View Book
+                            <BookOpen className="w-3 h-3" />
+                            Full Book
                           </a>
                         )}
-                        {book.chapters && book.chapters.length > 0 && (
+                        {(book.has_chapters || (book.chapters && book.chapters.length > 0)) && (
                           <button
                             type="button"
                             onClick={() => openChaptersModal(book, "reference")}
-                            className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded hover:bg-emerald-200"
+                            className="inline-flex items-center gap-1 bg-emerald-500 text-white text-xs px-3 py-1.5 rounded hover:bg-emerald-600"
                           >
                             <BookOpen className="w-3 h-3" />
-                            View Chapters
+                            View Chapters ({book.chapter_count || book.chapters?.length})
                           </button>
                         )}
                       </div>
@@ -2401,19 +2412,21 @@ const AcademicCMS = () => {
       {/* Chapters Viewer Modal (both Academic & Reference) */}
       {showChaptersModal && selectedBookForChapters && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-emerald-600" />
                   {selectedBookForChapters.title}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 mt-1">
                   {selectedBookForChapters.subject} – Class{" "}
-                  {selectedBookForChapters.class_standard} (
-                  {selectedBookForChapters.bookType === "academic"
-                    ? "Academic Book"
-                    : "Reference Book"}
-                  )
+                  {selectedBookForChapters.class_standard} • 
+                  <span className={`ml-1 ${selectedBookForChapters.bookType === "academic" ? "text-purple-600" : "text-blue-600"}`}>
+                    {selectedBookForChapters.bookType === "academic"
+                      ? "Academic Book"
+                      : "Reference Book"}
+                  </span>
                 </p>
               </div>
               <button
@@ -2422,109 +2435,80 @@ const AcademicCMS = () => {
                   setSelectedBookForChapters(null);
                   setChapterViewIndex(0);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {chapterLoading ? (
-              <div className="py-12 text-center text-blue-600">
-                Loading chapters...
+              <div className="py-12 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-3"></div>
+                <p className="text-gray-600">Loading chapters...</p>
               </div>
             ) : !selectedBookForChapters.chapters ||
               selectedBookForChapters.chapters.length === 0 ? (
               <div className="py-12 text-center text-gray-600">
-                No chapters found for this book.
+                <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p>No chapters found for this book.</p>
               </div>
             ) : (
-              <>
-                {(() => {
-                  const chap =
-                    selectedBookForChapters.chapters[chapterViewIndex];
-                  const title =
-                    chap.title ||
-                    chap.chapter_title ||
-                    `Chapter ${chap.chapter_number}`;
+              <div className="space-y-3">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-medium text-gray-700">
+                    All Chapters ({selectedBookForChapters.chapters.length})
+                  </h4>
+                </div>
+                {selectedBookForChapters.chapters.map((chap, index) => {
+                  const title = chap.title || chap.chapter_title || `Chapter ${chap.chapter_number}`;
                   const fileUrl = chap.file_url;
                   const fileName = chap.file_name;
-
+                  
                   return (
-                    <div className="border rounded-lg p-4 bg-gray-50 mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-semibold text-gray-900">
-                          Chapter {chap.chapter_number}: {title}
-                        </h4>
-                        <span className="text-xs text-gray-600">
-                          {chapterViewIndex + 1} of{" "}
-                          {selectedBookForChapters.chapters.length}
-                        </span>
-                      </div>
-                      {fileUrl ? (
-                        <a
-                          href={fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded hover:bg-orange-200"
-                        >
-                          <FileText className="w-3 h-3" />
-                          {fileName ? `Open ${fileName}` : "Open Chapter File"}
-                        </a>
-                      ) : chap.content ? (
-                        <div className="mt-2 max-h-64 overflow-y-auto bg-white p-3 rounded border text-sm whitespace-pre-wrap">
-                          {chap.content}
+                    <div 
+                      key={chap.id || index} 
+                      className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center justify-center w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                            {chap.chapter_number || index + 1}
+                          </span>
+                          <div>
+                            <h5 className="font-medium text-gray-900">{title}</h5>
+                            {fileName && (
+                              <p className="text-xs text-gray-500 mt-0.5">{fileName}</p>
+                            )}
+                          </div>
                         </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-gray-500">
-                          No file or content available for this chapter.
-                        </p>
-                      )}
+                        {fileUrl ? (
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 bg-emerald-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Open
+                          </a>
+                        ) : chap.content ? (
+                          <button
+                            onClick={() => setChapterViewIndex(index)}
+                            className="inline-flex items-center gap-1.5 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View Content
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-400 bg-gray-200 px-3 py-1.5 rounded">
+                            No file
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
-                })()}
-
-                <div className="flex justify-between items-center">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChapterViewIndex((idx) => Math.max(0, idx - 1))
-                    }
-                    disabled={chapterViewIndex === 0}
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded ${
-                      chapterViewIndex === 0
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    }`}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChapterViewIndex((idx) =>
-                        Math.min(
-                          selectedBookForChapters.chapters.length - 1,
-                          idx + 1,
-                        ),
-                      )
-                    }
-                    disabled={
-                      chapterViewIndex ===
-                      selectedBookForChapters.chapters.length - 1
-                    }
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded ${
-                      chapterViewIndex ===
-                      selectedBookForChapters.chapters.length - 1
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    }`}
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </>
+                })}
+              </div>
             )}
           </div>
         </div>
