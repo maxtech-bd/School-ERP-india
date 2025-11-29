@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request,
 from starlette.background import BackgroundTask
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
+from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
