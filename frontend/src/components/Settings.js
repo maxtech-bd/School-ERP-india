@@ -106,6 +106,47 @@ const Settings = () => {
     ]
   });
   
+  // Function to generate periods based on system type
+  const getPeriodsForSystemType = (systemType) => {
+    const academicStart = academicYearConfig.startDate || "2024-04-01";
+    const academicEnd = academicYearConfig.endDate || "2025-03-31";
+    
+    switch (systemType) {
+      case "semester":
+        return [
+          { name: "First Semester", startDate: "2024-04-01", endDate: "2024-09-30" },
+          { name: "Second Semester", startDate: "2024-10-01", endDate: "2025-03-31" }
+        ];
+      case "trimester":
+        return [
+          { name: "First Trimester", startDate: "2024-04-01", endDate: "2024-07-31" },
+          { name: "Second Trimester", startDate: "2024-08-01", endDate: "2024-11-30" },
+          { name: "Third Trimester", startDate: "2024-12-01", endDate: "2025-03-31" }
+        ];
+      case "quarter":
+        return [
+          { name: "First Quarter", startDate: "2024-04-01", endDate: "2024-06-30" },
+          { name: "Second Quarter", startDate: "2024-07-01", endDate: "2024-09-30" },
+          { name: "Third Quarter", startDate: "2024-10-01", endDate: "2024-12-31" },
+          { name: "Fourth Quarter", startDate: "2025-01-01", endDate: "2025-03-31" }
+        ];
+      default:
+        return semesterSystemConfig.periods;
+    }
+  };
+  
+  // Handler for system type change
+  const handleSystemTypeChange = (newSystemType) => {
+    const newPeriods = getPeriodsForSystemType(newSystemType);
+    const numberOfPeriods = newSystemType === "semester" ? 2 : newSystemType === "trimester" ? 3 : 4;
+    setSemesterSystemConfig({
+      ...semesterSystemConfig,
+      systemType: newSystemType,
+      numberOfPeriods: numberOfPeriods,
+      periods: newPeriods
+    });
+  };
+  
   const [holidayCalendarConfig, setHolidayCalendarConfig] = useState({
     holidays: [
       { id: 1, name: "Independence Day", date: "2024-08-15", type: "national" },
@@ -2774,7 +2815,7 @@ const Settings = () => {
           <div className="space-y-4">
             <div>
               <Label htmlFor="systemType">System Type</Label>
-              <Select value={semesterSystemConfig.systemType} onValueChange={(value) => setSemesterSystemConfig({...semesterSystemConfig, systemType: value})}>
+              <Select value={semesterSystemConfig.systemType} onValueChange={handleSystemTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select system type" />
                 </SelectTrigger>

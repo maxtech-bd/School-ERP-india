@@ -50,7 +50,11 @@ import {
   ArrowLeft,
   Calendar as CalendarIcon,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  Printer,
+  User,
+  Home
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -111,7 +115,11 @@ const StudentList = () => {
     roll_no: '',
     name: '',
     father_name: '',
+    father_phone: '',
+    father_whatsapp: '',
     mother_name: '',
+    mother_phone: '',
+    mother_whatsapp: '',
     date_of_birth: '',
     gender: '',
     class_id: '',
@@ -122,6 +130,8 @@ const StudentList = () => {
     guardian_name: '',
     guardian_phone: ''
   });
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewingStudent, setViewingStudent] = useState(null);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -348,7 +358,11 @@ const StudentList = () => {
       roll_no: student.roll_no,
       name: student.name,
       father_name: student.father_name,
+      father_phone: student.father_phone || '',
+      father_whatsapp: student.father_whatsapp || '',
       mother_name: student.mother_name,
+      mother_phone: student.mother_phone || '',
+      mother_whatsapp: student.mother_whatsapp || '',
       date_of_birth: student.date_of_birth,
       gender: student.gender,
       class_id: student.class_id,
@@ -394,7 +408,11 @@ const StudentList = () => {
       roll_no: '',
       name: '',
       father_name: '',
+      father_phone: '',
+      father_whatsapp: '',
       mother_name: '',
+      mother_phone: '',
+      mother_whatsapp: '',
       date_of_birth: '',
       gender: '',
       class_id: '',
@@ -1226,7 +1244,20 @@ const StudentList = () => {
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="text-blue-600 hover:text-blue-700"
+                            onClick={() => {
+                              setViewingStudent(student);
+                              setIsViewModalOpen(true);
+                            }}
+                            title="View Details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleEdit(student)}
+                            title="Edit"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -1235,6 +1266,7 @@ const StudentList = () => {
                             size="sm" 
                             className="text-red-600 hover:text-red-700"
                             onClick={() => handleDeleteClick(student)}
+                            title="Delete"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -1666,12 +1698,48 @@ const StudentList = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="add_father_phone">Father's Phone</Label>
+                <Input
+                  id="add_father_phone"
+                  value={formData.father_phone}
+                  onChange={(e) => setFormData({...formData, father_phone: e.target.value})}
+                  placeholder="Father's phone number"
+                />
+              </div>
+              <div>
+                <Label htmlFor="add_father_whatsapp">Father's WhatsApp</Label>
+                <Input
+                  id="add_father_whatsapp"
+                  value={formData.father_whatsapp}
+                  onChange={(e) => setFormData({...formData, father_whatsapp: e.target.value})}
+                  placeholder="Father's WhatsApp number"
+                />
+              </div>
+              <div>
                 <Label htmlFor="add_mother_name">Mother's Name *</Label>
                 <Input
                   id="add_mother_name"
                   value={formData.mother_name}
                   onChange={(e) => setFormData({...formData, mother_name: e.target.value})}
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="add_mother_phone">Mother's Phone</Label>
+                <Input
+                  id="add_mother_phone"
+                  value={formData.mother_phone}
+                  onChange={(e) => setFormData({...formData, mother_phone: e.target.value})}
+                  placeholder="Mother's phone number"
+                />
+              </div>
+              <div>
+                <Label htmlFor="add_mother_whatsapp">Mother's WhatsApp</Label>
+                <Input
+                  id="add_mother_whatsapp"
+                  value={formData.mother_whatsapp}
+                  onChange={(e) => setFormData({...formData, mother_whatsapp: e.target.value})}
+                  placeholder="Mother's WhatsApp number"
                 />
               </div>
               <div className="md:col-span-2">
@@ -1972,6 +2040,221 @@ const StudentList = () => {
         </DialogContent>
       </Dialog>
 
+      {/* View Student Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <User className="h-5 w-5 text-emerald-500" />
+              <span>Student Details</span>
+            </DialogTitle>
+          </DialogHeader>
+          {viewingStudent && (
+            <div id="student-print-content" className="space-y-6">
+              {/* Student Header */}
+              <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={viewingStudent.photo_url} />
+                  <AvatarFallback className="bg-emerald-100 text-emerald-700 text-xl">
+                    {viewingStudent.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">{viewingStudent.name}</h3>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Badge variant="outline">{viewingStudent.admission_no}</Badge>
+                    <Badge variant="secondary">Roll: {viewingStudent.roll_no}</Badge>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {getClassName(viewingStudent.class_id)} - Section {getSectionName(viewingStudent.section_id)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Personal Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <User className="h-4 w-4 mr-2 text-emerald-500" />
+                    Personal Information
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Gender:</span>
+                      <span className="font-medium">{viewingStudent.gender}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Date of Birth:</span>
+                      <span className="font-medium">{viewingStudent.date_of_birth}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Email:</span>
+                      <span className="font-medium">{viewingStudent.email || '-'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Phone:</span>
+                      <span className="font-medium">{viewingStudent.phone}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <Home className="h-4 w-4 mr-2 text-emerald-500" />
+                    Address
+                  </h4>
+                  <p className="text-sm text-gray-700">{viewingStudent.address || '-'}</p>
+                </div>
+              </div>
+
+              {/* Father's Information */}
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Father's Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <p className="font-medium">{viewingStudent.father_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <p className="font-medium">{viewingStudent.father_phone || '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">WhatsApp:</span>
+                    <p className="font-medium">{viewingStudent.father_whatsapp || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mother's Information */}
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Mother's Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <p className="font-medium">{viewingStudent.mother_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <p className="font-medium">{viewingStudent.mother_phone || '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">WhatsApp:</span>
+                    <p className="font-medium">{viewingStudent.mother_whatsapp || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Guardian Information */}
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Guardian Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <p className="font-medium">{viewingStudent.guardian_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <p className="font-medium">{viewingStudent.guardian_phone}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const printContent = document.getElementById('student-print-content');
+                if (printContent) {
+                  const printWindow = window.open('', '_blank');
+                  printWindow.document.write(`
+                    <html>
+                      <head>
+                        <title>Student Details - ${viewingStudent?.name}</title>
+                        <style>
+                          body { font-family: Arial, sans-serif; padding: 20px; }
+                          .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 16px; background: #f0fdf4; border-radius: 8px; }
+                          .avatar { width: 80px; height: 80px; border-radius: 50%; background: #d1fae5; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #047857; }
+                          .name { font-size: 20px; font-weight: bold; }
+                          .badge { display: inline-block; padding: 2px 8px; background: #e5e7eb; border-radius: 4px; margin-right: 8px; font-size: 12px; }
+                          .section { margin: 16px 0; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; }
+                          .section h4 { margin: 0 0 12px 0; font-weight: 600; }
+                          .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+                          .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+                          .label { color: #6b7280; font-size: 12px; }
+                          .value { font-weight: 500; }
+                          @media print { body { padding: 0; } }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="header">
+                          <div class="avatar">${viewingStudent?.name?.split(' ').map(n => n[0]).join('')}</div>
+                          <div>
+                            <div class="name">${viewingStudent?.name}</div>
+                            <div><span class="badge">${viewingStudent?.admission_no}</span><span class="badge">Roll: ${viewingStudent?.roll_no}</span></div>
+                            <div style="color: #6b7280; margin-top: 4px;">${getClassName(viewingStudent?.class_id)} - Section ${getSectionName(viewingStudent?.section_id)}</div>
+                          </div>
+                        </div>
+                        
+                        <div class="section">
+                          <h4>Personal Information</h4>
+                          <div class="grid-2">
+                            <div><div class="label">Gender</div><div class="value">${viewingStudent?.gender}</div></div>
+                            <div><div class="label">Date of Birth</div><div class="value">${viewingStudent?.date_of_birth}</div></div>
+                            <div><div class="label">Email</div><div class="value">${viewingStudent?.email || '-'}</div></div>
+                            <div><div class="label">Phone</div><div class="value">${viewingStudent?.phone}</div></div>
+                          </div>
+                        </div>
+                        
+                        <div class="section">
+                          <h4>Address</h4>
+                          <p>${viewingStudent?.address || '-'}</p>
+                        </div>
+                        
+                        <div class="section">
+                          <h4>Father's Information</h4>
+                          <div class="grid">
+                            <div><div class="label">Name</div><div class="value">${viewingStudent?.father_name}</div></div>
+                            <div><div class="label">Phone</div><div class="value">${viewingStudent?.father_phone || '-'}</div></div>
+                            <div><div class="label">WhatsApp</div><div class="value">${viewingStudent?.father_whatsapp || '-'}</div></div>
+                          </div>
+                        </div>
+                        
+                        <div class="section">
+                          <h4>Mother's Information</h4>
+                          <div class="grid">
+                            <div><div class="label">Name</div><div class="value">${viewingStudent?.mother_name}</div></div>
+                            <div><div class="label">Phone</div><div class="value">${viewingStudent?.mother_phone || '-'}</div></div>
+                            <div><div class="label">WhatsApp</div><div class="value">${viewingStudent?.mother_whatsapp || '-'}</div></div>
+                          </div>
+                        </div>
+                        
+                        <div class="section">
+                          <h4>Guardian Information</h4>
+                          <div class="grid-2">
+                            <div><div class="label">Name</div><div class="value">${viewingStudent?.guardian_name}</div></div>
+                            <div><div class="label">Phone</div><div class="value">${viewingStudent?.guardian_phone}</div></div>
+                          </div>
+                        </div>
+                      </body>
+                    </html>
+                  `);
+                  printWindow.document.close();
+                  printWindow.print();
+                }
+              }}
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+            <Button onClick={() => setIsViewModalOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Student Dialog */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -2049,12 +2332,48 @@ const StudentList = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="edit_father_phone">Father's Phone</Label>
+                <Input
+                  id="edit_father_phone"
+                  value={formData.father_phone}
+                  onChange={(e) => setFormData({...formData, father_phone: e.target.value})}
+                  placeholder="Father's phone number"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_father_whatsapp">Father's WhatsApp</Label>
+                <Input
+                  id="edit_father_whatsapp"
+                  value={formData.father_whatsapp}
+                  onChange={(e) => setFormData({...formData, father_whatsapp: e.target.value})}
+                  placeholder="Father's WhatsApp number"
+                />
+              </div>
+              <div>
                 <Label htmlFor="mother_name">Mother's Name *</Label>
                 <Input
                   id="mother_name"
                   value={formData.mother_name}
                   onChange={(e) => setFormData({...formData, mother_name: e.target.value})}
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_mother_phone">Mother's Phone</Label>
+                <Input
+                  id="edit_mother_phone"
+                  value={formData.mother_phone}
+                  onChange={(e) => setFormData({...formData, mother_phone: e.target.value})}
+                  placeholder="Mother's phone number"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_mother_whatsapp">Mother's WhatsApp</Label>
+                <Input
+                  id="edit_mother_whatsapp"
+                  value={formData.mother_whatsapp}
+                  onChange={(e) => setFormData({...formData, mother_whatsapp: e.target.value})}
+                  placeholder="Mother's WhatsApp number"
                 />
               </div>
               <div>
