@@ -505,21 +505,24 @@ const StudentList = () => {
   };
 
   const downloadSampleTemplate = (format = 'excel') => {
-    // Sample data for student import template with all required fields in exact order
+    // Sample data for student import template matching the user's Excel format
     const templateData = [
       {
         admission_no: 'HSS001',
         roll_no: '001',
         name: 'John Smith',
-        father_name: 'Robert Smith',
-        mother_name: 'Anna Smith',
-        date_of_birth: '2008-05-12',
         gender: 'Male',
+        date_of_birth: '2008-05-12',
         class_id: '8',
         section_id: 'A',
-        phone: '9876543210',
-        email: 'john.smith@email.com',
-        address: '123 Main Street New York',
+        father_name: 'Robert Smith',
+        'F/phone': '9876543210',
+        'F/ Whatsapp no': '9876543210',
+        mother_name: 'Anna Smith',
+        'M/phone': '9876543212',
+        'M/whatsapp no': '9876543212',
+        address: '123 Main Street, New York',
+        'email id': 'john.smith@email.com',
         guardian_name: 'Robert Smith',
         guardian_phone: '9876543210'
       },
@@ -527,33 +530,20 @@ const StudentList = () => {
         admission_no: 'HSS002',
         roll_no: '002',
         name: 'Sarah Johnson',
-        father_name: 'David Johnson',
-        mother_name: 'Linda Johnson',
-        date_of_birth: '2009-02-20',
         gender: 'Female',
+        date_of_birth: '2009-02-20',
         class_id: '8',
         section_id: 'A',
-        phone: '9876543211',
-        email: 'sarah.johnson@email.com',
-        address: '456 Oak Avenue California',
+        father_name: 'David Johnson',
+        'F/phone': '9876543211',
+        'F/ Whatsapp no': '9876543211',
+        mother_name: 'Linda Johnson',
+        'M/phone': '9876543213',
+        'M/whatsapp no': '9876543213',
+        address: '456 Oak Avenue, California',
+        'email id': 'sarah.johnson@email.com',
         guardian_name: 'David Johnson',
         guardian_phone: '9876543211'
-      },
-      {
-        admission_no: 'HSS003',
-        roll_no: '003',
-        name: 'Michael Brown',
-        father_name: 'James Brown',
-        mother_name: 'Patricia Brown',
-        date_of_birth: '2008-08-15',
-        gender: 'Male',
-        class_id: '8',
-        section_id: 'B',
-        phone: '9876543212',
-        email: 'michael.brown@email.com',
-        address: '789 Pine Road Texas',
-        guardian_name: 'James Brown',
-        guardian_phone: '9876543212'
       }
     ];
 
@@ -561,22 +551,25 @@ const StudentList = () => {
       // Create Excel workbook
       const worksheet = XLSX.utils.json_to_sheet(templateData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Import Template');
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
       
       // Set column widths for better readability
       worksheet['!cols'] = [
         { wch: 15 }, // admission_no
         { wch: 10 }, // roll_no
         { wch: 20 }, // name
-        { wch: 18 }, // father_name
-        { wch: 18 }, // mother_name
-        { wch: 15 }, // date_of_birth
         { wch: 10 }, // gender
+        { wch: 15 }, // date_of_birth
         { wch: 10 }, // class_id
         { wch: 12 }, // section_id
-        { wch: 15 }, // phone
-        { wch: 25 }, // email
+        { wch: 18 }, // father_name
+        { wch: 15 }, // F/phone
+        { wch: 18 }, // F/ Whatsapp no
+        { wch: 18 }, // mother_name
+        { wch: 15 }, // M/phone
+        { wch: 18 }, // M/whatsapp no
         { wch: 30 }, // address
+        { wch: 25 }, // email id
         { wch: 18 }, // guardian_name
         { wch: 15 }  // guardian_phone
       ];
@@ -1277,16 +1270,16 @@ const StudentList = () => {
                   className="text-emerald-600 hover:text-emerald-700 text-sm p-0 h-auto"
                   onClick={() => {
                     const link = document.createElement('a');
-                    link.href = `${API}/download/student-import-sample`;
-                    link.download = 'student_import_sample.csv';
+                    link.href = `${API}/download/student-import-sample?format=excel`;
+                    link.download = 'student_import_sample.xlsx';
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    toast.success('Sample template downloaded successfully');
+                    toast.success('Sample Excel template downloaded successfully');
                   }}
                 >
                   <Download className="h-4 w-4 mr-1" />
-                  Download Sample CSV
+                  Download Sample Excel
                 </Button>
               </div>
               <Input
@@ -1305,8 +1298,11 @@ const StudentList = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
               <h4 className="font-medium text-amber-900 text-sm mb-2">Required Columns:</h4>
               <p className="text-xs text-amber-800">
-                admission_no, roll_no, name, father_name, mother_name, date_of_birth, gender, 
-                class_id, section_id, phone, address, guardian_name, guardian_phone
+                admission_no, roll_no, name, gender, date_of_birth, class_id, section_id, 
+                father_name, F/phone, mother_name, address, guardian_name, guardian_phone
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                Optional: F/ Whatsapp no, M/phone, M/whatsapp no, email id
               </p>
             </div>
           </div>

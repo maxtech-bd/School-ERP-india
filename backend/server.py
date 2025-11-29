@@ -369,6 +369,9 @@ class Student(BaseModel):
     guardian_name: str
     guardian_phone: str
     photo_url: Optional[str] = None
+    father_whatsapp: Optional[str] = None  # Father's WhatsApp number
+    mother_phone: Optional[str] = None  # Mother's phone number
+    mother_whatsapp: Optional[str] = None  # Mother's WhatsApp number
     tags: List[str] = []  # Student tags for categorization
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -2322,30 +2325,87 @@ async def import_students(
         else:
             raise HTTPException(status_code=400, detail="Invalid file type. Only CSV and Excel files are allowed")
         
-        # Normalize column names (handle spaces, title case, etc.)
-        column_mapping = {
-            'admission no': 'admission_no',
-            'admission number': 'admission_no',
-            'roll no': 'roll_no',
-            'roll number': 'roll_no',
-            'father name': 'father_name',
-            'father\'s name': 'father_name',
-            'mother name': 'mother_name',
-            'mother\'s name': 'mother_name',
-            'date of birth': 'date_of_birth',
-            'dob': 'date_of_birth',
-            'birth date': 'date_of_birth',
-            'class id': 'class_id',
-            'class': 'class_id',
-            'section id': 'section_id',
-            'section': 'section_id',
-            'guardian name': 'guardian_name',
-            'guardian phone': 'guardian_phone',
-            'guardian\'s phone': 'guardian_phone'
-        }
+        # Normalize column names (handle spaces, title case, special characters, etc.)
+        def normalize_column_name(col):
+            """Normalize a column name to match expected field names"""
+            # Clean and lowercase the column name
+            col_clean = col.lower().strip()
+            
+            # Direct mappings for exact matches (after cleaning)
+            column_mapping = {
+                'admission no': 'admission_no',
+                'admission number': 'admission_no',
+                'admission_no': 'admission_no',
+                'roll no': 'roll_no',
+                'roll number': 'roll_no',
+                'roll_no': 'roll_no',
+                'father name': 'father_name',
+                'father_name': 'father_name',
+                'father\'s name': 'father_name',
+                'f/phone': 'phone',
+                'f/ phone': 'phone',
+                'f phone': 'phone',
+                'father phone': 'phone',
+                'phone': 'phone',
+                'f/ whatsapp no': 'father_whatsapp',
+                'f/whatsapp no': 'father_whatsapp',
+                'f whatsapp no': 'father_whatsapp',
+                'father whatsapp': 'father_whatsapp',
+                'father_whatsapp': 'father_whatsapp',
+                'mother name': 'mother_name',
+                'mother_name': 'mother_name',
+                'mother\'s name': 'mother_name',
+                'm/phone': 'mother_phone',
+                'm/ phone': 'mother_phone',
+                'm phone': 'mother_phone',
+                'mother phone': 'mother_phone',
+                'mother_phone': 'mother_phone',
+                'm/whatsapp no': 'mother_whatsapp',
+                'm/ whatsapp no': 'mother_whatsapp',
+                'm whatsapp no': 'mother_whatsapp',
+                'mother whatsapp': 'mother_whatsapp',
+                'mother_whatsapp': 'mother_whatsapp',
+                'date of birth': 'date_of_birth',
+                'date_of_birth': 'date_of_birth',
+                'dob': 'date_of_birth',
+                'birth date': 'date_of_birth',
+                'class id': 'class_id',
+                'class_id': 'class_id',
+                'class': 'class_id',
+                'section id': 'section_id',
+                'section_id': 'section_id',
+                'section': 'section_id',
+                'email id': 'email',
+                'email_id': 'email',
+                'emailid': 'email',
+                'email': 'email',
+                'guardian name': 'guardian_name',
+                'guardian_name': 'guardian_name',
+                'guardian phone': 'guardian_phone',
+                'guardian_phone': 'guardian_phone',
+                'guardian\'s phone': 'guardian_phone',
+                'name': 'name',
+                'gender': 'gender',
+                'address': 'address'
+            }
+            
+            # Try direct match first
+            if col_clean in column_mapping:
+                return column_mapping[col_clean]
+            
+            # Try with slashes replaced by spaces
+            col_no_slash = col_clean.replace('/', ' ')
+            if col_no_slash in column_mapping:
+                return column_mapping[col_no_slash]
+            
+            # Default: convert to snake_case
+            return col_clean.replace(' ', '_').replace('/', '_')
         
-        # Normalize column names to snake_case
-        df.columns = [column_mapping.get(col.lower().strip(), col.lower().strip().replace(' ', '_')) for col in df.columns]
+        # Normalize all column names
+        df.columns = [normalize_column_name(col) for col in df.columns]
+        
+        # Log normalized columns for debugging
+        logging.info(f"Normalized columns: {df.columns.tolist()}")
         
         # Validate required columns
         required_columns = ['admission_no', 'roll_no', 'name', 'father_name', 'mother_name', 
@@ -2364,6 +2424,23 @@ async def import_students(
         
         for index, row in df.iterrows():
             try:
+                # Validate required fields per row
+                missing_fields = []
+                for field in ['admission_no', 'roll_no', 'name', 'father_name', 'mother_name', 
+                             'date_of_birth', 'gender', 'class_id', 'section_id', 
+                             'guardian_name', 'guardian_phone']:
+                    value = row.get(field, '')
+                    if pd.isna(value) or str(value).strip() == '' or str(value).lower() == 'nan':
+                        missing_fields.append(field)
+                
+                if missing_fields:
+                    failed_imports.append({
+                        "row": index + 2,
+                        "admission_no": str(row.get('admission_no', 'N/A')),
+                        "error": f"Missing required fields: {', '.join(missing_fields)}"
+                    })
+                    continue
+                
                 # Check if student with same admission number exists
                 existing = await db.students.find_one({
                     "admission_no": str(row['admission_no']),
@@ -2373,32 +2450,52 @@ async def import_students(
                 
                 if existing:
                     failed_imports.append({
-                        "row": index + 2,  # +2 because index starts at 0 and we skip header
+                        "row": index + 2,
                         "admission_no": str(row['admission_no']),
                         "error": "Student with this admission number already exists"
                     })
                     continue
                 
-                # Create student data
+                # Helper function to clean cell values
+                def clean_value(val, default=''):
+                    if pd.isna(val) or str(val).lower() == 'nan':
+                        return default
+                    return str(val).strip()
+                
+                # Handle phone - can come from 'phone' column (mapped from F/phone)
+                phone_value = clean_value(row.get('phone', ''))
+                if not phone_value:
+                    phone_value = clean_value(row.get('father_whatsapp', ''))
+                
+                # Handle email
+                email_value = clean_value(row.get('email', ''))
+                
+                # Handle address - required field
+                address_value = clean_value(row.get('address', ''), 'Not Provided')
+                
                 student_data = {
                     "id": str(uuid.uuid4()),
-                    "admission_no": str(row['admission_no']),
-                    "roll_no": str(row['roll_no']),
-                    "name": str(row['name']),
-                    "father_name": str(row['father_name']),
-                    "mother_name": str(row['mother_name']),
-                    "date_of_birth": str(row['date_of_birth']),
-                    "gender": str(row['gender']),
-                    "class_id": str(row['class_id']),
-                    "section_id": str(row['section_id']),
-                    "phone": str(row['phone']),
-                    "email": str(row.get('email', '')),
-                    "address": str(row['address']),
-                    "guardian_name": str(row['guardian_name']),
-                    "guardian_phone": str(row['guardian_phone']),
-                    "photo_url": str(row.get('photo_url', '')),
+                    "admission_no": clean_value(row['admission_no']),
+                    "roll_no": clean_value(row['roll_no']),
+                    "name": clean_value(row['name']),
+                    "father_name": clean_value(row['father_name']),
+                    "mother_name": clean_value(row['mother_name']),
+                    "date_of_birth": clean_value(row['date_of_birth']),
+                    "gender": clean_value(row['gender']),
+                    "class_id": clean_value(row['class_id']),
+                    "section_id": clean_value(row['section_id']),
+                    "phone": phone_value,
+                    "email": email_value,
+                    "address": address_value,
+                    "guardian_name": clean_value(row['guardian_name']),
+                    "guardian_phone": clean_value(row['guardian_phone']),
+                    "photo_url": clean_value(row.get('photo_url', '')),
+                    "father_whatsapp": clean_value(row.get('father_whatsapp', '')),
+                    "mother_phone": clean_value(row.get('mother_phone', '')),
+                    "mother_whatsapp": clean_value(row.get('mother_whatsapp', '')),
                     "tenant_id": current_user.tenant_id,
                     "school_id": school_id,
+                    "tags": [],
                     "is_active": True,
                     "created_at": datetime.utcnow(),
                     "updated_at": datetime.utcnow()
@@ -2428,24 +2525,54 @@ async def import_students(
         raise HTTPException(status_code=500, detail=f"Failed to import students: {str(e)}")
 
 @api_router.get("/download/student-import-sample")
-async def download_student_import_sample():
-    """Download sample CSV template for student import"""
+async def download_student_import_sample(format: str = "excel"):
+    """Download sample Excel/CSV template for student import"""
     try:
-        # Path to the sample CSV file in frontend/public/templates
-        project_root = Path(__file__).parent.parent
-        sample_file_path = project_root / "frontend" / "public" / "templates" / "student_import_sample.csv"
+        # Create sample template data matching user's expected format
+        template_data = {
+            'admission_no': ['HSS001', 'HSS002'],
+            'roll_no': ['001', '002'],
+            'name': ['John Smith', 'Sarah Johnson'],
+            'gender': ['Male', 'Female'],
+            'date_of_birth': ['2008-05-12', '2009-02-20'],
+            'class_id': ['8', '8'],
+            'section_id': ['A', 'A'],
+            'father_name': ['Robert Smith', 'David Johnson'],
+            'F/phone': ['9876543210', '9876543211'],
+            'F/ Whatsapp no': ['9876543210', '9876543211'],
+            'mother_name': ['Anna Smith', 'Linda Johnson'],
+            'M/phone': ['9876543212', '9876543213'],
+            'M/whatsapp no': ['9876543212', '9876543213'],
+            'address': ['123 Main Street, New York', '456 Oak Avenue, California'],
+            'email id': ['john.smith@email.com', 'sarah.johnson@email.com'],
+            'guardian_name': ['Robert Smith', 'David Johnson'],
+            'guardian_phone': ['9876543210', '9876543211']
+        }
         
-        # Check if file exists
-        if not sample_file_path.exists():
-            raise HTTPException(status_code=404, detail="Sample template file not found")
+        df = pd.DataFrame(template_data)
         
-        # Return the file as a downloadable attachment
-        return FileResponse(
-            path=str(sample_file_path),
-            filename="student_import_sample.csv",
-            media_type="text/csv",
-            headers={"Content-Disposition": "attachment; filename=student_import_sample.csv"}
-        )
+        # Create file in memory
+        output = io.BytesIO()
+        
+        if format.lower() == 'csv':
+            # Generate CSV
+            df.to_csv(output, index=False)
+            output.seek(0)
+            return StreamingResponse(
+                output,
+                media_type="text/csv",
+                headers={"Content-Disposition": "attachment; filename=student_import_sample.csv"}
+            )
+        else:
+            # Generate Excel (default)
+            df.to_excel(output, index=False, sheet_name='Students')
+            output.seek(0)
+            return StreamingResponse(
+                output,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={"Content-Disposition": "attachment; filename=student_import_sample.xlsx"}
+            )
+            
     except Exception as e:
         logging.error(f"Failed to download sample template: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to download sample template: {str(e)}")
