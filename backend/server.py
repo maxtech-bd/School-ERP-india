@@ -21708,10 +21708,33 @@ async def get_cms_hierarchy(
 # Include router and middleware
 app.include_router(api_router)
 
+# Define allowed origins for CORS
+# When allow_credentials=True, you cannot use '*' - must list specific origins
+cors_origins_env = os.environ.get('CORS_ORIGINS', '')
+if cors_origins_env:
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
+else:
+    # Default origins for development and production
+    cors_origins = [
+        # Render deployment
+        "https://school-erp-frontend-ixwf.onrender.com",
+        "https://school-erp-srph.onrender.com",
+        # Local development
+        "http://localhost:3000",
+        "http://localhost:5000",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5000",
+    ]
+
+# Add Replit domains dynamically
+replit_dev_domain = os.environ.get('REPLIT_DEV_DOMAIN', '')
+if replit_dev_domain:
+    cors_origins.append(f"https://{replit_dev_domain}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
