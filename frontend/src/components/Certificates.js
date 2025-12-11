@@ -2615,13 +2615,13 @@ const Certificates = () => {
       {/* Certificate Types Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-3 lg:grid-cols-6 h-auto">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-6 h-auto">
             <TabsTrigger value="course" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Course</TabsTrigger>
             <TabsTrigger value="transfer" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Transfer</TabsTrigger>
             <TabsTrigger value="progress" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Progress</TabsTrigger>
-            <TabsTrigger value="adhar" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Adhar</TabsTrigger>
-            <TabsTrigger value="bonafide" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Bonafide</TabsTrigger>
-            <TabsTrigger value="id-cards" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">ID Cards</TabsTrigger>
+            <TabsTrigger value="adhar" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Adhar</TabsTrigger>
+            <TabsTrigger value="bonafide" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Bonafide</TabsTrigger>
+            <TabsTrigger value="id-cards" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">ID Cards</TabsTrigger>
           </TabsList>
         </div>
 

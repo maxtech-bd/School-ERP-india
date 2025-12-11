@@ -2367,16 +2367,16 @@ const Settings = () => {
       {/* Settings Categories Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-5 lg:grid-cols-9 h-auto">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-9 h-auto">
             <TabsTrigger value="academic" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Academic</TabsTrigger>
             <TabsTrigger value="classes" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Classes</TabsTrigger>
             <TabsTrigger value="timetable" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Timetable</TabsTrigger>
             <TabsTrigger value="grades" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Grades</TabsTrigger>
             <TabsTrigger value="curriculum" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Curriculum</TabsTrigger>
-            <TabsTrigger value="institution" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Institution</TabsTrigger>
-            <TabsTrigger value="staff-settings" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Staff</TabsTrigger>
-            <TabsTrigger value="permissions" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Permissions</TabsTrigger>
-            <TabsTrigger value="user-management" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Users</TabsTrigger>
+            <TabsTrigger value="institution" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Institution</TabsTrigger>
+            <TabsTrigger value="staff-settings" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Staff</TabsTrigger>
+            <TabsTrigger value="permissions" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Permissions</TabsTrigger>
+            <TabsTrigger value="user-management" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Users</TabsTrigger>
           </TabsList>
         </div>
 

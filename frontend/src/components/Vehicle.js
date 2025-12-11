@@ -1058,13 +1058,13 @@ const Vehicle = () => {
       {/* Vehicle Management Tabs */}
       <Tabs defaultValue="manage" className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-3 lg:grid-cols-6 h-auto">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-6 h-auto">
             <TabsTrigger value="manage" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Manage</TabsTrigger>
             <TabsTrigger value="list" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Vehicles</TabsTrigger>
             <TabsTrigger value="routes" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Routes</TabsTrigger>
-            <TabsTrigger value="boarding" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Boarding</TabsTrigger>
-            <TabsTrigger value="students" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Students</TabsTrigger>
-            <TabsTrigger value="reports" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Reports</TabsTrigger>
+            <TabsTrigger value="boarding" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Boarding</TabsTrigger>
+            <TabsTrigger value="students" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Students</TabsTrigger>
+            <TabsTrigger value="reports" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Reports</TabsTrigger>
           </TabsList>
         </div>
 
