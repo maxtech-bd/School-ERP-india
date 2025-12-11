@@ -140,91 +140,94 @@ const MarkAttendance = () => {
   console.log(`[ATTENDANCE-RENDER] Total staff: ${staff.length}, Staff with attendance for ${selectedDate}: ${displayedStaff.length}`);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-start">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-2">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Mark Attendance</h1>
-          <p className="text-gray-600 mt-1">Mark daily attendance for staff members</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Mark Attendance</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Mark daily attendance for staff members</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Staff</CardTitle>
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+            <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600">Total Staff</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{staff.length}</div>
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold">{staff.length}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Present</CardTitle>
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+            <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600">Present</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{presentCount}</div>
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{presentCount}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Absent</CardTitle>
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+            <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600">Absent</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{absentCount}</div>
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">{absentCount}</div>
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle>Attendance Register</CardTitle>
-            <div className="flex flex-wrap items-center gap-3">
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <CardTitle className="text-base sm:text-lg">Attendance Register</CardTitle>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-3 py-2 border rounded-lg"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 border rounded-lg text-xs sm:text-sm w-full sm:w-auto"
               />
               <Button
                 variant="outline"
                 size="sm"
+                className="text-xs sm:text-sm h-8 sm:h-9"
                 onClick={() => handleMarkAll('present')}
               >
-                <Check className="h-4 w-4 mr-2" />
-                Mark All Present
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Mark All</span> Present
               </Button>
               <Button
                 variant="outline"
                 size="sm"
+                className="text-xs sm:text-sm h-8 sm:h-9"
                 onClick={() => handleMarkAll('absent')}
               >
-                <X className="h-4 w-4 mr-2" />
-                Mark All Absent
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Mark All</span> Absent
               </Button>
               <Button
                 onClick={handleSaveAttendance}
                 disabled={saving}
-                className="bg-emerald-500 hover:bg-emerald-600"
+                className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9"
               >
-                {saving ? 'Saving...' : 'Save Attendance'}
+                {saving ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 sm:p-4 md:p-6 pt-0">
           {loading ? (
             <div className="text-center py-8">Loading...</div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>Employee ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Designation</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="text-xs sm:text-sm">#</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">Employee ID</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Department</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Designation</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -267,6 +270,7 @@ const MarkAttendance = () => {
                 )}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

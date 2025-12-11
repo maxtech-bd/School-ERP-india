@@ -921,40 +921,40 @@ const Reports = () => {
   }, [reportSlug, currentTab]);
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-          <p className="text-gray-600 mt-1">Comprehensive reporting and analytics dashboard</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Reports</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Comprehensive reporting and analytics dashboard</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Calendar className="h-4 w-4 mr-2" />
-            Date Range
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Date
           </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export All
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Export
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Generate Report
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9">
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Generate
           </Button>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {quickReports.map((report, index) => (
           <Card key={index} className="card-hover">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{report.name}</p>
-                  <p className="text-2xl font-bold text-gray-900">{report.count}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">{report.name}</p>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{report.count}</p>
                 </div>
-                <report.icon className="h-8 w-8 text-emerald-500" />
+                <report.icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
               </div>
             </CardContent>
           </Card>
@@ -963,11 +963,11 @@ const Reports = () => {
 
       {/* Report Categories */}
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="academic">Academic</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance</TabsTrigger>
-          <TabsTrigger value="administrative">Administrative</TabsTrigger>
-          <TabsTrigger value="transport">Transport</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="academic" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Academic</TabsTrigger>
+          <TabsTrigger value="attendance" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Attendance</TabsTrigger>
+          <TabsTrigger value="administrative" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Admin</TabsTrigger>
+          <TabsTrigger value="transport" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Transport</TabsTrigger>
         </TabsList>
 
         <TabsContent value="academic" className="space-y-4">

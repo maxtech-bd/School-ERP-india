@@ -2542,71 +2542,71 @@ const Certificates = () => {
   });
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Certificates</h1>
-          <p className="text-gray-600 mt-1">Generate and manage various academic certificates</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Certificates</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Generate and manage various academic certificates</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Templates
           </Button>
           <Button 
             onClick={handleGenerateCertificate}
-            className="bg-emerald-500 hover:bg-emerald-600"
+            className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9"
           >
-            <Award className="h-4 w-4 mr-2" />
-            Generate Certificate
+            <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Generate
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Issued</p>
-                <p className="text-3xl font-bold text-gray-900">{totalIssued}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Issued</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">{totalIssued}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-emerald-500" />
+              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-3xl font-bold text-orange-600">{pending}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-600">{pending}</p>
               </div>
-              <Clock className="h-8 w-8 text-orange-500" />
+              <Clock className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">This Month</p>
-                <p className="text-3xl font-bold text-blue-600">45</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">This Month</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-blue-600">45</p>
               </div>
-              <Award className="h-8 w-8 text-blue-500" />
+              <Award className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Templates</p>
-                <p className="text-3xl font-bold text-purple-600">8</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Templates</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-purple-600">8</p>
               </div>
-              <FileText className="h-8 w-8 text-purple-500" />
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
@@ -2614,14 +2614,16 @@ const Certificates = () => {
 
       {/* Certificate Types Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="course">Course</TabsTrigger>
-          <TabsTrigger value="transfer">Transfer</TabsTrigger>
-          <TabsTrigger value="progress">Progress Report</TabsTrigger>
-          <TabsTrigger value="adhar">Adhar Extract</TabsTrigger>
-          <TabsTrigger value="bonafide">Bonafide</TabsTrigger>
-          <TabsTrigger value="id-cards">ID Cards</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-3 lg:grid-cols-6 h-auto">
+            <TabsTrigger value="course" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Course</TabsTrigger>
+            <TabsTrigger value="transfer" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Transfer</TabsTrigger>
+            <TabsTrigger value="progress" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Progress</TabsTrigger>
+            <TabsTrigger value="adhar" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Adhar</TabsTrigger>
+            <TabsTrigger value="bonafide" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Bonafide</TabsTrigger>
+            <TabsTrigger value="id-cards" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">ID Cards</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="course" className="space-y-4">
           {ccView === 'list' ? (

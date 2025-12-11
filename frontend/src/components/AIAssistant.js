@@ -165,29 +165,29 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 bg-purple-100 rounded-lg">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">GiNi AI Assistant</h1>
-            <p className="text-gray-600">Ask academic questions and get tag-based answers</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">GiNi AI Assistant</h1>
+            <p className="text-xs sm:text-sm text-gray-600">Ask academic questions and get tag-based answers</p>
           </div>
         </div>
       </div>
 
       {/* Answer Source Filter */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-gray-700">Answer Source:</label>
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <label className="text-xs sm:text-sm font-medium text-gray-700">Answer Source:</label>
             <select
               value={answerSource}
               onChange={(e) => setAnswerSource(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs sm:text-sm"
             >
               <option value="">All Sources</option>
               <option value="Academic Book">Academic Books Only</option>
@@ -198,7 +198,7 @@ export default function AIAssistant() {
       </Card>
 
       {/* Chat Interface */}
-      <Card className="h-[500px] flex flex-col">
+      <Card className="h-[350px] sm:h-[400px] md:h-[500px] flex flex-col">
         <CardHeader className="border-b">
           <CardTitle className="flex items-center space-x-2">
             <Bot className="h-5 w-5" />

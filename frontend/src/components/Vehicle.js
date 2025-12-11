@@ -985,72 +985,71 @@ const Vehicle = () => {
   };
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Vehicle Management</h1>
-          <p className="text-gray-600 mt-1">Manage school transport, routes, and student assignments</p>
-          
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Vehicle Management</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage school transport, routes, and student assignments</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Export
           </Button>
           <Button 
-            className="bg-emerald-500 hover:bg-emerald-600"
+            className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9"
             onClick={handleAddVehicleClick}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Add Vehicle
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Vehicles</p>
-                <p className="text-3xl font-bold text-gray-900">{totalVehicles}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Vehicles</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">{totalVehicles}</p>
               </div>
-              <Car className="h-8 w-8 text-blue-500" />
+              <Car className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Routes</p>
-                <p className="text-3xl font-bold text-emerald-600">{activeRoutes}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Active Routes</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-600">{activeRoutes}</p>
               </div>
-              <Route className="h-8 w-8 text-emerald-500" />
+              <Route className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Transport Students</p>
-                <p className="text-3xl font-bold text-purple-600">{totalStudents}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Transport</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-purple-600">{totalStudents}</p>
               </div>
-              <Users className="h-8 w-8 text-purple-500" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Boarding Points</p>
-                <p className="text-3xl font-bold text-orange-600">24</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Boarding</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-600">24</p>
               </div>
-              <MapPin className="h-8 w-8 text-orange-500" />
+              <MapPin className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
@@ -1058,14 +1057,16 @@ const Vehicle = () => {
 
       {/* Vehicle Management Tabs */}
       <Tabs defaultValue="manage" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="manage">Vehicle Management</TabsTrigger>
-          <TabsTrigger value="list">Vehicle List</TabsTrigger>
-          <TabsTrigger value="routes">Routes</TabsTrigger>
-          <TabsTrigger value="boarding">Boarding Points</TabsTrigger>
-          <TabsTrigger value="students">Student List</TabsTrigger>
-          <TabsTrigger value="reports">Vehicle Report</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-3 lg:grid-cols-6 h-auto">
+            <TabsTrigger value="manage" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Manage</TabsTrigger>
+            <TabsTrigger value="list" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Vehicles</TabsTrigger>
+            <TabsTrigger value="routes" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Routes</TabsTrigger>
+            <TabsTrigger value="boarding" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Boarding</TabsTrigger>
+            <TabsTrigger value="students" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Students</TabsTrigger>
+            <TabsTrigger value="reports" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Reports</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="manage" className="space-y-4">
           <Card>

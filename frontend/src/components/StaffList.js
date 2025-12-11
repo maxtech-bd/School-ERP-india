@@ -459,30 +459,30 @@ const StaffListView = () => {
   }
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Staff Management</h1>
-          <p className="text-gray-600 mt-1">Manage school staff and employee records</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Staff Management</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage school staff and employee records</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" onClick={handleImport}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import Staff
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={handleImport}>
+            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Import</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsBulkPhotoModalOpen(true)}>
-            <Camera className="h-4 w-4 mr-2" />
-            Bulk Photo Upload
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 hidden md:flex" onClick={() => setIsBulkPhotoModalOpen(true)}>
+            <Camera className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Photos
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsExportModalOpen(true)}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => setIsExportModalOpen(true)}>
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Export</span>
           </Button>
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-600">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9">
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Add Staff
               </Button>
             </DialogTrigger>
