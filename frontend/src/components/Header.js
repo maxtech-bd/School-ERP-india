@@ -116,16 +116,16 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
-      <div className="flex items-center justify-between">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-3 sm:px-6 py-3 sm:py-4">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
         {/* Search Bar */}
-        <div className="flex-1 max-w-md">
+        <div className="flex-1 max-w-xs sm:max-w-md">
           <form onSubmit={handleSearch}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
-                placeholder="Search students, staff, or any data..."
-                className="pl-10 bg-gray-50 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-emerald-500"
+                placeholder="Search..."
+                className="pl-8 sm:pl-10 text-sm bg-gray-50 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-emerald-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -134,7 +134,7 @@ const Header = () => {
         </div>
 
         {/* Right side actions */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -191,11 +191,11 @@ const Header = () => {
           </Button>
 
           {/* User Menu */}
-          <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.full_name}</p>
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className={`text-xs ${getRoleColor(user?.role)}`}>
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="text-right hidden sm:block">
+              <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] sm:max-w-none">{user?.full_name}</p>
+              <div className="flex items-center justify-end space-x-2">
+                <Badge variant="secondary" className={`text-[10px] sm:text-xs ${getRoleColor(user?.role)}`}>
                   {user?.role?.replace('_', ' ').toUpperCase()}
                 </Badge>
               </div>
@@ -203,10 +203,10 @@ const Header = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
+                <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                     <AvatarImage src={user?.avatar} alt={user?.full_name} />
-                    <AvatarFallback className="bg-emerald-500 text-white">
+                    <AvatarFallback className="bg-emerald-500 text-white text-xs sm:text-sm">
                       {getInitials(user?.full_name)}
                     </AvatarFallback>
                   </Avatar>
@@ -244,18 +244,18 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Quick stats bar */}
-      <div className="flex items-center space-x-6 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+      {/* Quick stats bar - hidden on mobile */}
+      <div className="hidden sm:flex items-center space-x-4 sm:space-x-6 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-1 sm:gap-0">
           <span className="font-medium">Today:</span> 
-          <span className="ml-2 text-emerald-600 dark:text-emerald-400">245 Present</span>
-          <span className="mx-2">•</span>
+          <span className="ml-1 sm:ml-2 text-emerald-600 dark:text-emerald-400">245 Present</span>
+          <span className="mx-1 sm:mx-2">•</span>
           <span className="text-red-600 dark:text-red-400">12 Absent</span>
-          <span className="mx-2">•</span>
+          <span className="mx-1 sm:mx-2">•</span>
           <span className="text-orange-600 dark:text-orange-400">8 Late</span>
         </div>
         
-        <div className="text-xs text-gray-400 dark:text-gray-500">
+        <div className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 hidden md:block">
           Last updated: {new Date().toLocaleTimeString()}
         </div>
       </div>

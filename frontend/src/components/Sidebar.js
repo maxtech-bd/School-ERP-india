@@ -454,10 +454,6 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Main content offset for desktop */}
-      <div className="md:pl-64">
-        {/* Content goes here */}
-      </div>
     </>
   );
 };
