@@ -1078,102 +1078,104 @@ const StudentList = () => {
 
   // Student List View (default)
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-600 mt-1">Manage student information and records</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Students</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage student information and records</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => setIsPhotoUploadModalOpen(true)}>
-            <Camera className="h-4 w-4 mr-2" />
-            Bulk Photo Upload
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => setIsPhotoUploadModalOpen(true)}>
+            <Camera className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Bulk </span>Photo
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsImportModalOpen(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import Students
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => setIsImportModalOpen(true)}>
+            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Import
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsExportModalOpen(true)}>
-            <Download className="h-4 w-4 mr-2" />
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => setIsExportModalOpen(true)}>
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Export
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600" onClick={() => setIsAddStudentModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Student
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9" onClick={() => setIsAddStudentModalOpen(true)}>
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Add
           </Button>
         </div>
       </div>
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="w-full">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search by name, admission number, or roll number..."
+                  placeholder="Search students..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-sm"
                 />
               </div>
             </div>
-            <Select value={selectedClass} onValueChange={setSelectedClass}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="All Classes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all_classes">All Classes</SelectItem>
-                {classes.map((cls) => (
-                  <SelectItem key={cls.id} value={cls.id}>
-                    {cls.name} ({cls.standard})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedSection} onValueChange={setSelectedSection} disabled={!selectedClass}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="All Sections" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all_sections">All Sections</SelectItem>
-                {sections.map((section) => (
-                  <SelectItem key={section.id} value={section.id}>
-                    {section.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:flex sm:flex-row">
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
+                <SelectTrigger className="w-full sm:w-40 md:w-48 text-xs sm:text-sm">
+                  <SelectValue placeholder="All Classes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all_classes">All Classes</SelectItem>
+                  {classes.map((cls) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.name} ({cls.standard})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedSection} onValueChange={setSelectedSection} disabled={!selectedClass}>
+                <SelectTrigger className="w-full sm:w-40 md:w-48 text-xs sm:text-sm">
+                  <SelectValue placeholder="All Sections" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all_sections">All Sections</SelectItem>
+                  {sections.map((section) => (
+                    <SelectItem key={section.id} value={section.id}>
+                      {section.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Students Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
-              <Users className="h-5 w-5 text-emerald-500" />
-              <span>Student List</span>
-              <Badge variant="secondary">{filteredStudents.length} students</Badge>
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500" />
+              <span className="text-base sm:text-lg">Student List</span>
+              <Badge variant="secondary" className="text-xs">{filteredStudents.length} students</Badge>
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
+        <CardContent className="p-0 sm:p-4">
+          <div className="rounded-md border overflow-x-auto">
+            <Table className="min-w-[600px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">#</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Admission No</TableHead>
-                  <TableHead>Roll No</TableHead>
-                  <TableHead>Class</TableHead>
-                  <TableHead>Guardian</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="w-10 sm:w-12 px-2 sm:px-4">#</TableHead>
+                  <TableHead className="px-2 sm:px-4">Student</TableHead>
+                  <TableHead className="px-2 sm:px-4 hidden sm:table-cell">Admission No</TableHead>
+                  <TableHead className="px-2 sm:px-4 hidden md:table-cell">Roll No</TableHead>
+                  <TableHead className="px-2 sm:px-4">Class</TableHead>
+                  <TableHead className="px-2 sm:px-4 hidden lg:table-cell">Guardian</TableHead>
+                  <TableHead className="px-2 sm:px-4 hidden md:table-cell">Contact</TableHead>
+                  <TableHead className="px-2 sm:px-4">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1189,86 +1191,87 @@ const StudentList = () => {
                 ) : (
                   filteredStudents.map((student, index) => (
                     <TableRow key={student.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-10 w-10">
+                      <TableCell className="font-medium px-2 sm:px-4 text-xs sm:text-sm">{index + 1}</TableCell>
+                      <TableCell className="px-2 sm:px-4">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                             <AvatarImage src={student.photo_url} />
-                            <AvatarFallback className="bg-emerald-100 text-emerald-700">
+                            <AvatarFallback className="bg-emerald-100 text-emerald-700 text-xs sm:text-sm">
                               {student.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <p className="font-medium">{student.name}</p>
-                            <p className="text-sm text-gray-500">{student.father_name}</p>
+                          <div className="min-w-0">
+                            <p className="font-medium text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">{student.name}</p>
+                            <p className="text-xs text-gray-500 truncate max-w-[100px] sm:max-w-none">{student.father_name}</p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{student.admission_no}</Badge>
+                      <TableCell className="px-2 sm:px-4 hidden sm:table-cell">
+                        <Badge variant="outline" className="text-xs">{student.admission_no}</Badge>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{student.roll_no}</Badge>
+                      <TableCell className="px-2 sm:px-4 hidden md:table-cell">
+                        <Badge variant="secondary" className="text-xs">{student.roll_no}</Badge>
                       </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
+                      <TableCell className="px-2 sm:px-4">
+                        <div className="text-xs sm:text-sm">
                           <p className="font-medium">{getClassName(student.class_id)}</p>
-                          <p className="text-gray-500">Section {getSectionName(student.section_id)}</p>
+                          <p className="text-gray-500 text-xs">Sec {getSectionName(student.section_id)}</p>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <p className="font-medium">{student.guardian_name}</p>
-                          <div className="flex items-center text-gray-500">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {student.guardian_phone}
+                      <TableCell className="px-2 sm:px-4 hidden lg:table-cell">
+                        <div className="text-xs sm:text-sm">
+                          <p className="font-medium truncate max-w-[120px]">{student.guardian_name}</p>
+                          <div className="flex items-center text-gray-500 text-xs">
+                            <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">{student.guardian_phone}</span>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
+                      <TableCell className="px-2 sm:px-4 hidden md:table-cell">
+                        <div className="text-xs sm:text-sm">
                           <div className="flex items-center text-gray-500">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {student.phone}
+                            <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">{student.phone}</span>
                           </div>
                           {student.email && (
                             <div className="flex items-center text-gray-500 mt-1">
-                              <Mail className="h-3 w-3 mr-1" />
-                              {student.email}
+                              <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate max-w-[100px]">{student.email}</span>
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
+                      <TableCell className="px-2 sm:px-4">
+                        <div className="flex items-center space-x-1 sm:space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-blue-600 hover:text-blue-700"
+                            className="text-blue-600 hover:text-blue-700 h-7 w-7 sm:h-8 sm:w-8 p-0"
                             onClick={() => {
                               setViewingStudent(student);
                               setIsViewModalOpen(true);
                             }}
                             title="View Details"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                             onClick={() => handleEdit(student)}
                             title="Edit"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 h-7 w-7 sm:h-8 sm:w-8 p-0"
                             onClick={() => handleDeleteClick(student)}
                             title="Delete"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </TableCell>

@@ -1430,73 +1430,72 @@ const Fees = () => {
   };
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Fees Management</h1>
-          <p className="text-gray-600 mt-1">Manage school fees, payments, and financial records</p>
-          <p className="text-xs text-gray-400 mt-1">Build: v3.0-final-{new Date().toISOString().split('T')[0]}</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Fees Management</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage school fees, payments, and financial records</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => handleExportReport('excel')}>
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => handleExportReport('excel')}>
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Export
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600" onClick={handleCollectPayment}>
-            <CreditCard className="h-4 w-4 mr-2" />
-            Collect Payment
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9" onClick={handleCollectPayment}>
+            <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Collect
           </Button>
         </div>
       </div>
 
       {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Fees</p>
-                <p className="text-3xl font-bold text-gray-900">₹{(totalFees/100000).toFixed(1)}L</p>
-                <p className="text-xs text-gray-500">Academic Year</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Fees</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">₹{(totalFees/100000).toFixed(1)}L</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">Academic Year</p>
               </div>
-              <DollarSign className="h-8 w-8 text-blue-500" />
+              <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Collected</p>
-                <p className="text-3xl font-bold text-emerald-600">₹{(collected/100000).toFixed(1)}L</p>
-                <p className="text-xs text-emerald-500">+15% this month</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Collected</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-600">₹{(collected/100000).toFixed(1)}L</p>
+                <p className="text-[10px] sm:text-xs text-emerald-500 hidden sm:block">+15% this month</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-emerald-500" />
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-3xl font-bold text-orange-600">₹{(pending/100000).toFixed(1)}L</p>
-                <p className="text-xs text-orange-500">Due this month</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-600">₹{(pending/100000).toFixed(1)}L</p>
+                <p className="text-[10px] sm:text-xs text-orange-500 hidden sm:block">Due this month</p>
               </div>
-              <Calendar className="h-8 w-8 text-orange-500" />
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Overdue</p>
-                <p className="text-3xl font-bold text-red-600">₹{(overdue/100000).toFixed(1)}L</p>
-                <p className="text-xs text-red-500">Needs attention</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Overdue</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-red-600">₹{(overdue/100000).toFixed(1)}L</p>
+                <p className="text-[10px] sm:text-xs text-red-500 hidden sm:block">Needs attention</p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-red-500" />
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-red-500" />
             </div>
           </CardContent>
         </Card>
@@ -1504,59 +1503,58 @@ const Fees = () => {
 
       {/* Fees Management Tabs */}
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="manage">Manage Fees</TabsTrigger>
-          <TabsTrigger value="student-specific">Student Specific</TabsTrigger>
-          <TabsTrigger value="due">Fee Due</TabsTrigger>
-          <TabsTrigger value="select-student">Select Student</TabsTrigger>
-          <TabsTrigger value="collection">Fee Collection</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto">
+          <TabsTrigger value="manage" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Manage</TabsTrigger>
+          <TabsTrigger value="student-specific" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Student</TabsTrigger>
+          <TabsTrigger value="due" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Due</TabsTrigger>
+          <TabsTrigger value="select-student" className="text-xs sm:text-sm py-2 px-1 sm:px-3 hidden sm:flex">Select</TabsTrigger>
+          <TabsTrigger value="collection" className="text-xs sm:text-sm py-2 px-1 sm:px-3 hidden sm:flex">Collection</TabsTrigger>
         </TabsList>
 
         <TabsContent value="manage" className="space-y-4">
-          {/* HUGE CLEAR VISUAL INDICATOR FOR MANAGE FEES TAB */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-8 border-blue-500 rounded-lg p-8 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-500 text-white rounded-full p-4">
-                <DollarSign className="h-8 w-8" />
+          {/* Fee Section Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 sm:border-l-8 border-blue-500 rounded-lg p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="bg-blue-500 text-white rounded-full p-2 sm:p-3 md:p-4">
+                <DollarSign className="h-4 w-4 sm:h-6 sm:w-6 md:h-8 md:w-8" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-blue-700">🔧 MANAGE FEES TAB</h1>
-                <h2 className="text-xl font-bold text-blue-700">Fee Structure Management & Configuration</h2>
-                <p className="text-blue-600">Configure fee types, amounts, and payment schedules</p>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700">Fee Structure Management</h2>
+                <p className="text-xs sm:text-sm text-blue-600">Configure fee types, amounts, and payment schedules</p>
               </div>
             </div>
           </div>
           
           <Card>
-            <CardHeader>
-              <CardTitle>Fee Types Configuration</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Fee Types Configuration</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardContent className="p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
-                  <CardContent className="p-6 text-center">
-                    <DollarSign className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <h3 className="font-medium mb-2">Tuition Fees</h3>
-                    <p className="text-sm text-gray-600 mb-3">Monthly tuition charges</p>
-                    <Button variant="outline" size="sm" onClick={() => handleFeeConfiguration('Tuition Fees')}>Configure</Button>
+                  <CardContent className="p-4 sm:p-6 text-center">
+                    <DollarSign className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto text-gray-400 mb-2 sm:mb-3" />
+                    <h3 className="font-medium text-sm sm:text-base mb-1 sm:mb-2">Tuition Fees</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">Monthly tuition charges</p>
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => handleFeeConfiguration('Tuition Fees')}>Configure</Button>
                   </CardContent>
                 </Card>
                 
                 <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
-                  <CardContent className="p-6 text-center">
-                    <Receipt className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <h3 className="font-medium mb-2">Transport Fees</h3>
-                    <p className="text-sm text-gray-600 mb-3">Bus and transport charges</p>
-                    <Button variant="outline" size="sm" onClick={() => handleFeeConfiguration('Transport Fees')}>Configure</Button>
+                  <CardContent className="p-4 sm:p-6 text-center">
+                    <Receipt className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto text-gray-400 mb-2 sm:mb-3" />
+                    <h3 className="font-medium text-sm sm:text-base mb-1 sm:mb-2">Transport Fees</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">Bus and transport charges</p>
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => handleFeeConfiguration('Transport Fees')}>Configure</Button>
                   </CardContent>
                 </Card>
                 
-                <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
-                  <CardContent className="p-6 text-center">
-                    <CreditCard className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <h3 className="font-medium mb-2">Admission Fees</h3>
-                    <p className="text-sm text-gray-600 mb-3">One-time admission charges</p>
-                    <Button variant="outline" size="sm" onClick={() => handleFeeConfiguration('Admission Fees')}>Configure</Button>
+                <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors sm:col-span-2 lg:col-span-1">
+                  <CardContent className="p-4 sm:p-6 text-center">
+                    <CreditCard className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto text-gray-400 mb-2 sm:mb-3" />
+                    <h3 className="font-medium text-sm sm:text-base mb-1 sm:mb-2">Admission Fees</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">One-time admission charges</p>
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => handleFeeConfiguration('Admission Fees')}>Configure</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -1565,34 +1563,34 @@ const Fees = () => {
 
           {/* Recent Payments Summary for Manage Fees */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5 text-blue-500" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                 Recent Payment Activity
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{paymentsToday}</p>
-                  <p className="text-sm text-green-600">Payments Today</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+                <div className="text-center p-2 sm:p-4 bg-green-50 rounded-lg">
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{paymentsToday}</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-green-600">Payments Today</p>
                 </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">
+                <div className="text-center p-2 sm:p-4 bg-blue-50 rounded-lg">
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                     {todaysCollection >= 100000 
                       ? `₹${(todaysCollection / 100000).toFixed(2)}L`
                       : `₹${todaysCollection.toLocaleString('en-IN')}`
                     }
                   </p>
-                  <p className="text-sm text-blue-600">Today's Collection</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-blue-600">Today's Collection</p>
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <p className="text-2xl font-bold text-orange-600">{pendingApprovals}</p>
-                  <p className="text-sm text-orange-600">Pending Approvals</p>
+                <div className="text-center p-2 sm:p-4 bg-orange-50 rounded-lg">
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600">{pendingApprovals}</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-orange-600">Pending</p>
                 </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <p className="text-2xl font-bold text-purple-600">₹{(monthlyTarget / 100000).toFixed(1)}L</p>
-                  <p className="text-sm text-purple-600">Monthly Target</p>
+                <div className="text-center p-2 sm:p-4 bg-purple-50 rounded-lg">
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">₹{(monthlyTarget / 100000).toFixed(1)}L</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-purple-600">Monthly Target</p>
                 </div>
               </div>
             </CardContent>

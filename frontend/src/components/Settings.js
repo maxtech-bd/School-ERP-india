@@ -2297,68 +2297,68 @@ const Settings = () => {
   ];
 
   return (
-    <div className="space-y-6 fade-in">
+    <div className="space-y-4 sm:space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">Configure system settings and preferences</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Settings</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Configure system settings and preferences</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Database className="h-4 w-4 mr-2" />
-            Backup Settings
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
+            <Database className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Backup
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600">
-            <SettingsIcon className="h-4 w-4 mr-2" />
-            System Configuration
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-xs sm:text-sm h-8 sm:h-9">
+            <SettingsIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Config
           </Button>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Settings</p>
-                <p className="text-3xl font-bold text-gray-900">{activeSettings}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Active Settings</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">{activeSettings}</p>
               </div>
-              <SettingsIcon className="h-8 w-8 text-blue-500" />
+              <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">User Roles</p>
-                <p className="text-3xl font-bold text-emerald-600">5</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">User Roles</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-600">5</p>
               </div>
-              <Users className="h-8 w-8 text-emerald-500" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Permissions</p>
-                <p className="text-3xl font-bold text-purple-600">24</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Permissions</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-purple-600">24</p>
               </div>
-              <Shield className="h-8 w-8 text-purple-500" />
+              <Shield className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Last Backup</p>
-                <p className="text-lg font-bold text-orange-600">2 hours ago</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Last Backup</p>
+                <p className="text-sm sm:text-base md:text-lg font-bold text-orange-600">2 hours ago</p>
               </div>
-              <Database className="h-8 w-8 text-orange-500" />
+              <Database className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
@@ -2366,17 +2366,19 @@ const Settings = () => {
 
       {/* Settings Categories Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-9">
-          <TabsTrigger value="academic">Academic Periods</TabsTrigger>
-          <TabsTrigger value="classes">Manage Classes</TabsTrigger>
-          <TabsTrigger value="timetable">Time Table</TabsTrigger>
-          <TabsTrigger value="grades">Manage Grades</TabsTrigger>
-          <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-          <TabsTrigger value="institution">Institution</TabsTrigger>
-          <TabsTrigger value="staff-settings">Staff Settings</TabsTrigger>
-          <TabsTrigger value="permissions">Permissions</TabsTrigger>
-          <TabsTrigger value="user-management">User Management</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-5 lg:grid-cols-9 h-auto">
+            <TabsTrigger value="academic" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Academic</TabsTrigger>
+            <TabsTrigger value="classes" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Classes</TabsTrigger>
+            <TabsTrigger value="timetable" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Timetable</TabsTrigger>
+            <TabsTrigger value="grades" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Grades</TabsTrigger>
+            <TabsTrigger value="curriculum" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Curriculum</TabsTrigger>
+            <TabsTrigger value="institution" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden sm:flex">Institution</TabsTrigger>
+            <TabsTrigger value="staff-settings" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Staff</TabsTrigger>
+            <TabsTrigger value="permissions" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Permissions</TabsTrigger>
+            <TabsTrigger value="user-management" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap hidden lg:flex">Users</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="academic" className="space-y-4">
           <Card>
