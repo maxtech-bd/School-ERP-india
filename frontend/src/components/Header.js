@@ -116,16 +116,16 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-3 sm:px-6 py-3 sm:py-4">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
       <div className="flex items-center justify-between gap-2 sm:gap-4">
-        {/* Search Bar */}
-        <div className="flex-1 max-w-xs sm:max-w-md">
-          <form onSubmit={handleSearch}>
+        {/* Search Bar - Hidden on mobile, shown on sm+ */}
+        <div className="hidden sm:flex flex-1 max-w-xs md:max-w-md">
+          <form onSubmit={handleSearch} className="w-full">
             <div className="relative">
-              <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Search..."
-                className="pl-8 sm:pl-10 text-sm bg-gray-50 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-emerald-500"
+                className="pl-10 text-sm bg-gray-50 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-emerald-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -133,8 +133,15 @@ const Header = () => {
           </form>
         </div>
 
+        {/* Mobile Search Icon - Only on mobile */}
+        <div className="sm:hidden flex-1">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/search')}>
+            <Search className="h-5 w-5 text-gray-500" />
+          </Button>
+        </div>
+
         {/* Right side actions */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
