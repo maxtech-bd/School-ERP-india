@@ -12,6 +12,13 @@ Preferred communication style: Simple, everyday language.
 - **React 19 SPA**: Built with functional components and hooks.
 - **Tailwind CSS & Shadcn/ui**: Utilized for consistent styling and accessible UI components.
 - **Component-based**: Emphasizes reusable UI components.
+- **Fully Responsive Design**: All modules are responsive across mobile, tablet, and desktop. Uses Tailwind CSS breakpoints (sm, md, lg, xl) consistently. Key patterns include:
+  - Grid layouts: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4`
+  - Text scaling: `text-xs sm:text-sm md:text-base`
+  - Padding/spacing: `p-3 sm:p-4 md:p-6`
+  - Hidden/visible elements: `hidden sm:block`, `hidden lg:flex`
+  - Tables: `overflow-x-auto` wrapper for horizontal scrolling on mobile
+  - Tab lists: Scrollable on mobile with `overflow-x-auto` and grid layouts on larger screens
 
 ## Technical Implementations
 - **Frontend**: React 19, React Router DOM, Axios, Context API.
