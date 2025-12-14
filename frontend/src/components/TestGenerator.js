@@ -30,6 +30,10 @@ const TestGenerator = () => {
   // Which class is selected in History view
   const [selectedHistoryClassId, setSelectedHistoryClassId] = useState(null);
 
+  // Dynamic subjects from API based on selected class
+  const [subjectOptions, setSubjectOptions] = useState([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+
   // Test generation form with subject configs
   const [subjectConfigs, setSubjectConfigs] = useState([
     {
@@ -56,14 +60,6 @@ const TestGenerator = () => {
     scheduled_end: "",
   });
 
-  const subjects = [
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "Math",
-    "English",
-    "Computer Science",
-  ];
   const difficultyLevels = ["easy", "medium", "hard"];
   const learningTags = [
     "Knowledge",
@@ -119,6 +115,40 @@ const TestGenerator = () => {
       fetchTests();
     }
   }, [activeTab]);
+
+  // ---------- Fetch Subjects for selected class ----------
+  const fetchSubjectsForClass = async (classStandard) => {
+    if (!classStandard) {
+      setSubjectOptions([]);
+      return;
+    }
+    
+    try {
+      setSubjectsLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_BASE_URL}/subjects/by-class/${classStandard}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSubjectOptions(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch subjects for class", error);
+      setSubjectOptions([]);
+    } finally {
+      setSubjectsLoading(false);
+    }
+  };
+
+  // Handle class change - fetch subjects dynamically
+  const handleTestClassChange = (e) => {
+    const classStandard = e.target.value;
+    setTestForm({ ...testForm, class_standard: classStandard });
+    // Clear subject configs when class changes
+    setSubjectConfigs([{ subject: "", num_questions: 10, max_marks: 100 }]);
+    fetchSubjectsForClass(classStandard);
+  };
 
   // ---------- Subject config handlers ----------
   const handleAddSubject = () => {
@@ -429,9 +459,7 @@ const TestGenerator = () => {
               <label className="block text-sm font-medium mb-2">Class *</label>
               <select
                 value={testForm.class_standard}
-                onChange={(e) =>
-                  setTestForm({ ...testForm, class_standard: e.target.value })
-                }
+                onChange={handleTestClassChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 disabled={classLoading}
               >
@@ -535,11 +563,20 @@ const TestGenerator = () => {
                             )
                           }
                           className="w-full px-3 py-2 border rounded-lg"
+                          disabled={!testForm.class_standard || subjectsLoading}
                         >
-                          <option value="">Select Subject</option>
-                          {subjects.map((s) => (
-                            <option key={s} value={s}>
-                              {s}
+                          <option value="">
+                            {subjectsLoading
+                              ? "Loading subjects..."
+                              : !testForm.class_standard
+                              ? "Select class first"
+                              : subjectOptions.length === 0
+                              ? "No subjects available"
+                              : "Select Subject"}
+                          </option>
+                          {subjectOptions.map((s) => (
+                            <option key={s.id || s.subject_name} value={s.subject_name}>
+                              {s.subject_name}
                             </option>
                           ))}
                         </select>

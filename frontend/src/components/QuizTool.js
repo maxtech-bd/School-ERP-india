@@ -25,6 +25,10 @@ const QuizTool = () => {
   const [classOptions, setClassOptions] = useState([]);
   const [classLoading, setClassLoading] = useState(false);
 
+  // Dynamic subjects from API based on selected class
+  const [subjectOptions, setSubjectOptions] = useState([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+
   // Quiz generation filters
   const [filters, setFilters] = useState({
     class_standard: "",
@@ -52,14 +56,6 @@ const QuizTool = () => {
   const [timerPaused, setTimerPaused] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const subjects = [
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "Math",
-    "English",
-    "Computer Science",
-  ];
   const difficultyLevels = ["easy", "medium", "hard"];
   const learningTags = [
     "Knowledge",
@@ -99,6 +95,43 @@ const QuizTool = () => {
   useEffect(() => {
     fetchClasses();
   }, []);
+
+  // --------- Fetch Subjects for selected class ----------
+  const fetchSubjectsForClass = async (classStandard) => {
+    if (!classStandard) {
+      setSubjectOptions([]);
+      return;
+    }
+    
+    try {
+      setSubjectsLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_BASE_URL}/subjects/by-class/${classStandard}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSubjectOptions(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch subjects for class", error);
+      setSubjectOptions([]);
+    } finally {
+      setSubjectsLoading(false);
+    }
+  };
+
+  // Handle class change - fetch subjects dynamically
+  const handleClassChange = (e) => {
+    const classStandard = e.target.value;
+    setFilters({
+      ...filters,
+      class_standard: classStandard,
+      subject: "",
+      chapter: "",
+    });
+    fetchSubjectsForClass(classStandard);
+  };
 
   // --------- Generate Quiz ----------
   const handleGenerateQuiz = async () => {
@@ -402,9 +435,7 @@ const QuizTool = () => {
               <label className="block text-sm font-medium mb-2">Class *</label>
               <select
                 value={filters.class_standard}
-                onChange={(e) =>
-                  setFilters({ ...filters, class_standard: e.target.value })
-                }
+                onChange={handleClassChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 disabled={classLoading}
               >
@@ -430,11 +461,20 @@ const QuizTool = () => {
                   setFilters({ ...filters, subject: e.target.value })
                 }
                 className="w-full px-3 py-2 border rounded-lg"
+                disabled={!filters.class_standard || subjectsLoading}
               >
-                <option value="">Select Subject</option>
-                {subjects.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
+                <option value="">
+                  {subjectsLoading
+                    ? "Loading subjects..."
+                    : !filters.class_standard
+                    ? "Select class first"
+                    : subjectOptions.length === 0
+                    ? "No subjects available"
+                    : "Select Subject"}
+                </option>
+                {subjectOptions.map((s) => (
+                  <option key={s.id || s.subject_name} value={s.subject_name}>
+                    {s.subject_name}
                   </option>
                 ))}
               </select>
