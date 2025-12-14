@@ -6,7 +6,8 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -23,14 +24,14 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       console.error('Error loading stored user:', e);
     } finally {
-      setLoading(false);
+      setIsInitializing(false);
     }
   };
 
   const login = async (username, password, tenantId) => {
     try {
       setError(null);
-      setLoading(true);
+      setLoginLoading(true);
       
       if (tenantId) {
         await AsyncStorage.setItem('tenant_id', tenantId);
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
-      setLoading(false);
+      setLoginLoading(false);
     }
   };
 
@@ -68,7 +69,8 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        loading: isInitializing,
+        loginLoading,
         error,
         login,
         logout,

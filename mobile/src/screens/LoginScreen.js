@@ -18,7 +18,7 @@ const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [tenantId, setTenantId] = useState('');
-  const { login, loading, error } = useAuth();
+  const { login, loginLoading, error } = useAuth();
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -92,7 +92,7 @@ const LoginScreen = () => {
             <TouchableOpacity
               style={styles.loginButton}
               onPress={handleLogin}
-              disabled={loading}
+              disabled={loginLoading}
             >
               <LinearGradient
                 colors={['#00b894', '#00cec9']}
@@ -100,7 +100,7 @@ const LoginScreen = () => {
                 end={{ x: 1, y: 0 }}
                 style={styles.gradientButton}
               >
-                {loading ? (
+                {loginLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text style={styles.loginButtonText}>Login</Text>
