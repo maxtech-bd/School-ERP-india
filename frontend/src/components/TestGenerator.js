@@ -116,6 +116,12 @@ const TestGenerator = () => {
     }
   }, [activeTab]);
 
+  const getClassValue = (classStandard) => {
+    if (!classStandard) return "";
+    const match = classStandard.match(/\d+/);
+    return match ? match[0] : classStandard;
+  };
+
   // ---------- Fetch Subjects for selected class ----------
   const fetchSubjectsForClass = async (classStandard) => {
     if (!classStandard) {
@@ -123,11 +129,13 @@ const TestGenerator = () => {
       return;
     }
     
+    const numericStandard = getClassValue(classStandard);
+    
     try {
       setSubjectsLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${API_BASE_URL}/subjects/by-class/${classStandard}`,
+        `${API_BASE_URL}/subjects/by-class/${numericStandard}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
