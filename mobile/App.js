@@ -15,6 +15,7 @@ import {
   NotesScreen,
   AssistantScreen,
   ProfileScreen,
+  AttendanceScreen,
 } from './src/screens';
 
 const Stack = createNativeStackNavigator();
@@ -53,7 +54,7 @@ const MainTabs = () => {
     >
       <Tab.Screen name="Home" component={DashboardScreen} />
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Attendance" component={DashboardScreen} />
+      <Tab.Screen name="Attendance" component={AttendanceScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

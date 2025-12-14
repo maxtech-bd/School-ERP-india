@@ -8,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 });
 
 api.interceptors.request.use(
@@ -44,10 +45,15 @@ export const authAPI = {
   getProfile: () => api.get('/auth/me'),
 };
 
+export const classesAPI = {
+  getClasses: () => api.get('/classes'),
+  getSubjects: () => api.get('/subjects'),
+};
+
 export const quizAPI = {
-  getQuizzes: () => api.get('/quiz'),
-  getQuiz: (id) => api.get(`/quiz/${id}`),
-  submitQuiz: (id, answers) => api.post(`/quiz/${id}/submit`, { answers }),
+  generateQuiz: (data) => api.post('/ai/quiz/generate', data),
+  submitQuiz: (quizId, answers) => api.post(`/ai/quiz/${quizId}/submit`, { answers }),
+  getQuizHistory: () => api.get('/ai/quiz/history'),
 };
 
 export const summaryAPI = {
@@ -61,7 +67,12 @@ export const notesAPI = {
 };
 
 export const assistantAPI = {
-  chat: (message) => api.post('/ai/assistant/chat', { message }),
+  chat: (data) => api.post('/ai/assistant/chat', data),
+};
+
+export const attendanceAPI = {
+  getAttendance: (params) => api.get('/attendance', { params }),
+  getMyAttendance: () => api.get('/attendance/my'),
 };
 
 export default api;

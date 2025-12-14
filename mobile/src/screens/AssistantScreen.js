@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,39 +9,59 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { assistantAPI } from '../services/api';
 
-const AssistantScreen = () => {
+const AssistantScreen = ({ navigation }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
     {
       id: '1',
-      text: 'Hello! I am GiNi, your AI learning assistant. How can I help you today?',
+      text: 'Hello! I am GiNi, your AI learning assistant. How can I help you today? You can ask me questions about your subjects, get explanations, or ask for study tips!',
       isBot: true,
     },
   ]);
+  const [loading, setLoading] = useState(false);
+  const flatListRef = useRef(null);
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
+  const sendMessage = async () => {
+    if (!message.trim() || loading) return;
 
-    const newMessage = {
+    const userMessage = {
       id: Date.now().toString(),
       text: message,
       isBot: false,
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, userMessage]);
+    const currentMessage = message;
     setMessage('');
+    setLoading(true);
 
-    setTimeout(() => {
+    try {
+      const response = await assistantAPI.chat({
+        message: currentMessage,
+        sources: ['academic_books', 'reference_books', 'qa_knowledge_base'],
+      });
+
       const botReply = {
         id: (Date.now() + 1).toString(),
-        text: 'I understand your question. Let me help you with that. This feature will be fully functional when connected to the backend API.',
+        text: response.data.response || response.data.message || 'I received your message but could not generate a response.',
         isBot: true,
       };
       setMessages((prev) => [...prev, botReply]);
-    }, 1000);
+    } catch (error) {
+      const errorMessage = {
+        id: (Date.now() + 1).toString(),
+        text: 'Sorry, I encountered an error. Please try again.',
+        isBot: true,
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderMessage = ({ item }) => (
@@ -69,27 +89,36 @@ const AssistantScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#1a1a2e', '#16213e']}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
           <View style={styles.headerIcon}>
             <Text style={styles.headerIconText}>🤖</Text>
           </View>
-          <View>
+          <View style={styles.headerInfo}>
             <Text style={styles.headerTitle}>GiNi Assistant</Text>
             <Text style={styles.headerSubtitle}>AI-Powered Learning</Text>
           </View>
         </View>
 
         <FlatList
+          ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
           style={styles.messageList}
           contentContainerStyle={styles.messageListContent}
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
         />
+
+        {loading && (
+          <View style={styles.typingIndicator}>
+            <Text style={styles.typingText}>GiNi is typing...</Text>
+            <ActivityIndicator size="small" color="#00b894" />
+          </View>
+        )}
 
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -102,10 +131,15 @@ const AssistantScreen = () => {
               value={message}
               onChangeText={setMessage}
               multiline
+              editable={!loading}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <TouchableOpacity
+              style={[styles.sendButton, loading && styles.sendButtonDisabled]}
+              onPress={sendMessage}
+              disabled={loading}
+            >
               <LinearGradient
-                colors={['#00b894', '#00cec9']}
+                colors={loading ? ['#666', '#666'] : ['#00b894', '#00cec9']}
                 style={styles.sendButtonGradient}
               >
                 <Text style={styles.sendButtonText}>↑</Text>
@@ -129,26 +163,37 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
+  backButton: {
+    padding: 8,
+    marginRight: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 24,
+  },
   headerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(0, 184, 148, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   headerIconText: {
-    fontSize: 24,
+    fontSize: 20,
+  },
+  headerInfo: {
+    flex: 1,
   },
   headerTitle: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   headerSubtitle: {
@@ -202,6 +247,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  typingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  typingText: {
+    color: '#888',
+    fontSize: 12,
+    marginRight: 8,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -226,6 +282,9 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     overflow: 'hidden',
+  },
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
   sendButtonGradient: {
     flex: 1,
