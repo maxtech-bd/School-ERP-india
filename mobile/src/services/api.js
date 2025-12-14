@@ -47,7 +47,45 @@ export const authAPI = {
 
 export const classesAPI = {
   getClasses: () => api.get('/classes'),
+  getSections: (classId) => api.get(`/sections${classId ? `?class_id=${classId}` : ''}`),
   getSubjects: () => api.get('/subjects'),
+  getSubjectsByClass: (classStandard) => api.get(`/subjects/by-class/${classStandard}`),
+};
+
+export const studentsAPI = {
+  getStudents: (params) => api.get('/students', { params }),
+  getStudent: (id) => api.get(`/students/${id}`),
+  getStudentCount: () => api.get('/students/count'),
+};
+
+export const staffAPI = {
+  getStaff: (params) => api.get('/staff', { params }),
+  getStaffMember: (id) => api.get(`/staff/${id}`),
+  getStaffCount: () => api.get('/staff/count'),
+};
+
+export const timetableAPI = {
+  getTimetables: (params) => api.get('/timetables', { params }),
+  getTimetable: (id) => api.get(`/timetables/${id}`),
+  getMyTimetable: () => api.get('/timetables/my'),
+};
+
+export const calendarAPI = {
+  getEvents: (params) => api.get('/calendar/events', { params }),
+  getEvent: (id) => api.get(`/calendar/events/${id}`),
+};
+
+export const notificationsAPI = {
+  getNotifications: (params) => api.get('/notifications', { params }),
+  getUnreadCount: () => api.get('/notifications/unread-count'),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
+  markAllAsRead: () => api.put('/notifications/read-all'),
+};
+
+export const testsAPI = {
+  getTests: (params) => api.get('/tests', { params }),
+  getTest: (id) => api.get(`/tests/${id}`),
+  generateTest: (data) => api.post('/ai/test/generate', data),
 };
 
 export const quizAPI = {
@@ -73,6 +111,11 @@ export const assistantAPI = {
 export const attendanceAPI = {
   getAttendance: (params) => api.get('/attendance', { params }),
   getMyAttendance: () => api.get('/attendance/my'),
+};
+
+export const dashboardAPI = {
+  getAnalytics: (params) => api.get('/gini/usage/analytics', { params }),
+  getStats: () => api.get('/dashboard/stats'),
 };
 
 export default api;

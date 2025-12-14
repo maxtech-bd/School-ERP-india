@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,94 +7,151 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
+  RefreshControl,
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import api from '../services/api';
+import { staffAPI } from '../services/api';
 
-const StaffListScreen = ({ navigation }) => {
-  const [staff, setStaff] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredStaff, setFilteredStaff] = useState([]);
-
-  useEffect(() => {
-    fetchStaff();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = staff.filter(s => 
-        s.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.designation?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredStaff(filtered);
-    } else {
-      setFilteredStaff(staff);
-    }
-  }, [searchQuery, staff]);
-
-  const fetchStaff = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/staff');
-      setStaff(response.data || []);
-      setFilteredStaff(response.data || []);
-    } catch (error) {
-      console.error('Failed to fetch staff:', error);
-    } finally {
-      setLoading(false);
-    }
+const StaffCard = ({ staff }) => {
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const StaffCard = ({ member }) => (
-    <TouchableOpacity style={styles.staffCard}>
-      <View style={[styles.avatar, { backgroundColor: member.role === 'teacher' ? '#9b59b6' : '#00b894' }]}>
-        <Text style={styles.avatarText}>
-          {member.full_name?.charAt(0)?.toUpperCase() || 'S'}
-        </Text>
+  const getAvatarColor = (name) => {
+    const colors = ['#9b59b6', '#3498db', '#e74c3c', '#f39c12', '#1abc9c', '#34495e'];
+    const index = name ? name.charCodeAt(0) % colors.length : 0;
+    return colors[index];
+  };
+
+  const getRoleColor = (role) => {
+    const colors = {
+      teacher: '#3498db',
+      admin: '#9b59b6',
+      super_admin: '#e74c3c',
+      principal: '#f39c12',
+    };
+    return colors[role?.toLowerCase()] || '#1abc9c';
+  };
+
+  return (
+    <TouchableOpacity style={styles.staffCard} activeOpacity={0.7}>
+      <View style={[styles.avatar, { backgroundColor: getAvatarColor(staff.full_name || staff.name) }]}>
+        <Text style={styles.avatarText}>{getInitials(staff.full_name || staff.name)}</Text>
       </View>
       <View style={styles.staffInfo}>
-        <Text style={styles.staffName}>{member.full_name || 'Unknown'}</Text>
-        <Text style={styles.staffDesignation}>{member.designation || member.role || '-'}</Text>
-        <Text style={styles.staffSubject}>{member.subject || member.department || '-'}</Text>
+        <Text style={styles.staffName}>{staff.full_name || staff.name || 'Unknown'}</Text>
+        <Text style={styles.staffDesignation}>{staff.designation || staff.role || 'Staff'}</Text>
+        {staff.department && (
+          <Text style={styles.staffDept}>📁 {staff.department}</Text>
+        )}
+      </View>
+      <View style={[styles.roleBadge, { backgroundColor: getRoleColor(staff.role) + '30' }]}>
+        <Text style={[styles.roleText, { color: getRoleColor(staff.role) }]}>
+          {(staff.role || 'Staff').replace(/_/g, ' ')}
+        </Text>
       </View>
     </TouchableOpacity>
   );
+};
+
+const StaffListScreen = ({ navigation }) => {
+  const [staff, setStaff] = useState([]);
+  const [filteredStaff, setFilteredStaff] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchStaff = useCallback(async () => {
+    try {
+      const response = await staffAPI.getStaff();
+      const data = response.data?.staff || response.data || [];
+      setStaff(data);
+      setFilteredStaff(data);
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      setStaff([]);
+      setFilteredStaff([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredStaff(staff);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = staff.filter(s => 
+        (s.full_name || s.name || '').toLowerCase().includes(query) ||
+        (s.designation || '').toLowerCase().includes(query) ||
+        (s.department || '').toLowerCase().includes(query)
+      );
+      setFilteredStaff(filtered);
+    }
+  }, [searchQuery, staff]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchStaff();
+    setRefreshing(false);
+  }, [fetchStaff]);
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>←</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Staff List</Text>
-          <View style={{ width: 30 }} />
+          <Text style={styles.headerTitle}>Staff</Text>
+          <View style={styles.countBadge}>
+            <Text style={styles.countText}>{filteredStaff.length}</Text>
+          </View>
         </View>
 
         <View style={styles.searchContainer}>
+          <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search staff..."
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            placeholder="Search by name or designation..."
+            placeholderTextColor="#666"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Text style={styles.clearIcon}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#00b894" />
+            <ActivityIndicator size="large" color="#9b59b6" />
+            <Text style={styles.loadingText}>Loading staff...</Text>
+          </View>
+        ) : filteredStaff.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>👨‍🏫</Text>
+            <Text style={styles.emptyText}>No staff found</Text>
+            <Text style={styles.emptySubtext}>
+              {searchQuery ? 'Try a different search term' : 'Staff members will appear here'}
+            </Text>
           </View>
         ) : (
           <FlatList
             data={filteredStaff}
-            keyExtractor={(item) => item.id || String(Math.random())}
-            renderItem={({ item }) => <StaffCard member={item} />}
-            contentContainerStyle={styles.listContainer}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No staff found</Text>
+            keyExtractor={(item, index) => item.id || index.toString()}
+            renderItem={({ item }) => <StaffCard staff={item} />}
+            contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#9b59b6" />
             }
           />
         )}
@@ -113,48 +170,107 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backButtonText: {
     color: '#fff',
     fontSize: 24,
   },
   headerTitle: {
+    flex: 1,
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    marginLeft: 16,
+  },
+  countBadge: {
+    backgroundColor: '#9b59b6',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  countText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   searchContainer: {
-    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 14,
+    marginHorizontal: 16,
     marginBottom: 16,
+    paddingHorizontal: 14,
+    height: 50,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 10,
   },
   searchInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 14,
+    flex: 1,
     color: '#fff',
     fontSize: 16,
+  },
+  clearIcon: {
+    color: '#888',
+    fontSize: 18,
+    padding: 4,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  listContainer: {
-    paddingHorizontal: 20,
+  loadingText: {
+    color: '#888',
+    marginTop: 16,
+    fontSize: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  listContent: {
+    paddingHorizontal: 16,
     paddingBottom: 20,
   },
   staffCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
   },
   avatar: {
     width: 50,
@@ -162,15 +278,15 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
   },
   avatarText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   staffInfo: {
     flex: 1,
+    marginLeft: 14,
   },
   staffName: {
     color: '#fff',
@@ -178,20 +294,24 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   staffDesignation: {
-    color: '#00b894',
+    color: '#9b59b6',
     fontSize: 13,
     marginTop: 2,
   },
-  staffSubject: {
-    color: 'rgba(255, 255, 255, 0.5)',
+  staffDept: {
+    color: '#888',
     fontSize: 12,
     marginTop: 2,
   },
-  emptyText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    textAlign: 'center',
-    marginTop: 40,
-    fontSize: 16,
+  roleBadge: {
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  roleText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
   },
 });
 
