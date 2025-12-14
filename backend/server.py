@@ -6544,8 +6544,9 @@ async def get_subjects_by_class(class_standard: str, current_user: User = Depend
         
         overall_progress = (completed_topics / total_topics * 100) if total_topics > 0 else 0
         
+        subject_dict = {k: v for k, v in subject.items() if k != '_id'}
         result.append({
-            **subject,
+            **subject_dict,
             "overall_progress": round(overall_progress, 2),
             "total_topics": total_topics,
             "completed_topics": completed_topics
