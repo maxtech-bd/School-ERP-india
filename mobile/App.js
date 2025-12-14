@@ -1,10 +1,10 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import {
@@ -104,10 +104,12 @@ const Navigation = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <StatusBar style="light" />
-      <Navigation />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <StatusBar style="light" />
+        <Navigation />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 
