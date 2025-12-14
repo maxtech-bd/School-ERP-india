@@ -55,8 +55,8 @@ const QuizScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await quizAPI.generateQuiz({
-        class_id: selectedClass,
-        subject_id: selectedSubject,
+        class_standard: selectedClass,
+        subject: selectedSubject,
         num_questions: parseInt(numQuestions),
       });
       setQuiz(response.data);
@@ -64,7 +64,8 @@ const QuizScreen = ({ navigation }) => {
       setAnswers({});
       setShowResults(false);
     } catch (error) {
-      Alert.alert('Error', 'Failed to generate quiz. Please try again.');
+      console.log('Quiz error:', error?.response?.data || error.message);
+      Alert.alert('Error', error?.response?.data?.detail || 'Failed to generate quiz. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -237,7 +238,7 @@ const QuizScreen = ({ navigation }) => {
               >
                 <Picker.Item label="Choose a class..." value="" />
                 {classes.map((cls) => (
-                  <Picker.Item key={cls._id || cls.id} label={cls.name} value={cls._id || cls.id} />
+                  <Picker.Item key={cls._id || cls.id} label={cls.name} value={cls.standard || cls.name} />
                 ))}
               </Picker>
             </View>
@@ -252,7 +253,7 @@ const QuizScreen = ({ navigation }) => {
               >
                 <Picker.Item label="Choose a subject..." value="" />
                 {subjects.map((sub) => (
-                  <Picker.Item key={sub._id || sub.id} label={sub.subject_name || sub.name || 'Unknown'} value={sub.subject_name || sub._id || sub.id} />
+                  <Picker.Item key={sub._id || sub.id} label={sub.subject_name || sub.name || 'Unknown'} value={sub.subject_name || sub.name} />
                 ))}
               </Picker>
             </View>

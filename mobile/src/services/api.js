@@ -89,23 +89,24 @@ export const testsAPI = {
 };
 
 export const quizAPI = {
-  generateQuiz: (data) => api.post('/ai/quiz/generate', data),
-  submitQuiz: (quizId, answers) => api.post(`/ai/quiz/${quizId}/submit`, { answers }),
-  getQuizHistory: () => api.get('/ai/quiz/history'),
+  generateQuiz: (data) => api.post('/quiz/generate', data),
+  submitQuiz: (data) => api.post('/quiz/submit', data),
+  getQuizResults: (studentId) => api.get(`/quiz/results/${studentId}`),
+  getQuizProgress: (studentId) => api.get(`/quiz/progress/${studentId}`),
 };
 
 export const summaryAPI = {
-  getSummaries: (params) => api.get('/ai/summaries', { params }),
-  generateSummary: (data) => api.post('/ai/summaries/generate', data),
+  getSummaries: (params) => api.get('/ai/summary/list', { params }),
+  generateSummary: (data) => api.post('/ai/summary/generate', data),
 };
 
 export const notesAPI = {
-  getNotes: (params) => api.get('/ai/notes', { params }),
+  getNotes: (params) => api.get('/ai/notes/list', { params }),
   generateNotes: (data) => api.post('/ai/notes/generate', data),
 };
 
 export const assistantAPI = {
-  chat: (data) => api.post('/ai/assistant/chat', data),
+  chat: (data) => api.post('/ai-engine/chat', data),
 };
 
 export const attendanceAPI = {

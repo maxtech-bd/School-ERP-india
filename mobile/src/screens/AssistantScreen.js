@@ -42,17 +42,18 @@ const AssistantScreen = ({ navigation }) => {
 
     try {
       const response = await assistantAPI.chat({
-        message: currentMessage,
-        sources: ['academic_books', 'reference_books', 'qa_knowledge_base'],
+        question: currentMessage,
+        type: 'text',
       });
 
       const botReply = {
         id: (Date.now() + 1).toString(),
-        text: response.data.response || response.data.message || 'I received your message but could not generate a response.',
+        text: response.data.response || response.data.answer || response.data.message || 'I received your message but could not generate a response.',
         isBot: true,
       };
       setMessages((prev) => [...prev, botReply]);
     } catch (error) {
+      console.log('Assistant error:', error?.response?.data || error.message);
       const botReply = {
         id: (Date.now() + 1).toString(),
         text: `Thank you for your question! The AI Assistant feature is currently being set up. In the meantime, you can use the Quiz, Summary, and Notes features from the dashboard. Your question was: "${currentMessage}"`,

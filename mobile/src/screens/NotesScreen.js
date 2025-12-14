@@ -50,12 +50,13 @@ const NotesScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await notesAPI.generateNotes({
-        class_id: selectedClass,
-        subject_id: selectedSubject,
+        class_standard: selectedClass,
+        subject: selectedSubject,
       });
       setNotes(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to generate notes. Please try again.');
+      console.log('Notes error:', error?.response?.data || error.message);
+      Alert.alert('Error', error?.response?.data?.detail || 'Failed to generate notes. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -136,7 +137,7 @@ const NotesScreen = ({ navigation }) => {
               >
                 <Picker.Item label="Choose a class..." value="" />
                 {classes.map((cls) => (
-                  <Picker.Item key={cls._id || cls.id} label={cls.name} value={cls._id || cls.id} />
+                  <Picker.Item key={cls._id || cls.id} label={cls.name} value={cls.standard || cls.name} />
                 ))}
               </Picker>
             </View>
@@ -151,7 +152,7 @@ const NotesScreen = ({ navigation }) => {
               >
                 <Picker.Item label="Choose a subject..." value="" />
                 {subjects.map((sub) => (
-                  <Picker.Item key={sub._id || sub.id} label={sub.subject_name || sub.name || 'Unknown'} value={sub.subject_name || sub._id || sub.id} />
+                  <Picker.Item key={sub._id || sub.id} label={sub.subject_name || sub.name || 'Unknown'} value={sub.subject_name || sub.name} />
                 ))}
               </Picker>
             </View>
