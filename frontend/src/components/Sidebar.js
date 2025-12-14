@@ -32,11 +32,10 @@ import { Button } from './ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { ScrollArea } from './ui/scroll-area';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
 
   const toggleMenu = (menuKey) => {
@@ -298,14 +297,14 @@ const Sidebar = () => {
   const handleNavigation = (path) => {
     if (path) {
       navigate(path);
-      setIsMobileOpen(false);
+      setIsOpen(false);
     }
   };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
-    setIsMobileOpen(false);
+    setIsOpen(false);
   };
 
   const SidebarContent = () => (
@@ -404,16 +403,6 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile toggle button - sticky to header */}
-      <Button
-        onClick={() => setIsMobileOpen(true)}
-        variant="ghost"
-        size="icon"
-        className="fixed top-3 left-3 z-50 md:hidden bg-emerald-500 hover:bg-emerald-600 text-white shadow-md"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
-
       {/* Desktop sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-40 overflow-y-auto">
         <div className="glass-sidebar min-h-full">
@@ -422,15 +411,15 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile sidebar */}
-      {isMobileOpen && (
+      {isOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileOpen(false)} />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
           <div className="relative flex w-64 h-full glass-sidebar overflow-y-auto">
             <div className="flex flex-col w-full min-h-full">
               {/* Close button only - no duplicate header */}
               <div className="absolute top-4 right-4 z-10">
                 <Button
-                  onClick={() => setIsMobileOpen(false)}
+                  onClick={() => setIsOpen(false)}
                   variant="ghost"
                   size="icon"
                   className="text-white hover:bg-white/10"

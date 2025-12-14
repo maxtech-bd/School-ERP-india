@@ -182,6 +182,7 @@ const Layout = ({ children }) => {
   const { user } = useAuth();
   const location = useLocation();
   const mainRef = React.useRef(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
   
   const isLoginPage = location.pathname === '/login';
   
@@ -207,9 +208,9 @@ const Layout = ({ children }) => {
 
   return (
     <div className="flex min-h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
-      <Sidebar />
+      <Sidebar isOpen={isMobileSidebarOpen} setIsOpen={setIsMobileSidebarOpen} />
       <div className="flex flex-col flex-1 min-w-0 w-full md:pl-64">
-        <Header />
+        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
         <main ref={mainRef} className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
           <div className="min-h-[calc(100vh-100px)] pb-16 sm:pb-24 max-w-full overflow-x-hidden">
             {children}

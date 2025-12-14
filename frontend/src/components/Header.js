@@ -13,12 +13,12 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Badge } from './ui/badge';
-import { Bell, Search, Settings, User, LogOut, Moon, Sun } from 'lucide-react';
+import { Bell, Search, Settings, User, LogOut, Moon, Sun, Menu } from 'lucide-react';
 import { Input } from './ui/input';
 
 const API_BASE_URL = '/api';
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
@@ -118,6 +118,16 @@ const Header = () => {
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
       <div className="flex items-center justify-between gap-2 sm:gap-4">
+        {/* Mobile hamburger menu - in header */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onMenuClick}
+          className="md:hidden bg-emerald-500 hover:bg-emerald-600 text-white"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
         {/* Search Bar - Hidden on mobile, shown on sm+ */}
         <div className="hidden sm:flex flex-1 max-w-xs md:max-w-md">
           <form onSubmit={handleSearch} className="w-full">
