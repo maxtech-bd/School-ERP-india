@@ -15,22 +15,47 @@ const API_BASE_URL =
 
 /**
  * Convert a class object to the canonical class_standard value.
- * Examples:
- *  { name: "Class 10" }  -> "10"
- *  { name: "10" }        -> "10"
- *  { class_standard: 9 } -> "9"
+ * Returns the standard with ordinal suffix (e.g., "5th", "6th")
+ * to match the format stored in subjects collection.
  */
 const getClassValue = (cls) => {
+  // If class has standard field (e.g., "5th"), use it directly
+  if (cls.standard) {
+    return String(cls.standard);
+  }
+  // If class_standard is already in ordinal format
   if (cls.class_standard !== undefined && cls.class_standard !== null) {
-    return String(cls.class_standard);
+    const val = String(cls.class_standard);
+    // If already has ordinal suffix, return as is
+    if (val.match(/\d+(st|nd|rd|th)$/i)) {
+      return val;
+    }
+    // Add ordinal suffix
+    const num = parseInt(val.match(/\d+/)?.[0] || val, 10);
+    if (!isNaN(num)) {
+      return `${num}${getOrdinalSuffix(num)}`;
+    }
+    return val;
   }
   if (cls.name) {
     const nameStr = String(cls.name);
-    const match = nameStr.match(/\d+/); // first number in the string
-    if (match) return match[0];
+    const match = nameStr.match(/\d+/);
+    if (match) {
+      const num = parseInt(match[0], 10);
+      return `${num}${getOrdinalSuffix(num)}`;
+    }
     return nameStr;
   }
   return String(cls.id);
+};
+
+const getOrdinalSuffix = (num) => {
+  const j = num % 10;
+  const k = num % 100;
+  if (j === 1 && k !== 11) return "st";
+  if (j === 2 && k !== 12) return "nd";
+  if (j === 3 && k !== 13) return "rd";
+  return "th";
 };
 
 const AINotes = () => {

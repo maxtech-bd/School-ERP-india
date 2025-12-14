@@ -116,10 +116,25 @@ const TestGenerator = () => {
     }
   }, [activeTab]);
 
+  // Returns the class standard with ordinal suffix (e.g., "5th") to match database format
   const getClassValue = (classStandard) => {
     if (!classStandard) return "";
+    // If already has ordinal suffix, return as is
+    if (classStandard.match(/\d+(st|nd|rd|th)$/i)) {
+      return classStandard;
+    }
     const match = classStandard.match(/\d+/);
-    return match ? match[0] : classStandard;
+    if (match) {
+      const num = parseInt(match[0], 10);
+      const j = num % 10;
+      const k = num % 100;
+      let suffix = "th";
+      if (j === 1 && k !== 11) suffix = "st";
+      else if (j === 2 && k !== 12) suffix = "nd";
+      else if (j === 3 && k !== 13) suffix = "rd";
+      return `${num}${suffix}`;
+    }
+    return classStandard;
   };
 
   // ---------- Fetch Subjects for selected class ----------
