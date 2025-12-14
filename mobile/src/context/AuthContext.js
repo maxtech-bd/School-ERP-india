@@ -33,11 +33,10 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoginLoading(true);
       
-      if (tenantId) {
-        await AsyncStorage.setItem('tenant_id', tenantId);
-      }
+      const effectiveTenantId = tenantId || 'demo';
+      await AsyncStorage.setItem('tenant_id', effectiveTenantId);
       
-      const response = await authAPI.login({ username, password });
+      const response = await authAPI.login({ username, password, tenant_id: effectiveTenantId });
       const { access_token, user: userData } = response.data;
       
       await AsyncStorage.setItem('token', access_token);
