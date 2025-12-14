@@ -146,6 +146,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       roles: ['super_admin', 'admin', 'teacher', 'student']
     },
     {
+      key: 'reports',
+      title: 'Reports',
+      icon: BarChart3,
+      roles: ['super_admin', 'admin'],
+      subItems: [
+        { title: 'Admission Summary', path: '/admission-summary', roles: ['super_admin', 'admin'] },
+        { title: 'All Reports', path: '/reports', roles: ['super_admin', 'admin'] }
+      ]
+    },
+    {
       key: 'communication',
       title: 'Communication',
       icon: MessageSquare,
