@@ -252,7 +252,7 @@ const QuizScreen = ({ navigation }) => {
               >
                 <Picker.Item label="Choose a subject..." value="" />
                 {subjects.map((sub) => (
-                  <Picker.Item key={sub._id || sub.id} label={sub.name} value={sub._id || sub.id} />
+                  <Picker.Item key={sub._id || sub.id} label={sub.subject_name || sub.name || 'Unknown'} value={sub.subject_name || sub._id || sub.id} />
                 ))}
               </Picker>
             </View>
