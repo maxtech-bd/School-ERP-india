@@ -56,12 +56,18 @@ export const studentsAPI = {
   getStudents: (params) => api.get('/students', { params }),
   getStudent: (id) => api.get(`/students/${id}`),
   getStudentCount: () => api.get('/students/count'),
+  createStudent: (data) => api.post('/students', data),
+  updateStudent: (id, data) => api.put(`/students/${id}`, data),
+  deleteStudent: (id) => api.delete(`/students/${id}`),
 };
 
 export const staffAPI = {
   getStaff: (params) => api.get('/staff', { params }),
   getStaffMember: (id) => api.get(`/staff/${id}`),
   getStaffCount: () => api.get('/staff/count'),
+  createStaff: (data) => api.post('/staff', data),
+  updateStaff: (id, data) => api.put(`/staff/${id}`, data),
+  deleteStaff: (id) => api.delete(`/staff/${id}`),
 };
 
 export const timetableAPI = {
@@ -117,6 +123,13 @@ export const attendanceAPI = {
 export const dashboardAPI = {
   getAnalytics: (params) => api.get('/gini/usage/analytics', { params }),
   getStats: () => api.get('/dashboard/stats'),
+};
+
+export const adminAPI = {
+  getUsers: (params) => api.get('/admin/users', { params }),
+  createUser: (data) => api.post('/admin/users', data),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
 };
 
 export default api;
