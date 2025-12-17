@@ -22646,6 +22646,23 @@ async def download_result_template(
         
         class_name = class_doc.get("name", "")
         
+        # Build possible class_standard variations
+        # e.g., "Class 10" -> ["Class 10", "10", "10th", "class 10", "X"]
+        import re
+        class_standard_variations = [class_name]
+        
+        # Extract number from class name
+        match = re.search(r'\d+', class_name)
+        if match:
+            num = match.group()
+            class_standard_variations.extend([
+                num,                    # "10"
+                f"{num}th",            # "10th"  
+                f"{num}st" if num == "1" else f"{num}nd" if num == "2" else f"{num}rd" if num == "3" else f"{num}th",
+                class_name.lower(),    # "class 10"
+                class_name.upper(),    # "CLASS 10"
+            ])
+        
         # Get students in the class/section
         students = await db.students.find({
             "class_id": class_id,
@@ -22656,12 +22673,10 @@ async def download_result_template(
         }).to_list(None)
         
         # Get subjects for the class - try multiple ways subjects might be linked
-        # 1. By class_standard (from Class Subject Management)
-        # 2. By class_id (direct link)
         subjects = await db.subjects.find({
             "tenant_id": current_user.tenant_id,
             "$or": [
-                {"class_standard": class_name},
+                {"class_standard": {"$in": class_standard_variations}},
                 {"class_id": class_id}
             ],
             "is_active": True
@@ -22669,7 +22684,7 @@ async def download_result_template(
         
         # If no subjects found, log a warning
         if not subjects:
-            logger.warning(f"No subjects found for class {class_name} (ID: {class_id})")
+            logger.warning(f"No subjects found for class {class_name} (ID: {class_id}). Tried variations: {class_standard_variations}")
         
         # Create Excel workbook
         wb = openpyxl.Workbook()
