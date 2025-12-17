@@ -6521,12 +6521,35 @@ async def delete_assessment_criteria(criteria_id: str, current_user: User = Depe
 @api_router.get("/subjects", response_model=List[Subject])
 async def get_subjects(
     class_standard: Optional[str] = None,
+    class_id: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     """Get all subjects for the current tenant, optionally filtered by class"""
+    import re
     query = {"tenant_id": current_user.tenant_id, "is_active": True}
     
-    if class_standard:
+    # If class_id is provided, look up the class name and build variations
+    if class_id:
+        class_doc = await db.classes.find_one({
+            "id": class_id,
+            "tenant_id": current_user.tenant_id
+        })
+        if class_doc:
+            class_name = class_doc.get("name", "")
+            # Build possible class_standard variations
+            class_standard_variations = [class_name]
+            match = re.search(r'\d+', class_name)
+            if match:
+                num = match.group()
+                class_standard_variations.extend([
+                    num,                    # "10"
+                    f"{num}th",            # "10th"  
+                    f"{num}st" if num == "1" else f"{num}nd" if num == "2" else f"{num}rd" if num == "3" else f"{num}th",
+                    class_name.lower(),    # "class 10"
+                    class_name.upper(),    # "CLASS 10"
+                ])
+            query["class_standard"] = {"$in": class_standard_variations}
+    elif class_standard:
         query["class_standard"] = class_standard
     
     subjects = await db.subjects.find(query).to_list(1000)
