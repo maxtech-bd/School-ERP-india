@@ -22673,14 +22673,14 @@ async def download_result_template(
         }).to_list(None)
         
         # Get subjects for the class - try multiple ways subjects might be linked
+        # Don't filter by school_id as subjects may be shared across schools in tenant
         subjects = await db.subjects.find({
             "tenant_id": current_user.tenant_id,
-            "$or": [
-                {"class_standard": {"$in": class_standard_variations}},
-                {"class_id": class_id}
-            ],
+            "class_standard": {"$in": class_standard_variations},
             "is_active": True
         }).to_list(None)
+        
+        logger.info(f"Template download: Class={class_name}, Variations={class_standard_variations}, Found {len(subjects)} subjects")
         
         # If no subjects found, log a warning
         if not subjects:
