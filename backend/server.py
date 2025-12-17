@@ -22634,6 +22634,18 @@ async def download_result_template(
         if current_user.role not in ["super_admin", "admin", "principal", "teacher"]:
             raise HTTPException(status_code=403, detail="Not authorized")
         
+        # Get the class to find its name/standard
+        class_doc = await db.classes.find_one({
+            "id": class_id,
+            "tenant_id": current_user.tenant_id,
+            "school_id": current_user.school_id
+        })
+        
+        if not class_doc:
+            raise HTTPException(status_code=404, detail="Class not found")
+        
+        class_name = class_doc.get("name", "")
+        
         # Get students in the class/section
         students = await db.students.find({
             "class_id": class_id,
@@ -22643,13 +22655,21 @@ async def download_result_template(
             "is_active": True
         }).to_list(None)
         
-        # Get subjects for the class
+        # Get subjects for the class - try multiple ways subjects might be linked
+        # 1. By class_standard (from Class Subject Management)
+        # 2. By class_id (direct link)
         subjects = await db.subjects.find({
-            "class_id": class_id,
             "tenant_id": current_user.tenant_id,
-            "school_id": current_user.school_id,
+            "$or": [
+                {"class_standard": class_name},
+                {"class_id": class_id}
+            ],
             "is_active": True
         }).to_list(None)
+        
+        # If no subjects found, log a warning
+        if not subjects:
+            logger.warning(f"No subjects found for class {class_name} (ID: {class_id})")
         
         # Create Excel workbook
         wb = openpyxl.Workbook()
