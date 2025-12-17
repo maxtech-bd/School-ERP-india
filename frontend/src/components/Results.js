@@ -685,7 +685,7 @@ const Results = () => {
                     <th className="text-left py-3 px-3 font-medium">Adm No</th>
                     {subjects.map(subj => (
                       <th key={subj.id} className="text-center py-3 px-3 font-medium min-w-[80px]">
-                        {subj.name}
+                        {subj.subject_name || subj.name}
                       </th>
                     ))}
                     <th className="text-center py-3 px-3 font-medium">Actions</th>
