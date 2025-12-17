@@ -15,6 +15,7 @@ import {
   Save,
   Send,
   Eye,
+  EyeOff,
   Edit,
   Trash2,
   Plus,
@@ -196,6 +197,21 @@ const Results = () => {
       fetchExamTerms();
     } catch (error) {
       toast.error('Failed to delete exam term');
+    }
+  };
+
+  const handleTogglePublishExamTerm = async (term) => {
+    const action = term.is_published ? 'unpublish' : 'publish';
+    if (!window.confirm(`Are you sure you want to ${action} this exam term?`)) return;
+    try {
+      await axios.put(`/api/exam-terms/${term.id}`, {
+        ...term,
+        is_published: !term.is_published
+      });
+      toast.success(`Exam term ${action}ed successfully`);
+      fetchExamTerms();
+    } catch (error) {
+      toast.error(`Failed to ${action} exam term`);
     }
   };
 
@@ -642,14 +658,25 @@ const Results = () => {
                         </Badge>
                       </td>
                       <td className="py-2 px-3 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteExamTerm(term.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTogglePublishExamTerm(term)}
+                            className={term.is_published ? 'text-orange-500 hover:text-orange-700' : 'text-green-500 hover:text-green-700'}
+                            title={term.is_published ? 'Unpublish' : 'Publish'}
+                          >
+                            {term.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteExamTerm(term.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
