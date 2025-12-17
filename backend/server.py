@@ -22547,22 +22547,31 @@ async def upload_results_excel(
         # Normalize column names to lowercase for easier matching
         df.columns = [str(c).strip().lower().replace(' ', '_') for c in df.columns]
         
-        # Expected columns: admission_no (required)
-        if 'admission_no' not in df.columns:
-            raise HTTPException(status_code=400, detail="Missing required column: admission_no")
+        # Find the admission number column (could have different names)
+        admission_col = None
+        possible_admission_cols = ['admission_no', 'admissionno', 'admission_number', 'adm_no', 'admno', 'roll_no', 'rollno', 'student_id']
+        for col in possible_admission_cols:
+            if col in df.columns:
+                admission_col = col
+                break
+        
+        if not admission_col:
+            raise HTTPException(status_code=400, detail="Missing required column: admission_no (or roll_no, student_id)")
         
         success_count = 0
         error_count = 0
         errors = []
         
-        # Get subject columns (exclude admission_no and student_name - those are reference columns)
+        # Get subject columns (exclude ID and name columns - those are reference columns)
         # Column names are already normalized to lowercase with underscores
-        excluded_cols = ['admission_no', 'student_name', 'name', 'roll_no', 'roll_number']
+        excluded_cols = ['admission_no', 'admissionno', 'admission_number', 'adm_no', 'admno', 
+                        'roll_no', 'rollno', 'roll_number', 'student_id',
+                        'student_name', 'name', 'full_name', 'student']
         subject_cols = [c for c in df.columns if c not in excluded_cols]
         
         for _, row in df.iterrows():
             try:
-                admission_no = str(row['admission_no']).strip()
+                admission_no = str(row[admission_col]).strip()
                 
                 # Find student by admission number
                 student = await db.students.find_one({
