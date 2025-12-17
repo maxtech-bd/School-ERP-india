@@ -22544,18 +22544,21 @@ async def upload_results_excel(
         contents = await file.read()
         df = pd.read_excel(io.BytesIO(contents))
         
-        # Expected columns: admission_no, subject_name, obtained_marks, max_marks
-        required_cols = ['admission_no']
-        for col in required_cols:
-            if col not in df.columns:
-                raise HTTPException(status_code=400, detail=f"Missing required column: {col}")
+        # Normalize column names to lowercase for easier matching
+        df.columns = [str(c).strip().lower().replace(' ', '_') for c in df.columns]
+        
+        # Expected columns: admission_no (required)
+        if 'admission_no' not in df.columns:
+            raise HTTPException(status_code=400, detail="Missing required column: admission_no")
         
         success_count = 0
         error_count = 0
         errors = []
         
-        # Get subject columns (any column that's not admission_no and contains marks)
-        subject_cols = [c for c in df.columns if c != 'admission_no']
+        # Get subject columns (exclude admission_no and student_name - those are reference columns)
+        # Column names are already normalized to lowercase with underscores
+        excluded_cols = ['admission_no', 'student_name', 'name', 'roll_no', 'roll_number']
+        subject_cols = [c for c in df.columns if c not in excluded_cols]
         
         for _, row in df.iterrows():
             try:
