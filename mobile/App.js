@@ -40,7 +40,7 @@ const Drawer = createDrawerNavigator();
 const TabIcon = ({ name, focused }) => {
   const icons = {
     Home: '🏠',
-    GiNi: '📊',
+    GiNi: '🤖',
     Tests: '✓',
     Profile: '👤',
   };
@@ -71,8 +71,8 @@ const MainTabs = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={DashboardScreen} />
-      <Tab.Screen name="GiNi" component={DashboardScreen} options={{ title: 'Dashboard' }} />
+      <Tab.Screen name="Home" component={DashboardScreen} options={{ title: 'Dashboard' }} />
+      <Tab.Screen name="GiNi" component={AssistantScreen} options={{ title: 'AI Assistant' }} />
       <Tab.Screen name="Tests" component={TestGeneratorScreen} options={{ title: 'Test Generator' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

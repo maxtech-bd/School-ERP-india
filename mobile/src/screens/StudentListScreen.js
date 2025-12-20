@@ -17,7 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { studentsAPI, classesAPI } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
-const ADMIN_ROLES = ['super_admin', 'principal'];
+const ADMIN_ROLES = ['super_admin', 'admin', 'principal'];
 
 const StudentCard = ({ student, canEdit, onEdit, onDelete }) => {
   const getInitials = (name) => {

@@ -17,7 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { staffAPI } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
-const ADMIN_ROLES = ['super_admin', 'principal'];
+const ADMIN_ROLES = ['super_admin', 'admin', 'principal'];
 
 const StaffCard = ({ staff, canEdit, onEdit, onDelete }) => {
   const getInitials = (name) => {
