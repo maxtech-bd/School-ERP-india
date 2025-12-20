@@ -69,5 +69,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Mobile App (React Native / Expo)
 - **Framework**: React Native 0.81.5 with Expo SDK 54.
-- **Navigation**: React Navigation.
-- **Dependencies**: axios, @react-native-async-storage/async-storage, expo-linear-gradient.
+- **Navigation**: React Navigation (Stack, Tab, Drawer navigators).
+- **Dependencies**: axios, @react-native-async-storage/async-storage, expo-linear-gradient, @react-native-picker/picker.
+- **Screens (22 total)**:
+  - Core: Login, Dashboard, Profile, Settings
+  - AI Features: Assistant, Quiz, Summary, Notes, TestGenerator
+  - Academic: TimeTable, Calendar, Attendance, Results, AcademicCMS
+  - Management: StudentList, StaffList, ClassManagement, UserManagement
+  - Financial: Fees, Certificates
+  - Communication: CommunicationScreen
+  - Analytics: Reports
+- **Role-Based Navigation**: Different menu items and quick access buttons for super_admin, admin, teacher, principal, student, and parent roles.
+- **API Integration**: Centralized API service layer in `mobile/src/services/api.js` with axios interceptors for JWT token and tenant ID handling.

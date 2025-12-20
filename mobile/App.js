@@ -23,6 +23,14 @@ import {
   StudentListScreen,
   StaffListScreen,
   CommunicationScreen,
+  ResultsScreen,
+  FeesScreen,
+  CertificatesScreen,
+  AcademicCMSScreen,
+  ClassManagementScreen,
+  ReportsScreen,
+  SettingsScreen,
+  UserManagementScreen,
 } from './src/screens';
 
 const Stack = createNativeStackNavigator();
@@ -127,6 +135,14 @@ const getMenuItemsForRole = (role) => {
   const academicItems = [
     { label: 'Calendar', icon: '📅', screen: 'Calendar' },
     { label: 'TimeTable', icon: '🕐', screen: 'TimeTable' },
+    { label: 'Results', icon: '📊', screen: 'Results' },
+    { label: 'Library', icon: '📖', screen: 'AcademicCMS' },
+  ];
+
+  const studentItems = [
+    { label: 'Fees', icon: '💰', screen: 'Fees' },
+    { label: 'Certificates', icon: '📜', screen: 'Certificates' },
+    { label: 'Attendance', icon: '✅', screen: 'Attendance' },
   ];
 
   if (role === 'super_admin' || role === 'admin') {
@@ -134,28 +150,48 @@ const getMenuItemsForRole = (role) => {
       ...commonItems,
       { label: 'Students', icon: '👥', screen: 'StudentList' },
       { label: 'Staff', icon: '👨‍🏫', screen: 'StaffList' },
+      { label: 'Classes', icon: '🏫', screen: 'ClassManagement' },
       ...academicItems,
+      { label: 'Fees', icon: '💰', screen: 'Fees' },
       ...aiItems,
       { label: 'Test Generator', icon: '📄', screen: 'TestGenerator' },
+      { label: 'Reports', icon: '📈', screen: 'Reports' },
+      { label: 'Users', icon: '🔐', screen: 'UserManagement' },
       { label: 'Communication', icon: '💬', screen: 'Communication' },
+      { label: 'Settings', icon: '⚙️', screen: 'Settings' },
     ];
-  } else if (role === 'teacher') {
+  } else if (role === 'teacher' || role === 'principal') {
     return [
       ...commonItems,
-      { label: 'Student List', icon: '👥', screen: 'StudentList' },
-      { label: 'Staff List', icon: '👨‍🏫', screen: 'StaffList' },
+      { label: 'Students', icon: '👥', screen: 'StudentList' },
+      { label: 'Staff', icon: '👨‍🏫', screen: 'StaffList' },
+      { label: 'Classes', icon: '🏫', screen: 'ClassManagement' },
       ...academicItems,
       ...aiItems,
       { label: 'Test Generator', icon: '📄', screen: 'TestGenerator' },
+      { label: 'Reports', icon: '📈', screen: 'Reports' },
       { label: 'Communication', icon: '💬', screen: 'Communication' },
+      { label: 'Settings', icon: '⚙️', screen: 'Settings' },
+    ];
+  } else if (role === 'parent') {
+    return [
+      ...commonItems,
+      { label: 'Results', icon: '📊', screen: 'Results' },
+      { label: 'Fees', icon: '💰', screen: 'Fees' },
+      { label: 'Attendance', icon: '✅', screen: 'Attendance' },
+      { label: 'Calendar', icon: '📅', screen: 'Calendar' },
+      { label: 'Communication', icon: '💬', screen: 'Communication' },
+      { label: 'Settings', icon: '⚙️', screen: 'Settings' },
     ];
   } else {
     return [
       ...commonItems,
       ...aiItems,
       ...academicItems,
+      ...studentItems,
       { label: 'Staff List', icon: '👨‍🏫', screen: 'StaffList' },
       { label: 'Communication', icon: '💬', screen: 'Communication' },
+      { label: 'Settings', icon: '⚙️', screen: 'Settings' },
     ];
   }
 };
@@ -193,6 +229,15 @@ const AppStack = () => {
       <Stack.Screen name="StudentList" component={StudentListScreen} />
       <Stack.Screen name="StaffList" component={StaffListScreen} />
       <Stack.Screen name="Communication" component={CommunicationScreen} />
+      <Stack.Screen name="Results" component={ResultsScreen} />
+      <Stack.Screen name="Fees" component={FeesScreen} />
+      <Stack.Screen name="Certificates" component={CertificatesScreen} />
+      <Stack.Screen name="AcademicCMS" component={AcademicCMSScreen} />
+      <Stack.Screen name="ClassManagement" component={ClassManagementScreen} />
+      <Stack.Screen name="Reports" component={ReportsScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="UserManagement" component={UserManagementScreen} />
+      <Stack.Screen name="Attendance" component={AttendanceScreen} />
     </Stack.Navigator>
   );
 };

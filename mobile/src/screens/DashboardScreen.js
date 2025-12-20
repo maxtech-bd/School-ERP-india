@@ -143,16 +143,49 @@ const DashboardScreen = ({ navigation }) => {
     },
   ];
 
-  const quickButtons = [
-    { title: 'TimeTable', icon: '📅', screen: 'TimeTable', color: '#3498db' },
-    { title: 'Calendar', icon: '🗓️', screen: 'Calendar', color: '#e74c3c' },
-    { title: 'Students', icon: '👥', screen: 'StudentList', color: '#2ecc71' },
-    { title: 'Staff', icon: '👨‍🏫', screen: 'StaffList', color: '#9b59b6' },
-  ];
+  const getQuickButtonsForRole = () => {
+    const commonButtons = [
+      { title: 'TimeTable', icon: '📅', screen: 'TimeTable', color: '#3498db' },
+      { title: 'Calendar', icon: '🗓️', screen: 'Calendar', color: '#e74c3c' },
+    ];
 
-  const filteredQuickButtons = role === 'student' 
-    ? quickButtons.filter(b => b.title !== 'Students')
-    : quickButtons;
+    if (role === 'super_admin' || role === 'admin') {
+      return [
+        ...commonButtons,
+        { title: 'Students', icon: '👥', screen: 'StudentList', color: '#2ecc71' },
+        { title: 'Staff', icon: '👨‍🏫', screen: 'StaffList', color: '#9b59b6' },
+        { title: 'Classes', icon: '🏫', screen: 'ClassManagement', color: '#0984e3' },
+        { title: 'Fees', icon: '💰', screen: 'Fees', color: '#00b894' },
+        { title: 'Reports', icon: '📈', screen: 'Reports', color: '#636e72' },
+        { title: 'Users', icon: '🔐', screen: 'UserManagement', color: '#8e44ad' },
+      ];
+    } else if (role === 'teacher' || role === 'principal') {
+      return [
+        ...commonButtons,
+        { title: 'Students', icon: '👥', screen: 'StudentList', color: '#2ecc71' },
+        { title: 'Results', icon: '📊', screen: 'Results', color: '#667eea' },
+        { title: 'Classes', icon: '🏫', screen: 'ClassManagement', color: '#0984e3' },
+        { title: 'Reports', icon: '📈', screen: 'Reports', color: '#636e72' },
+      ];
+    } else if (role === 'parent') {
+      return [
+        ...commonButtons,
+        { title: 'Results', icon: '📊', screen: 'Results', color: '#667eea' },
+        { title: 'Fees', icon: '💰', screen: 'Fees', color: '#00b894' },
+        { title: 'Attendance', icon: '✅', screen: 'Attendance', color: '#27ae60' },
+      ];
+    } else {
+      return [
+        ...commonButtons,
+        { title: 'Results', icon: '📊', screen: 'Results', color: '#667eea' },
+        { title: 'Fees', icon: '💰', screen: 'Fees', color: '#00b894' },
+        { title: 'Library', icon: '📖', screen: 'AcademicCMS', color: '#e17055' },
+        { title: 'Certificates', icon: '📜', screen: 'Certificates', color: '#6c5ce7' },
+      ];
+    }
+  };
+
+  const filteredQuickButtons = getQuickButtonsForRole();
 
   return (
     <SafeAreaView style={styles.container}>

@@ -132,4 +132,55 @@ export const adminAPI = {
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
 };
 
+export const resultsAPI = {
+  getExamTerms: () => api.get('/exam-terms'),
+  getStudentResults: (params) => api.get('/student-results', { params }),
+  getClassResults: (params) => api.get('/class-results', { params }),
+  getMyResults: () => api.get('/my-results'),
+  getMarkEntryTemplate: (params) => api.get('/mark-entry/template', { params }),
+  saveMarks: (data) => api.post('/marks', data),
+};
+
+export const feesAPI = {
+  getFeesSummary: () => api.get('/fees/dashboard'),
+  getMyFees: () => api.get('/fees/student-fees'),
+  getStudentFees: (studentId) => api.get(`/fees/student/${studentId}`),
+  getFeeHistory: (params) => api.get('/fees/payments', { params }),
+  getFeeDue: () => api.get('/fees/student-fees'),
+  getFeeStructure: () => api.get('/fees/configurations'),
+};
+
+export const certificatesAPI = {
+  getCertificates: () => api.get('/certificates/dashboard'),
+  getMyCertificates: () => api.get('/certificates/dashboard'),
+  downloadCertificate: (id) => api.get(`/certificates/${id}/download`, { responseType: 'blob' }),
+  getCertificateTypes: () => api.get('/certificates/dashboard'),
+};
+
+export const academicCMSAPI = {
+  getBooks: (params) => api.get('/academic-books', { params }),
+  getBook: (id) => api.get(`/academic-books/${id}`),
+  getReferenceBooks: (params) => api.get('/reference-books', { params }),
+  getPreviousPapers: (params) => api.get('/previous-year-papers', { params }),
+  getQnA: (params) => api.get('/qna-questions', { params }),
+};
+
+export const reportsAPI = {
+  getAttendanceReport: (params) => api.get('/reports/attendance/monthly-summary', { params }),
+  getFeeReport: (params) => api.get('/fees/dashboard', { params }),
+  getStudentReport: (studentId) => api.get('/reports/student-information', { params: { student_id: studentId } }),
+};
+
+export const vehicleAPI = {
+  getVehicles: () => api.get('/vehicles'),
+  getRoutes: () => api.get('/vehicle-routes'),
+  getMyTransport: () => api.get('/transport/assignment'),
+};
+
+export const settingsAPI = {
+  getInstitutionSettings: () => api.get('/institution'),
+  getAcademicPeriods: () => api.get('/academic-periods'),
+  updateNotificationPrefs: (data) => api.put('/notification-preferences', data),
+};
+
 export default api;
