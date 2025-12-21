@@ -1001,8 +1001,8 @@ const Vehicle = () => {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Vehicle Management</h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage school transport, routes, and student assignments</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Vehicle Management</h1>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Manage school transport, routes, and student assignments</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
@@ -1025,8 +1025,8 @@ const Vehicle = () => {
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Vehicles</p>
-                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">{totalVehicles}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total Vehicles</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{totalVehicles}</p>
               </div>
               <Car className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-500" />
             </div>
@@ -1036,7 +1036,7 @@ const Vehicle = () => {
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Active Routes</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Active Routes</p>
                 <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-600">{activeRoutes}</p>
               </div>
               <Route className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
@@ -1047,7 +1047,7 @@ const Vehicle = () => {
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Transport</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Transport</p>
                 <p className="text-lg sm:text-2xl md:text-3xl font-bold text-purple-600">{totalStudents}</p>
               </div>
               <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-500" />
@@ -1058,7 +1058,7 @@ const Vehicle = () => {
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Boarding</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Boarding</p>
                 <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-600">24</p>
               </div>
               <MapPin className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-500" />
@@ -1087,11 +1087,11 @@ const Vehicle = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
+                <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-emerald-500 transition-colors">
                   <CardContent className="p-6 text-center">
                     <Car className="h-12 w-12 mx-auto text-gray-400 mb-3" />
                     <h3 className="font-medium mb-2">Add New Vehicle</h3>
-                    <p className="text-sm text-gray-600 mb-3">Register a new school bus or vehicle</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Register a new school bus or vehicle</p>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -1102,11 +1102,11 @@ const Vehicle = () => {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
+                <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-emerald-500 transition-colors">
                   <CardContent className="p-6 text-center">
                     <Route className="h-12 w-12 mx-auto text-gray-400 mb-3" />
                     <h3 className="font-medium mb-2">Route Planning</h3>
-                    <p className="text-sm text-gray-600 mb-3">Create and manage transport routes</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Create and manage transport routes</p>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -1117,11 +1117,11 @@ const Vehicle = () => {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-2 border-dashed border-gray-300 hover:border-emerald-500 transition-colors">
+                <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-emerald-500 transition-colors">
                   <CardContent className="p-6 text-center">
                     <Users className="h-12 w-12 mx-auto text-gray-400 mb-3" />
                     <h3 className="font-medium mb-2">Student Assignment</h3>
-                    <p className="text-sm text-gray-600 mb-3">Assign students to vehicles and routes</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Assign students to vehicles and routes</p>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -1148,8 +1148,8 @@ const Vehicle = () => {
                 {vehicles.length === 0 ? (
                   <div className="text-center py-12">
                     <Car className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No vehicles added yet</h3>
-                    <p className="text-gray-600 mb-4">Start by adding your first vehicle to the fleet</p>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No vehicles added yet</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">Start by adding your first vehicle to the fleet</p>
                     <Button 
                       onClick={handleAddVehicleClick}
                       className="bg-emerald-500 hover:bg-emerald-600"
@@ -1161,7 +1161,7 @@ const Vehicle = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {vehicles.map((vehicle) => (
-                      <Card key={vehicle.id} className="border border-gray-200">
+                      <Card key={vehicle.id} className="border border-gray-200 dark:border-gray-600">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <Badge 
@@ -1176,9 +1176,9 @@ const Vehicle = () => {
                             }`} />
                           </div>
                           <h3 className="font-semibold mb-2">{vehicle.name}</h3>
-                          <p className="text-sm text-gray-600 mb-2">Registration: {vehicle.registration}</p>
-                          <p className="text-sm text-gray-600 mb-3">Capacity: {vehicle.capacity} students</p>
-                          <div className="flex justify-between text-xs text-gray-500 mb-3">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Registration: {vehicle.registration}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Capacity: {vehicle.capacity} students</p>
+                          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                             <span>Route: {vehicle.route_assigned || 'Not assigned'}</span>
                             <span>Driver: {vehicle.driver_name}</span>
                           </div>
@@ -1221,8 +1221,8 @@ const Vehicle = () => {
             <CardContent>
               <div className="text-center py-12">
                 <Navigation className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Route Management</h3>
-                <p className="text-gray-600 mb-4">Create and manage transport routes with boarding points</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Route Management</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Create and manage transport routes with boarding points</p>
                 <div className="flex justify-center space-x-3">
                   <Button 
                     variant="outline" 
@@ -1251,8 +1251,8 @@ const Vehicle = () => {
             <CardContent>
               <div className="text-center py-12">
                 <MapPin className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Boarding Points Management</h3>
-                <p className="text-gray-600 mb-4">Manage pickup and drop-off locations</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Boarding Points Management</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Manage pickup and drop-off locations</p>
                 <div className="flex justify-center space-x-3">
                   <Button 
                     variant="outline"
@@ -1281,8 +1281,8 @@ const Vehicle = () => {
             <CardContent>
               <div className="text-center py-12">
                 <Users className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Student Transport List</h3>
-                <p className="text-gray-600 mb-4">View and manage students using school transport</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Student Transport List</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">View and manage students using school transport</p>
                 <div className="flex justify-center space-x-3">
                   <Button 
                     variant="outline"
@@ -1310,8 +1310,8 @@ const Vehicle = () => {
             <CardContent>
               <div className="text-center py-12">
                 <Download className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Transport Reports</h3>
-                <p className="text-gray-600 mb-4">Generate comprehensive transport and vehicle reports</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Transport Reports</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Generate comprehensive transport and vehicle reports</p>
                 <div className="flex justify-center space-x-3">
                   <Button 
                     variant="outline"
@@ -1344,7 +1344,7 @@ const Vehicle = () => {
       {/* Add Vehicle Modal */}
       {showAddVehicleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">{editingVehicleId ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
               <Button 
@@ -1359,13 +1359,13 @@ const Vehicle = () => {
             <form onSubmit={handleAddVehicleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Registration Number *
                   </label>
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="e.g., MH 12 AB 1234"
                     value={vehicleFormData.registration}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, registration: e.target.value})}
@@ -1373,12 +1373,12 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Vehicle Type *
                   </label>
                   <select
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={vehicleFormData.type}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, type: e.target.value})}
                   >
@@ -1389,14 +1389,14 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Capacity *
                   </label>
                   <input
                     type="number"
                     required
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Number of students"
                     value={vehicleFormData.capacity}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, capacity: e.target.value})}
@@ -1404,13 +1404,13 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Driver Name *
                   </label>
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Driver's full name"
                     value={vehicleFormData.driver_name}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, driver_name: e.target.value})}
@@ -1418,13 +1418,13 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Driver Phone *
                   </label>
                   <input
                     type="tel"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Driver's phone number"
                     value={vehicleFormData.driver_phone}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, driver_phone: e.target.value})}
@@ -1432,12 +1432,12 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Driver License
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="License number"
                     value={vehicleFormData.driver_license}
                     onChange={(e) => setVehicleFormData({...vehicleFormData, driver_license: e.target.value})}
@@ -1446,12 +1446,12 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Insurance Number
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Insurance policy number"
                   value={vehicleFormData.insurance_number}
                   onChange={(e) => setVehicleFormData({...vehicleFormData, insurance_number: e.target.value})}
@@ -1482,7 +1482,7 @@ const Vehicle = () => {
       {/* Plan Routes Modal */}
       {showPlanRoutesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Plan New Route</h3>
               <Button 
@@ -1496,13 +1496,13 @@ const Vehicle = () => {
             
             <form onSubmit={handlePlanRouteSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Route Name *
                 </label>
                 <input
                   type="text"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="e.g., Central Route, Northern Route"
                   value={routeFormData.route_name}
                   onChange={(e) => setRouteFormData({...routeFormData, route_name: e.target.value})}
@@ -1511,13 +1511,13 @@ const Vehicle = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Start Point *
                   </label>
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Starting location"
                     value={routeFormData.start_point}
                     onChange={(e) => setRouteFormData({...routeFormData, start_point: e.target.value})}
@@ -1525,13 +1525,13 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     End Point *
                   </label>
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="End location (usually school)"
                     value={routeFormData.end_point}
                     onChange={(e) => setRouteFormData({...routeFormData, end_point: e.target.value})}
@@ -1541,26 +1541,26 @@ const Vehicle = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Morning Start Time *
                   </label>
                   <input
                     type="time"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={routeFormData.morning_start_time}
                     onChange={(e) => setRouteFormData({...routeFormData, morning_start_time: e.target.value})}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Evening Start Time *
                   </label>
                   <input
                     type="time"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={routeFormData.evening_start_time}
                     onChange={(e) => setRouteFormData({...routeFormData, evening_start_time: e.target.value})}
                   />
@@ -1568,11 +1568,11 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Vehicle Assignment
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   value={routeFormData.vehicle_assigned}
                   onChange={(e) => setRouteFormData({...routeFormData, vehicle_assigned: e.target.value})}
                 >
@@ -1609,7 +1609,7 @@ const Vehicle = () => {
       {/* View Routes Modal */}
       {showViewRoutesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Transport Routes</h3>
               <Button 
@@ -1625,8 +1625,8 @@ const Vehicle = () => {
               {routes.length === 0 ? (
                 <div className="text-center py-12">
                   <Route className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No routes found</h3>
-                  <p className="text-gray-600 mb-4">Start by creating your first transport route</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No routes found</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Start by creating your first transport route</p>
                   <Button 
                     onClick={() => {
                       setShowViewRoutesModal(false);
@@ -1641,10 +1641,10 @@ const Vehicle = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {routes.map((route) => (
-                    <Card key={route.id} className="border border-gray-200">
+                    <Card key={route.id} className="border border-gray-200 dark:border-gray-600">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-lg font-medium text-gray-900">{route.route_name}</h4>
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-white">{route.route_name}</h4>
                           <Badge 
                             variant={route.status === 'active' ? 'default' : 'secondary'}
                             className={route.status === 'active' ? 'bg-emerald-100 text-emerald-700' : ''}
@@ -1653,7 +1653,7 @@ const Vehicle = () => {
                           </Badge>
                         </div>
                         
-                        <div className="space-y-2 text-sm text-gray-600">
+                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2 text-gray-400" />
                             <span><strong>Start:</strong> {route.start_point}</span>
@@ -1734,7 +1734,7 @@ const Vehicle = () => {
       {/* Assign Students Modal */}
       {showAssignStudentsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Assign Students to Routes</h3>
               <Button 
@@ -1749,12 +1749,12 @@ const Vehicle = () => {
             <form onSubmit={handleStudentAssignmentSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Select Route *
                   </label>
                   <select
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={assignmentData.route_id}
                     onChange={(e) => setAssignmentData({...assignmentData, route_id: e.target.value})}
                   >
@@ -1768,12 +1768,12 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Boarding Point *
                   </label>
                   <select
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={assignmentData.boarding_point}
                     onChange={(e) => setAssignmentData({...assignmentData, boarding_point: e.target.value})}
                   >
@@ -1787,12 +1787,12 @@ const Vehicle = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Pickup Time
                   </label>
                   <input
                     type="time"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                     value={assignmentData.pickup_time}
                     onChange={(e) => setAssignmentData({...assignmentData, pickup_time: e.target.value})}
                   />
@@ -1800,16 +1800,16 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   Select Students to Assign
                 </label>
-                <div className="border border-gray-300 rounded-md p-4 max-h-60 overflow-y-auto">
+                <div className="border border-gray-300 dark:border-gray-700 rounded-md p-4 max-h-60 overflow-y-auto">
                   {console.log('👥 Rendering student assignment modal - students.length:', students.length, 'students:', students)}
                   {students.length === 0 ? (
                     <div className="text-center py-8">
                       <Users className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                      <p className="text-gray-600">No students available</p>
-                      <p className="text-sm text-gray-500 mt-1">Add students first to assign them to routes</p>
+                      <p className="text-gray-600 dark:text-gray-400">No students available</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Add students first to assign them to routes</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1841,10 +1841,10 @@ const Vehicle = () => {
                               <p className="font-medium text-sm">
                                 {student.name || `${student.first_name || ''} ${student.last_name || ''}`.trim()}
                               </p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
                                 {student.class_name || 'N/A'} {student.section ? `- ${student.section}` : ''}
                               </p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {student.admission_number || student.roll_number || 'N/A'}
                               </p>
                             </div>
@@ -1857,7 +1857,7 @@ const Vehicle = () => {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                   {assignmentData.selected_students.length} students selected
                 </p>
               </div>
@@ -1886,7 +1886,7 @@ const Vehicle = () => {
       {/* View Boarding Points Modal */}
       {showViewBoardingPointsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Boarding Points</h3>
               <Button 
@@ -1902,8 +1902,8 @@ const Vehicle = () => {
               {boardingPoints.length === 0 ? (
                 <div className="text-center py-12">
                   <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No boarding points found</h3>
-                  <p className="text-gray-600 mb-4">Start by adding boarding points to your routes</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No boarding points found</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Start by adding boarding points to your routes</p>
                   <Button 
                     onClick={() => {
                       setShowViewBoardingPointsModal(false);
@@ -1918,16 +1918,16 @@ const Vehicle = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {boardingPoints.map((point) => (
-                    <Card key={point.id} className="border border-gray-200">
+                    <Card key={point.id} className="border border-gray-200 dark:border-gray-600">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-lg font-medium text-gray-900">{point.name}</h4>
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-white">{point.name}</h4>
                           <Badge className="bg-blue-100 text-blue-700">
                             Active
                           </Badge>
                         </div>
                         
-                        <div className="space-y-2 text-sm text-gray-600">
+                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2 text-gray-400" />
                             <span><strong>Location:</strong> {point.location}</span>
@@ -1979,7 +1979,7 @@ const Vehicle = () => {
       {/* Add Boarding Point Modal */}
       {showAddBoardingPointModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Add New Boarding Point</h3>
               <Button 
@@ -1993,13 +1993,13 @@ const Vehicle = () => {
             
             <form onSubmit={handleAddBoardingPointSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Boarding Point Name *
                 </label>
                 <input
                   type="text"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="e.g., Main Gate, Shopping Mall, Bus Stop A"
                   value={boardingPointFormData.point_name}
                   onChange={(e) => setBoardingPointFormData({...boardingPointFormData, point_name: e.target.value})}
@@ -2007,12 +2007,12 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Route *
                 </label>
                 <select
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   value={boardingPointFormData.route_id}
                   onChange={(e) => setBoardingPointFormData({...boardingPointFormData, route_id: e.target.value})}
                 >
@@ -2026,12 +2026,12 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Location/Address
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Full address or landmark description"
                   value={boardingPointFormData.location}
                   onChange={(e) => setBoardingPointFormData({...boardingPointFormData, location: e.target.value})}
@@ -2039,12 +2039,12 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nearby Landmark
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Nearby recognizable landmark"
                   value={boardingPointFormData.landmark}
                   onChange={(e) => setBoardingPointFormData({...boardingPointFormData, landmark: e.target.value})}
@@ -2052,12 +2052,12 @@ const Vehicle = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   GPS Coordinates (Optional)
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="e.g., 23.8103, 90.4125"
                   value={boardingPointFormData.coordinates}
                   onChange={(e) => setBoardingPointFormData({...boardingPointFormData, coordinates: e.target.value})}
@@ -2088,7 +2088,7 @@ const Vehicle = () => {
       {/* View Student List Modal */}
       {showViewStudentListModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Transport Student List</h3>
               <Button 
@@ -2104,8 +2104,8 @@ const Vehicle = () => {
               {transportStudents.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Transport Students Found</h3>
-                  <p className="text-gray-600 mb-4">No students are currently assigned to school transport</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Transport Students Found</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">No students are currently assigned to school transport</p>
                   <Button 
                     onClick={() => {
                       setShowViewStudentListModal(false);
@@ -2119,10 +2119,10 @@ const Vehicle = () => {
                 </div>
               ) : (
                 <>
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900">Total Transport Students</h4>
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">Total Transport Students</h4>
                         <p className="text-2xl font-bold text-emerald-600">{transportStudents.length}</p>
                       </div>
                       <Button 
@@ -2140,57 +2140,57 @@ const Vehicle = () => {
                   
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Student Info
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Class
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Contact
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Route
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         {transportStudents.map((student, index) => (
-                          <tr key={student.id || index} className="hover:bg-gray-50">
+                          <tr key={student.id || index} className="hover:bg-gray-50 dark:bg-gray-700">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <Users className="h-5 w-5 text-gray-500" />
+                                  <Users className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                 </div>
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-white">
                                     {student.name || 'N/A'}
                                   </div>
-                                  <div className="text-sm text-gray-500">
+                                  <div className="text-sm text-gray-500 dark:text-gray-400">
                                     Roll: {student.roll_no || 'N/A'}
                                   </div>
                                 </div>
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
+                              <div className="text-sm text-gray-900 dark:text-white">
                                 {student.class_name || 'N/A'}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
                                 Section: {student.section_name || 'N/A'}
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                               <div>{student.email || 'N/A'}</div>
-                              <div className="text-gray-500">{student.phone || 'N/A'}</div>
+                              <div className="text-gray-500 dark:text-gray-400">{student.phone || 'N/A'}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
