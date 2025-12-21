@@ -18,8 +18,9 @@ import { studentsAPI, classesAPI } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const ADMIN_ROLES = ['super_admin', 'admin', 'principal'];
+const VIEW_ROLES = ['super_admin', 'admin', 'principal', 'teacher'];
 
-const StudentCard = ({ student, canEdit, onEdit, onDelete }) => {
+const StudentCard = ({ student, canEdit, canView, onEdit, onDelete, onView }) => {
   const getInitials = (name) => {
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -35,7 +36,7 @@ const StudentCard = ({ student, canEdit, onEdit, onDelete }) => {
     <TouchableOpacity 
       style={styles.studentCard} 
       activeOpacity={0.7}
-      onPress={() => canEdit && onEdit(student)}
+      onPress={() => canView && onView(student)}
     >
       <View style={[styles.avatar, { backgroundColor: getAvatarColor(student.name || student.full_name) }]}>
         <Text style={styles.avatarText}>{getInitials(student.name || student.full_name)}</Text>
@@ -49,6 +50,9 @@ const StudentCard = ({ student, canEdit, onEdit, onDelete }) => {
       </View>
       {canEdit ? (
         <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.viewBtn} onPress={() => onView(student)}>
+            <Text style={styles.viewBtnText}>View</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.editBtn} onPress={() => onEdit(student)}>
             <Text style={styles.editBtnText}>Edit</Text>
           </TouchableOpacity>
@@ -56,12 +60,93 @@ const StudentCard = ({ student, canEdit, onEdit, onDelete }) => {
             <Text style={styles.deleteBtnText}>Del</Text>
           </TouchableOpacity>
         </View>
+      ) : canView ? (
+        <TouchableOpacity style={styles.viewOnlyBtn} onPress={() => onView(student)}>
+          <Text style={styles.viewOnlyBtnText}>View</Text>
+        </TouchableOpacity>
       ) : (
         <View style={styles.statusBadge}>
           <Text style={styles.statusText}>Active</Text>
         </View>
       )}
     </TouchableOpacity>
+  );
+};
+
+const StudentDetailModal = ({ visible, student, onClose, onViewResults, canEdit, onEdit }) => {
+  if (!student) return null;
+
+  const InfoRow = ({ label, value }) => (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value || 'N/A'}</Text>
+    </View>
+  );
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalOverlay}>
+        <View style={styles.detailModalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Student Details</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.closeBtn}>X</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Personal Information</Text>
+              <InfoRow label="Full Name" value={student.name || student.full_name} />
+              <InfoRow label="Admission No" value={student.admission_no || student.admission_number} />
+              <InfoRow label="Roll No" value={student.roll_no} />
+              <InfoRow label="Date of Birth" value={student.date_of_birth} />
+              <InfoRow label="Gender" value={student.gender} />
+              <InfoRow label="Email" value={student.email} />
+              <InfoRow label="Phone" value={student.phone} />
+            </View>
+
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Academic Information</Text>
+              <InfoRow label="Class" value={student.class_name || student.class_standard} />
+              <InfoRow label="Section" value={student.section_name} />
+            </View>
+
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Guardian Information</Text>
+              <InfoRow label="Father's Name" value={student.father_name} />
+              <InfoRow label="Mother's Name" value={student.mother_name} />
+              <InfoRow label="Guardian Name" value={student.guardian_name} />
+              <InfoRow label="Guardian Phone" value={student.guardian_phone} />
+            </View>
+
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Address</Text>
+              <Text style={styles.addressText}>{student.address || 'Not provided'}</Text>
+            </View>
+
+            <View style={styles.detailActions}>
+              <TouchableOpacity 
+                style={styles.viewResultsBtn} 
+                onPress={() => onViewResults(student)}
+              >
+                <Text style={styles.viewResultsBtnText}>View Results</Text>
+              </TouchableOpacity>
+              {canEdit && (
+                <TouchableOpacity 
+                  style={styles.editStudentBtn} 
+                  onPress={() => {
+                    onClose();
+                    onEdit(student);
+                  }}
+                >
+                  <Text style={styles.editStudentBtnText}>Edit Student</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
   );
 };
 
@@ -358,10 +443,13 @@ const StudentListScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [viewingStudent, setViewingStudent] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const canEdit = ADMIN_ROLES.includes(user?.role?.toLowerCase());
+  const canView = VIEW_ROLES.includes(user?.role?.toLowerCase());
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -432,6 +520,16 @@ const StudentListScreen = ({ navigation }) => {
   const handleEdit = (student) => {
     setSelectedStudent(student);
     setModalVisible(true);
+  };
+
+  const handleView = (student) => {
+    setViewingStudent(student);
+    setDetailModalVisible(true);
+  };
+
+  const handleViewResults = (student) => {
+    setDetailModalVisible(false);
+    navigation.navigate('Results', { studentId: student._id, studentName: student.name || student.full_name });
   };
 
   const handleDelete = (student) => {
@@ -543,8 +641,10 @@ const StudentListScreen = ({ navigation }) => {
               <StudentCard 
                 student={item} 
                 canEdit={canEdit}
+                canView={canView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onView={handleView}
               />
             )}
             contentContainerStyle={styles.listContent}
@@ -568,6 +668,15 @@ const StudentListScreen = ({ navigation }) => {
           onClose={() => setModalVisible(false)}
           onSave={handleSave}
           loading={saving}
+        />
+
+        <StudentDetailModal
+          visible={detailModalVisible}
+          student={viewingStudent}
+          onClose={() => setDetailModalVisible(false)}
+          onViewResults={handleViewResults}
+          canEdit={canEdit}
+          onEdit={handleEdit}
         />
       </LinearGradient>
     </SafeAreaView>
@@ -878,6 +987,100 @@ const styles = StyleSheet.create({
   },
   saveBtnText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  viewBtn: {
+    backgroundColor: 'rgba(46, 204, 113, 0.3)',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  viewBtnText: {
+    color: '#2ecc71',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  viewOnlyBtn: {
+    backgroundColor: 'rgba(46, 204, 113, 0.3)',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  viewOnlyBtnText: {
+    color: '#2ecc71',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  detailModalContent: {
+    backgroundColor: '#1a1a2e',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
+    maxHeight: '90%',
+  },
+  detailSection: {
+    marginBottom: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    padding: 16,
+  },
+  sectionTitle: {
+    color: '#00b894',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  infoLabel: {
+    color: '#888',
+    fontSize: 14,
+  },
+  infoValue: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    maxWidth: '60%',
+    textAlign: 'right',
+  },
+  addressText: {
+    color: '#fff',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  detailActions: {
+    marginTop: 10,
+    gap: 12,
+  },
+  viewResultsBtn: {
+    backgroundColor: '#667eea',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  viewResultsBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  editStudentBtn: {
+    backgroundColor: 'rgba(52, 152, 219, 0.3)',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  editStudentBtnText: {
+    color: '#3498db',
     fontSize: 16,
     fontWeight: '600',
   },
