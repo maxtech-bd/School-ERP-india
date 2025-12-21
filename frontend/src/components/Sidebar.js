@@ -42,12 +42,35 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const { user, logout } = useAuth();
   const [openMenus, setOpenMenus] = useState({});
   const [, forceUpdate] = useState(0);
+  const [allowedModules, setAllowedModules] = useState([]);
 
   useEffect(() => {
     const handleLanguageChange = () => forceUpdate(n => n + 1);
     i18n.on('languageChanged', handleLanguageChange);
     return () => i18n.off('languageChanged', handleLanguageChange);
   }, []);
+
+  useEffect(() => {
+    const fetchAllowedModules = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const response = await fetch('/api/tenant/allowed-modules', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setAllowedModules(data.allowed_modules || []);
+        }
+      } catch (error) {
+        console.error('Error fetching allowed modules:', error);
+      }
+    };
+    
+    fetchAllowedModules();
+  }, [user]);
 
   const t = (key) => i18n.t(key);
 
@@ -272,6 +295,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       roles: ['super_admin', 'admin']
     },
     {
+      key: 'tenant-management',
+      title: 'Tenant Management',
+      icon: Users,
+      path: '/tenant-management',
+      roles: ['super_admin']
+    },
+    {
       key: 'communication',
       title: 'Communication',
       icon: MessageSquare,
@@ -283,9 +313,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     }
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
-    item.roles.includes(user?.role)
-  );
+  const filteredMenuItems = menuItems.filter(item => {
+    const hasRole = item.roles.includes(user?.role);
+    const isModuleAllowed = user?.role === 'super_admin' || allowedModules.length === 0 || allowedModules.includes(item.key);
+    return hasRole && isModuleAllowed;
+  });
 
   const isActiveMenu = (item) => {
     if (item.path) {

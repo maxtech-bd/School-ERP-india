@@ -38,6 +38,7 @@ import Results from './components/Results';
 import StudentResults from './components/StudentResults';
 import ParentResults from './components/ParentResults';
 import ResultConfiguration from './components/ResultConfiguration';
+import TenantManagement from './components/TenantManagement';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { Toaster } from './components/ui/sonner';
@@ -424,6 +425,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/tenant-management" 
+                element={
+                  <ProtectedRoute>
+                    <TenantManagement />
                   </ProtectedRoute>
                 } 
               />
