@@ -771,12 +771,12 @@ const Results = () => {
             </div>
             <div>
               <Label className="text-sm">Student (Optional)</Label>
-              <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+              <Select value={selectedStudent || 'all'} onValueChange={(val) => setSelectedStudent(val === 'all' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="All Students" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Students</SelectItem>
+                  <SelectItem value="all">All Students</SelectItem>
                   {students.map(student => (
                     <SelectItem key={student.id} value={student.id}>
                       {student.name} ({student.admission_no})
