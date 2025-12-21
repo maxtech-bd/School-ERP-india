@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../App';
-import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { 
   Home,
   Users,
@@ -40,8 +40,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { t } = useTranslation();
   const [openMenus, setOpenMenus] = useState({});
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const handleLanguageChange = () => forceUpdate(n => n + 1);
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => i18n.off('languageChanged', handleLanguageChange);
+  }, []);
+
+  const t = (key) => i18n.t(key);
 
   const toggleMenu = (menuKey) => {
     setOpenMenus(prev => ({

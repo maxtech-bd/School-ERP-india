@@ -8,7 +8,7 @@ import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner';
 import { Eye, EyeOff, GraduationCap, Users, BookOpen, Award, Globe } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -28,13 +28,18 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language || 'en');
   const { login, register } = useAuth();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'bn' : 'en';
+    const newLang = currentLang === 'en' ? 'bn' : 'en';
     i18n.changeLanguage(newLang);
+    setCurrentLang(newLang);
+  };
+
+  const t = (key) => {
+    return i18n.t(key);
   };
 
   const handleLogin = async (e) => {
@@ -113,7 +118,7 @@ const LoginPage = () => {
             className="text-gray-600 hover:text-gray-900"
           >
             <Globe className="h-4 w-4 mr-1" />
-            {i18n.language === 'en' ? 'বাংলা' : 'English'}
+            {currentLang === 'en' ? 'বাংলা' : 'English'}
           </Button>
         </div>
 

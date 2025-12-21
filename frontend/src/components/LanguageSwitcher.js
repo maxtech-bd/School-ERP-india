@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+import i18n from '../i18n';
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -10,20 +10,19 @@ import {
 import { Globe } from 'lucide-react';
 
 const LanguageSwitcher = () => {
-  const { i18n, t } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
+    setCurrentLanguage(lng);
   };
-
-  const currentLanguage = i18n.language;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Globe className="h-5 w-5" />
-          <span className="sr-only">{t('common.language')}</span>
+          <span className="sr-only">Language</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -31,15 +30,13 @@ const LanguageSwitcher = () => {
           onClick={() => changeLanguage('en')}
           className={currentLanguage === 'en' ? 'bg-accent' : ''}
         >
-          <span className="mr-2">🇺🇸</span>
-          {t('common.english')}
+          English
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('bn')}
           className={currentLanguage === 'bn' ? 'bg-accent' : ''}
         >
-          <span className="mr-2">🇧🇩</span>
-          {t('common.bangla')}
+          বাংলা
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

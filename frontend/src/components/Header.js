@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
+import i18n from '../i18n';
 import axios from 'axios';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -16,18 +17,25 @@ import { Badge } from './ui/badge';
 import { Bell, Search, Settings, User, LogOut, Moon, Sun, Menu } from 'lucide-react';
 import { Input } from './ui/input';
 import LanguageSwitcher from './LanguageSwitcher';
-import { useTranslation } from 'react-i18next';
 
 const API_BASE_URL = '/api';
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const handleLanguageChange = () => forceUpdate(n => n + 1);
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => i18n.off('languageChanged', handleLanguageChange);
+  }, []);
+
+  const t = (key) => i18n.t(key);
 
   const fetchNotifications = useCallback(async () => {
     try {
