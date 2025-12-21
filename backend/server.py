@@ -1791,15 +1791,27 @@ async def get_all_users(current_user: User = Depends(get_current_user)):
 async def create_user_by_admin(
     user_data: UserCreate,
     request: Request,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    target_tenant_id: Optional[str] = None
 ):
     """Create a new user (System Admin and Admin only)"""
     if current_user.role not in ["super_admin", "admin"]:
         raise HTTPException(status_code=403, detail="Only System Admins and Admins can create users")
     
-    # Check if user already exists
+    # Determine which tenant to create the user under
+    # Super admin can specify a target tenant, others use their own tenant
+    if target_tenant_id and current_user.role == "super_admin":
+        # Verify target tenant exists
+        target_tenant = await db.tenants.find_one({"id": target_tenant_id})
+        if not target_tenant:
+            raise HTTPException(status_code=404, detail="Target tenant not found")
+        effective_tenant_id = target_tenant_id
+    else:
+        effective_tenant_id = current_user.tenant_id
+    
+    # Check if user already exists in the target tenant
     existing_user = await db.users.find_one({
-        "tenant_id": current_user.tenant_id,
+        "tenant_id": effective_tenant_id,
         "$or": [
             {"email": user_data.email},
             {"username": user_data.username}
@@ -1813,7 +1825,7 @@ async def create_user_by_admin(
     hashed_password = hash_password(user_data.password)
     user_dict = user_data.dict()
     del user_dict["password"]
-    user_dict["tenant_id"] = current_user.tenant_id
+    user_dict["tenant_id"] = effective_tenant_id
     
     user = User(**user_dict)
     user_doc = user.dict()
@@ -1823,18 +1835,18 @@ async def create_user_by_admin(
     
     # Log admin action
     await log_admin_action(
-        tenant_id=current_user.tenant_id,
+        tenant_id=effective_tenant_id,
         admin_id=current_user.id,
         admin_name=current_user.full_name,
         action="user_created",
         target_user_id=user.id,
         target_user_name=user.full_name,
-        details={"role": user.role, "email": user.email},
+        details={"role": user.role, "email": user.email, "created_for_tenant": effective_tenant_id},
         school_id=current_user.school_id,
         ip_address=request.client.host if request.client else None
     )
     
-    return {"message": "User created successfully", "user_id": user.id}
+    return {"message": "User created successfully", "user_id": user.id, "tenant_id": effective_tenant_id}
 
 @api_router.put("/admin/users/{user_id}")
 async def update_user(
@@ -2162,6 +2174,27 @@ async def update_tenant_modules(
         raise HTTPException(status_code=404, detail="Tenant not found")
     
     return {"message": "Tenant modules updated successfully", "allowed_modules": module_data.allowed_modules}
+
+@api_router.get("/tenants/{tenant_id}/users")
+async def get_tenant_users(tenant_id: str, current_user: User = Depends(get_current_user)):
+    """Get all users for a specific tenant - super_admin only"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Verify tenant exists
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Get all users for this tenant
+    users = await db.users.find({"tenant_id": tenant_id}).to_list(1000)
+    
+    # Remove sensitive data
+    for user in users:
+        user.pop("password_hash", None)
+        user.pop("_id", None)
+    
+    return {"users": users, "tenant_id": tenant_id}
 
 @api_router.get("/tenant/allowed-modules")
 async def get_current_tenant_modules(current_user: User = Depends(get_current_user)):
