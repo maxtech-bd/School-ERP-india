@@ -42,7 +42,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const { user, logout } = useAuth();
   const [openMenus, setOpenMenus] = useState({});
   const [, forceUpdate] = useState(0);
-  const [allowedModules, setAllowedModules] = useState([]);
+  const [allowedModules, setAllowedModules] = useState(null);
+  const [modulesLoaded, setModulesLoaded] = useState(false);
 
   useEffect(() => {
     const handleLanguageChange = () => forceUpdate(n => n + 1);
@@ -54,7 +55,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     const fetchAllowedModules = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        if (!token) {
+          setModulesLoaded(true);
+          return;
+        }
         
         const response = await fetch('/api/tenant/allowed-modules', {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -66,6 +70,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         }
       } catch (error) {
         console.error('Error fetching allowed modules:', error);
+      } finally {
+        setModulesLoaded(true);
       }
     };
     
@@ -313,11 +319,31 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     }
   ];
 
+  // Don't show any menu items until modules are loaded (except for super_admin who sees all)
   const filteredMenuItems = menuItems.filter(item => {
     const hasRole = item.roles.includes(user?.role);
-    const isModuleAllowed = user?.role === 'super_admin' || allowedModules.length === 0 || allowedModules.includes(item.key);
-    return hasRole && isModuleAllowed;
+    
+    // Super admin always sees all modules they have role access to
+    if (user?.role === 'super_admin') {
+      return hasRole;
+    }
+    
+    // For other users, don't show anything until modules are loaded
+    if (!modulesLoaded) {
+      return false;
+    }
+    
+    // If no module restrictions set (empty array), show all role-allowed items
+    if (!allowedModules || allowedModules.length === 0) {
+      return hasRole;
+    }
+    
+    // Check if this specific module is allowed
+    return hasRole && allowedModules.includes(item.key);
   });
+  
+  // Flag to show loading state for non-super_admin users
+  const isLoadingModules = user?.role !== 'super_admin' && !modulesLoaded;
 
   const isActiveMenu = (item) => {
     if (item.path) {
