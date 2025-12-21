@@ -15,12 +15,15 @@ import {
 import { Badge } from './ui/badge';
 import { Bell, Search, Settings, User, LogOut, Moon, Sun, Menu } from 'lucide-react';
 import { Input } from './ui/input';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE_URL = '/api';
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState([]);
@@ -134,7 +137,7 @@ const Header = ({ onMenuClick }) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
-                placeholder="Search..."
+                placeholder={t('common.search') + '...'}
                 className="pl-10 text-sm bg-gray-50 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-emerald-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -166,9 +169,9 @@ const Header = ({ onMenuClick }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel className="flex justify-between items-center">
-                <span>Notifications</span>
+                <span>{t('common.notifications')}</span>
                 {unreadCount > 0 && (
-                  <Badge variant="secondary" className="text-xs">{unreadCount} new</Badge>
+                  <Badge variant="secondary" className="text-xs">{unreadCount}</Badge>
                 )}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -201,6 +204,9 @@ const Header = ({ onMenuClick }) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Language Switcher */}
+          <LanguageSwitcher />
 
           {/* Theme toggle */}
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -241,11 +247,11 @@ const Header = ({ onMenuClick }) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t('settings.profile')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>{t('common.settings')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
@@ -253,7 +259,7 @@ const Header = ({ onMenuClick }) => {
                   onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{t('common.logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../App';
+import { useTranslation } from 'react-i18next';
 import { 
   Home,
   Users,
@@ -39,6 +40,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [openMenus, setOpenMenus] = useState({});
 
   const toggleMenu = (menuKey) => {
@@ -390,7 +392,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10"
         >
           <LogOut className="h-5 w-5 mr-3" />
-          Logout
+          {t('common.logout')}
         </Button>
       </div>
     </div>

@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner';
-import { Eye, EyeOff, GraduationCap, Users, BookOpen, Award } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, Users, BookOpen, Award, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -29,6 +30,12 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'bn' : 'en';
+    i18n.changeLanguage(newLang);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -97,6 +104,19 @@ const LoginPage = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
+        {/* Language Toggle */}
+        <div className="absolute top-0 right-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <Globe className="h-4 w-4 mr-1" />
+            {i18n.language === 'en' ? 'বাংলা' : 'English'}
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -105,7 +125,7 @@ const LoginPage = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">School ERP</h1>
-          <p className="text-gray-600 mt-2">Complete School Management System</p>
+          <p className="text-gray-600 mt-2">{t('auth.loginTitle')}</p>
         </div>
 
         {/* Features showcase */}
@@ -130,10 +150,10 @@ const LoginPage = () => {
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                  Sign In
+                  {t('auth.signIn')}
                 </TabsTrigger>
                 <TabsTrigger value="register" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                  Register
+                  {t('common.add')}
                 </TabsTrigger>
               </TabsList>
 
@@ -141,11 +161,11 @@ const LoginPage = () => {
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
+                    <Label htmlFor="username">{t('auth.username')}</Label>
                     <Input
                       id="username"
                       type="text"
-                      placeholder="Enter your username"
+                      placeholder={t('auth.username')}
                       value={loginData.username}
                       onChange={(e) => setLoginData({...loginData, username: e.target.value})}
                       required
@@ -154,12 +174,12 @@ const LoginPage = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('auth.password')}</Label>
                     <div className="relative">
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder={t('auth.password')}
                         value={loginData.password}
                         onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                         required
@@ -180,13 +200,12 @@ const LoginPage = () => {
                     <Input
                       id="tenantId"
                       type="text"
-                      placeholder="Enter your school code"
+                      placeholder="School CODE"
                       value={loginData.tenantId}
                       onChange={(e) => setLoginData({...loginData, tenantId: e.target.value})}
                       required
                       className="form-input"
                     />
-                    <p className="text-xs text-gray-500">School CODE is provided by your institution</p>
                   </div>
 
                   <Button 
@@ -195,9 +214,9 @@ const LoginPage = () => {
                     disabled={loading}
                   >
                     {loading ? (
-                      <span className="loading-dots">Signing in</span>
+                      <span className="loading-dots">{t('auth.signingIn')}</span>
                     ) : (
-                      'Sign In'
+                      t('auth.signIn')
                     )}
                   </Button>
                 </form>
