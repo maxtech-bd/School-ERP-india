@@ -47,6 +47,13 @@ const Results = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [urlParamsApplied, setUrlParamsApplied] = useState(false);
+  const [schoolBranding, setSchoolBranding] = useState({
+    name: 'School ERP System',
+    address: '',
+    contact: '',
+    email: '',
+    logo_url: ''
+  });
   
   // Filters - initialize from URL params if present
   const [selectedExamTerm, setSelectedExamTerm] = useState('');
@@ -78,6 +85,23 @@ const Results = () => {
   
   const canEdit = ['super_admin', 'admin', 'principal', 'teacher'].includes(user?.role);
   const canPublish = ['super_admin', 'admin', 'principal'].includes(user?.role);
+
+  const fetchSchoolBranding = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/institution');
+      if (response.data) {
+        setSchoolBranding({
+          name: response.data.name || 'School ERP System',
+          address: response.data.address || '',
+          contact: response.data.contact_phone || response.data.phone || '',
+          email: response.data.contact_email || response.data.email || '',
+          logo_url: response.data.logo_url || response.data.logo || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching school branding:', error);
+    }
+  }, []);
 
   const fetchExamTerms = useCallback(async () => {
     try {
@@ -153,11 +177,11 @@ const Results = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchExamTerms(), fetchClasses()]);
+      await Promise.all([fetchExamTerms(), fetchClasses(), fetchSchoolBranding()]);
       setLoading(false);
     };
     loadData();
-  }, [fetchExamTerms, fetchClasses]);
+  }, [fetchExamTerms, fetchClasses, fetchSchoolBranding]);
 
   useEffect(() => {
     if (selectedClass) {
@@ -379,9 +403,15 @@ const Results = () => {
           <title>Result Card - ${result.student_name}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 30px; max-width: 800px; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #10b981; }
-            .school-name { font-size: 24px; font-weight: bold; color: #1f2937; }
-            .result-card { font-size: 18px; color: #6b7280; margin-top: 8px; }
+            .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #10b981; }
+            .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
+            .school-logo { width: 80px; height: 80px; object-fit: contain; }
+            .school-info { text-align: center; }
+            .school-name { font-size: 28px; font-weight: bold; color: #1f2937; text-transform: uppercase; }
+            .school-address { font-size: 14px; color: #6b7280; margin-top: 4px; }
+            .school-contact { font-size: 12px; color: #6b7280; margin-top: 2px; }
+            .result-title { font-size: 20px; font-weight: 600; color: #10b981; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; }
+            .exam-info { font-size: 16px; color: #4b5563; margin-top: 8px; }
             .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; padding: 16px; background: #f0fdf4; border-radius: 8px; }
             .info-item { }
             .info-label { font-size: 12px; color: #6b7280; }
@@ -397,13 +427,25 @@ const Results = () => {
             .pass { color: #10b981; }
             .fail { color: #ef4444; }
             .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
+            .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 40px; }
+            .signature-box { text-align: center; }
+            .signature-line { border-top: 1px solid #374151; width: 150px; margin-bottom: 8px; }
+            .signature-label { font-size: 12px; color: #6b7280; }
             @media print { body { padding: 15px; } }
           </style>
         </head>
         <body>
           <div class="header">
-            <div class="school-name">Student Result Card</div>
-            <div class="result-card">${examTerm?.name || 'Examination'} - ${examTerm?.academic_year || ''}</div>
+            <div class="header-content">
+              ${schoolBranding.logo_url ? `<img src="${schoolBranding.logo_url}" alt="School Logo" class="school-logo" />` : ''}
+              <div class="school-info">
+                <div class="school-name">${schoolBranding.name}</div>
+                ${schoolBranding.address ? `<div class="school-address">${schoolBranding.address}</div>` : ''}
+                ${schoolBranding.contact || schoolBranding.email ? `<div class="school-contact">${[schoolBranding.contact, schoolBranding.email].filter(Boolean).join(' | ')}</div>` : ''}
+              </div>
+            </div>
+            <div class="result-title">Student Result Card</div>
+            <div class="exam-info">${examTerm?.name || 'Examination'} - ${examTerm?.academic_year || ''}</div>
           </div>
           
           <div class="student-info">
@@ -469,8 +511,19 @@ const Results = () => {
             </div>
           </div>
           
+          <div class="signatures">
+            <div class="signature-box">
+              <div class="signature-line"></div>
+              <div class="signature-label">Class Teacher</div>
+            </div>
+            <div class="signature-box">
+              <div class="signature-line"></div>
+              <div class="signature-label">Principal</div>
+            </div>
+          </div>
+          
           <div class="footer">
-            Generated by Cloud School ERP | ${new Date().toLocaleDateString()}
+            ${schoolBranding.name} | Generated on ${new Date().toLocaleDateString()}
           </div>
         </body>
       </html>
