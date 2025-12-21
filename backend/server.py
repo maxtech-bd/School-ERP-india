@@ -2137,6 +2137,10 @@ async def get_tenant(tenant_id: str, current_user: User = Depends(get_current_us
     tenant = await db.tenants.find_one({"id": tenant_id})
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Convert ObjectId to string for JSON serialization
+    if "_id" in tenant:
+        tenant["_id"] = str(tenant["_id"])
     return tenant
 
 @api_router.put("/tenants/{tenant_id}/modules")
