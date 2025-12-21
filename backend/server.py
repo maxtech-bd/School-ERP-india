@@ -1685,12 +1685,28 @@ async def register_user(user_data: UserCreate):
 @api_router.post("/auth/login")
 async def login_user(login_data: UserLogin):
     # Use tenant from login data or default (do not use global context)
-    tenant_id = login_data.tenant_id or DEFAULT_TENANT_ID
+    input_tenant_id = login_data.tenant_id or DEFAULT_TENANT_ID
     
-    logging.info(f"DEBUG LOGIN: Looking for username='{login_data.username}', tenant_id='{tenant_id}'")
+    # First try to find tenant by id, then by domain
+    tenant = await db.tenants.find_one({"id": input_tenant_id})
+    if not tenant:
+        # Try finding by domain
+        tenant = await db.tenants.find_one({"domain": input_tenant_id})
     
+    # Determine actual tenant_id
+    if tenant:
+        tenant_id = tenant["id"]
+    else:
+        tenant_id = input_tenant_id
+    
+    logging.info(f"DEBUG LOGIN: Looking for username='{login_data.username}', tenant_id='{tenant_id}' (input was: {input_tenant_id})")
+    
+    # Search by username OR email within the tenant
     user = await db.users.find_one({
-        "username": login_data.username,
+        "$or": [
+            {"username": login_data.username},
+            {"email": login_data.username}
+        ],
         "tenant_id": tenant_id
     })
     
