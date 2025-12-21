@@ -578,8 +578,8 @@ const Results = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Results</h1>
-          <p className="text-gray-600 mt-1">Manage and track student examination results</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Student Results</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track student examination results</p>
         </div>
         {canEdit && (
           <div className="flex flex-wrap gap-2">

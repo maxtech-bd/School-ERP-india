@@ -364,7 +364,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
   // Render
   // ===============================
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 mb-6">
@@ -381,8 +381,8 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Generate Form */}
-          <div className="lg:col-span-1 bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 dark:text-white">
               <Sparkles size={20} className="text-purple-600" />
               Generate Summary
             </h2>
@@ -390,13 +390,13 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
             <div className="space-y-4">
               {/* Class */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Class *
                 </label>
                 <select
                   value={selectedClassId}
                   onChange={handleFormClassChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">
                     {classLoading ? "Loading classes..." : "Select Class"}
@@ -411,14 +411,14 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
               {/* Subject (dynamic from backend with demo fallback) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Subject *
                 </label>
                 <select
                   value={formData.subject}
                   onChange={handleFormSubjectChange}
                   disabled={!formData.class_standard || subjectsLoading}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">
                     {subjectsLoading
@@ -446,7 +446,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
               {/* Chapter (dynamic from syllabus or free text) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Chapter
                 </label>
                 {chaptersOptions.length > 0 ? (
@@ -454,7 +454,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                     value={formData.chapter}
                     onChange={handleFormChapterChange}
                     disabled={!formData.subject}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Select Chapter</option>
                     {chaptersOptions.map((ch) => (
@@ -478,14 +478,14 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                         ? "No syllabus chapters found – type chapter name"
                         : "Select Subject first"
                     }
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                   />
                 )}
               </div>
 
               {/* Topic */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Topic
                 </label>
                 <input
@@ -498,7 +498,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                     }))
                   }
                   placeholder="e.g., Velocity and Acceleration"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
 
@@ -521,16 +521,16 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                 )}
               </button>
 
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                 Checks library first, generates with AI if needed
               </p>
             </div>
           </div>
 
           {/* Middle: Summary Display */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+              <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
                 <FileText size={20} className="text-purple-600" />
                 Summary
               </h2>
@@ -547,44 +547,44 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
             {currentSummary ? (
               <div className="space-y-4">
-                <div className="bg-purple-50 rounded-lg p-4">
+                <div className="bg-purple-50 dark:bg-gray-700 rounded-lg p-4">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="font-medium text-gray-700">Class:</span>{" "}
-                      <span className="text-gray-900">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Class:</span>{" "}
+                      <span className="text-gray-900 dark:text-white">
                         {currentSummary.class_standard}
                       </span>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
                         Subject:
                       </span>{" "}
-                      <span className="text-gray-900">
+                      <span className="text-gray-900 dark:text-white">
                         {currentSummary.subject}
                       </span>
                     </div>
                     {currentSummary.chapter && (
                       <div>
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
                           Chapter:
                         </span>{" "}
-                        <span className="text-gray-900">
+                        <span className="text-gray-900 dark:text-white">
                           {currentSummary.chapter}
                         </span>
                       </div>
                     )}
                     {currentSummary.topic && (
                       <div>
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
                           Topic:
                         </span>{" "}
-                        <span className="text-gray-900">
+                        <span className="text-gray-900 dark:text-white">
                           {currentSummary.topic}
                         </span>
                       </div>
                     )}
                     <div className="col-span-2">
-                      <span className="font-medium text-gray-700">Source:</span>{" "}
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Source:</span>{" "}
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           currentSummary.source === "cms"
@@ -600,14 +600,14 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                   </div>
                 </div>
 
-                <div className="prose max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900">
+                <div className="prose max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 dark:prose-invert">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {currentSummary.content}
                   </ReactMarkdown>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                 <BookOpen size={64} className="mx-auto mb-4 opacity-30" />
                 <p>Generate a summary to view it here</p>
               </div>
@@ -616,20 +616,20 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
         </div>
 
         {/* Summary History */}
-        <div className="mt-6 bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Summary Library</h2>
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">Summary Library</h2>
 
           {/* Filters */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Class filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter by Class
               </label>
               <select
                 value={filterClass}
                 onChange={handleFilterClassChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">
                   {classLoading ? "Loading classes..." : "All Classes"}
@@ -644,14 +644,14 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
             {/* Subject filter – options based on summaries + class */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter by Subject
               </label>
               <select
                 value={filterSubject}
                 onChange={handleFilterSubjectChange}
                 disabled={subjectFilterOptions.length === 0}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 disabled:bg-gray-100"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 disabled:bg-gray-100 dark:disabled:bg-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">
                   {subjectFilterOptions.length
@@ -668,14 +668,14 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
 
             {/* Chapter filter – based on summaries + class + subject */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter by Chapter
               </label>
               <select
                 value={filterChapter}
                 onChange={handleFilterChapterChange}
                 disabled={chapterFilterOptions.length === 0}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 disabled:bg-gray-100"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 disabled:bg-gray-100 dark:disabled:bg-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">
                   {chapterFilterOptions.length
@@ -694,7 +694,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
           {/* List */}
           <div className="space-y-3">
             {loading ? (
-              <div className="flex items-center justify-center gap-2 text-gray-500 py-8">
+              <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400 py-8">
                 <Loader2 className="animate-spin" size={18} />
                 Loading summaries...
               </div>
@@ -702,21 +702,21 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
               summaries.map((summary) => (
                 <div
                   key={summary.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition cursor-pointer"
+                  className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:border-purple-300 dark:hover:border-purple-500 transition cursor-pointer"
                   onClick={() => handleViewSummary(summary)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
                         {summary.subject} - Class {summary.class_standard}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {summary.chapter && `Chapter: ${summary.chapter}`}
                         {summary.chapter && summary.topic && " | "}
                         {summary.topic && `Topic: ${summary.topic}`}
                       </p>
                       <div className="flex items-center gap-3 mt-2">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(summary.created_at).toLocaleDateString()}
                         </span>
                         <span
@@ -743,7 +743,7 @@ Source: ${currentSummary.source === "cms" ? "Library" : "AI Generated"}
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-gray-400 dark:text-gray-500">
                 No summaries found
               </div>
             )}

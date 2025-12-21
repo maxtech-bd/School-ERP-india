@@ -289,7 +289,7 @@ const Calendar = () => {
             <CalendarIcon className="h-6 w-6 text-emerald-600" />
             School Calendar
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
             View holidays, events, and important dates
           </p>
         </div>
@@ -339,7 +339,7 @@ const Calendar = () => {
             <CardContent>
               <div className="grid grid-cols-7 gap-1">
                 {dayNames.map(day => (
-                  <div key={day} className="text-center font-semibold text-gray-600 py-2 text-sm">
+                  <div key={day} className="text-center font-semibold text-gray-600 dark:text-gray-400 py-2 text-sm">
                     {day}
                   </div>
                 ))}
@@ -351,16 +351,16 @@ const Calendar = () => {
                   return (
                     <div
                       key={index}
-                      className={`min-h-[100px] p-1 border rounded-lg transition-all ${
+                      className={`min-h-[100px] p-1 border dark:border-gray-700 rounded-lg transition-all ${
                         dayObj.isCurrentMonth 
-                          ? 'bg-white hover:bg-gray-50' 
-                          : 'bg-gray-50'
-                      } ${isToday(dayObj.day) ? 'ring-2 ring-emerald-500 bg-emerald-50' : ''}`}
+                          ? 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700' 
+                          : 'bg-gray-50 dark:bg-gray-900'
+                      } ${isToday(dayObj.day) ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : ''}`}
                     >
                       {dayObj.day && (
                         <>
                           <div className={`text-sm font-medium mb-1 ${
-                            isToday(dayObj.day) ? 'text-emerald-600' : 'text-gray-700'
+                            isToday(dayObj.day) ? 'text-emerald-600' : 'text-gray-700 dark:text-gray-300'
                           }`}>
                             {dayObj.day}
                           </div>
@@ -384,7 +384,7 @@ const Calendar = () => {
                               );
                             })}
                             {dayEvents.length > 2 && (
-                              <div className="text-xs text-gray-500 pl-1">
+                              <div className="text-xs text-gray-500 dark:text-gray-400 pl-1">
                                 +{dayEvents.length - 2} more
                               </div>
                             )}
@@ -412,7 +412,7 @@ const Calendar = () => {
                   return (
                     <div 
                       key={type.value}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                       onClick={() => setFilterType(filterType === type.value ? 'all' : type.value)}
                     >
                       <div className="flex items-center gap-2">
@@ -438,7 +438,7 @@ const Calendar = () => {
             </CardHeader>
             <CardContent>
               {upcomingEvents.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-4">No upcoming events</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No upcoming events</p>
               ) : (
                 <div className="space-y-3">
                   {upcomingEvents.map(event => {
@@ -459,7 +459,7 @@ const Calendar = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{event.title}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               {new Date(event.start_date).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',

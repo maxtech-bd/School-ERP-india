@@ -973,8 +973,8 @@ const Reports = () => {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Reports</h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">Comprehensive reporting and analytics dashboard</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Reports</h1>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Comprehensive reporting and analytics dashboard</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
@@ -999,8 +999,8 @@ const Reports = () => {
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">{report.name}</p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{report.count}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{report.name}</p>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{report.count}</p>
                 </div>
                 <report.icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-emerald-500" />
               </div>
@@ -1028,10 +1028,10 @@ const Reports = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Consolidated Marksheet</h3>
-                    <p className="text-sm text-gray-600 mb-3">Complete academic performance report</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Consolidated Marksheet</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Complete academic performance report</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateConsolidatedMarksheet}>Generate</Button>
@@ -1039,10 +1039,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Subject-wise Analysis</h3>
-                    <p className="text-sm text-gray-600 mb-3">Performance analysis by subjects</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Subject-wise Analysis</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Performance analysis by subjects</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateSubjectWiseAnalysis}>Generate</Button>
@@ -1050,10 +1050,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Class Performance</h3>
-                    <p className="text-sm text-gray-600 mb-3">Class-wise academic summary</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Class Performance</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Class-wise academic summary</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateClassPerformance}>Generate</Button>
@@ -1085,10 +1085,10 @@ const Reports = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="border border-gray-200 hover:border-emerald-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Daily Attendance</h3>
-                    <p className="text-sm text-gray-600 mb-3">Today's attendance summary</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Daily Attendance</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Today's attendance summary</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">Live</Badge>
                       <Button 
@@ -1103,10 +1103,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-emerald-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Monthly Summary</h3>
-                    <p className="text-sm text-gray-600 mb-3">Complete month attendance report</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Monthly Summary</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Complete month attendance report</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateMonthlyAttendanceReport}>Generate</Button>
@@ -1114,10 +1114,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-emerald-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Staff Attendance</h3>
-                    <p className="text-sm text-gray-600 mb-3">Employee attendance tracking</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Staff Attendance</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Employee attendance tracking</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateStaffAttendanceReport}>Generate</Button>
@@ -1147,7 +1147,7 @@ const Reports = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="space-y-2">
                     <Label>Academic Year</Label>
                     <Select 
@@ -1220,36 +1220,36 @@ const Reports = () => {
                 {admissionLoading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                    <span className="ml-3 text-gray-600">Loading admission data...</span>
+                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading admission data...</span>
                   </div>
                 ) : admissionData.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500">No admission records found with current filters</p>
+                    <p className="text-gray-500 dark:text-gray-400">No admission records found with current filters</p>
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <Card className="bg-blue-50">
+                      <Card className="bg-blue-50 dark:bg-blue-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600">{admissionData.length}</div>
-                          <div className="text-sm text-gray-600">Total Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Total Students</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-green-50">
+                      <Card className="bg-green-50 dark:bg-green-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {admissionData.filter(s => s.gender === 'Male').length}
                           </div>
-                          <div className="text-sm text-gray-600">Male Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Male Students</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-pink-50">
+                      <Card className="bg-pink-50 dark:bg-pink-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-pink-600">
                             {admissionData.filter(s => s.gender === 'Female').length}
                           </div>
-                          <div className="text-sm text-gray-600">Female Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Female Students</div>
                         </CardContent>
                       </Card>
                     </div>
@@ -1312,7 +1312,7 @@ const Reports = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="space-y-2">
                     <Label>Start Date</Label>
                     <Input
@@ -1356,18 +1356,18 @@ const Reports = () => {
                 ) : loginActivityData.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500">No login activity records found</p>
+                    <p className="text-gray-500 dark:text-gray-400">No login activity records found</p>
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <Card className="bg-blue-50">
+                      <Card className="bg-blue-50 dark:bg-blue-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600">{loginActivityData.length}</div>
-                          <div className="text-sm text-gray-600">Total Logins</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Total Logins</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-green-50">
+                      <Card className="bg-green-50 dark:bg-green-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {loginActivityData.filter(l => l.status === 'Success').length}
@@ -1448,7 +1448,7 @@ const Reports = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="space-y-2">
                     <Label>Class</Label>
                     <Select 
@@ -1520,18 +1520,18 @@ const Reports = () => {
                 ) : studentInfoData.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500">No student records found with current filters</p>
+                    <p className="text-gray-500 dark:text-gray-400">No student records found with current filters</p>
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                      <Card className="bg-blue-50">
+                      <Card className="bg-blue-50 dark:bg-blue-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600">{studentInfoData.length}</div>
-                          <div className="text-sm text-gray-600">Total Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Total Students</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-green-50">
+                      <Card className="bg-green-50 dark:bg-green-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {studentInfoData.filter(s => s.is_active || s.status === 'active').length}
@@ -1547,7 +1547,7 @@ const Reports = () => {
                           <div className="text-sm text-gray-600">Male</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-pink-50">
+                      <Card className="bg-pink-50 dark:bg-pink-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-pink-600">
                             {studentInfoData.filter(s => s.gender === 'Female').length}
@@ -1630,7 +1630,7 @@ const Reports = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="space-y-2">
                     <Label>Academic Year</Label>
                     <Select 
@@ -1692,32 +1692,32 @@ const Reports = () => {
                 ) : crossCountData.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500">No student records found for cross counting</p>
+                    <p className="text-gray-500 dark:text-gray-400">No student records found for cross counting</p>
                   </div>
                 ) : (
                   <>
                     {/* Summary Statistics */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                      <Card className="bg-blue-50">
+                      <Card className="bg-blue-50 dark:bg-blue-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600">{crossCountData.length}</div>
-                          <div className="text-sm text-gray-600">Total Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Total Students</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-green-50">
+                      <Card className="bg-green-50 dark:bg-green-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {crossCountData.filter(s => s.gender === 'Male').length}
                           </div>
-                          <div className="text-sm text-gray-600">Male Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Male Students</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-pink-50">
+                      <Card className="bg-pink-50 dark:bg-pink-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-pink-600">
                             {crossCountData.filter(s => s.gender === 'Female').length}
                           </div>
-                          <div className="text-sm text-gray-600">Female Students</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Female Students</div>
                         </CardContent>
                       </Card>
                       <Card className="bg-purple-50">
@@ -1842,7 +1842,7 @@ const Reports = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="space-y-2">
                     <Label>Department</Label>
                     <Select 
@@ -1918,18 +1918,18 @@ const Reports = () => {
                 ) : teacherData.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500">No teacher records found</p>
+                    <p className="text-gray-500 dark:text-gray-400">No teacher records found</p>
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <Card className="bg-blue-50">
+                      <Card className="bg-blue-50 dark:bg-blue-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-blue-600">{teacherData.length}</div>
                           <div className="text-sm text-gray-600">Total Teachers</div>
                         </CardContent>
                       </Card>
-                      <Card className="bg-green-50">
+                      <Card className="bg-green-50 dark:bg-green-900/30">
                         <CardContent className="p-4 text-center">
                           <div className="text-2xl font-bold text-green-600">
                             {teacherData.filter(t => t.is_active || t.status === 'active').length}
@@ -2050,10 +2050,10 @@ const Reports = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Card className="border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer">
+                  <Card className="border border-gray-200 dark:border-gray-600 hover:border-purple-300 transition-colors cursor-pointer">
                     <CardContent className="p-4">
-                      <h3 className="font-semibold mb-2">Admission Report</h3>
-                      <p className="text-sm text-gray-600 mb-3">New admissions and trends</p>
+                      <h3 className="font-semibold mb-2 dark:text-white">Admission Report</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">New admissions and trends</p>
                       <div className="flex justify-between items-center">
                         <Badge variant="secondary">Ready</Badge>
                         <Button size="sm" variant="outline" onClick={() => navigate('/reports/admission')}>View</Button>
@@ -2061,10 +2061,10 @@ const Reports = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer">
+                  <Card className="border border-gray-200 dark:border-gray-600 hover:border-purple-300 transition-colors cursor-pointer">
                     <CardContent className="p-4">
-                      <h3 className="font-semibold mb-2">Login Activity</h3>
-                      <p className="text-sm text-gray-600 mb-3">System access and usage report</p>
+                      <h3 className="font-semibold mb-2 dark:text-white">Login Activity</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">System access and usage report</p>
                       <div className="flex justify-between items-center">
                         <Badge variant="secondary">Ready</Badge>
                         <Button size="sm" variant="outline" onClick={() => navigate('/reports/login')}>View</Button>
@@ -2072,10 +2072,10 @@ const Reports = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer">
+                  <Card className="border border-gray-200 dark:border-gray-600 hover:border-purple-300 transition-colors cursor-pointer">
                     <CardContent className="p-4">
-                      <h3 className="font-semibold mb-2">Student Information</h3>
-                      <p className="text-sm text-gray-600 mb-3">Comprehensive student database</p>
+                      <h3 className="font-semibold mb-2 dark:text-white">Student Information</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Comprehensive student database</p>
                       <div className="flex justify-between items-center">
                         <Badge variant="secondary">Ready</Badge>
                         <Button size="sm" variant="outline" onClick={() => navigate('/reports/students')}>View</Button>
@@ -2098,10 +2098,10 @@ const Reports = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="border border-gray-200 hover:border-orange-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-orange-300 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Vehicle Report</h3>
-                    <p className="text-sm text-gray-600 mb-3">Fleet utilization and maintenance</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Vehicle Report</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Fleet utilization and maintenance</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateVehicleReport}>Generate</Button>
@@ -2109,10 +2109,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-orange-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-orange-300 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Route Efficiency</h3>
-                    <p className="text-sm text-gray-600 mb-3">Route performance analysis</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Route Efficiency</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Route performance analysis</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateRouteEfficiencyReport}>Generate</Button>
@@ -2120,10 +2120,10 @@ const Reports = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:border-orange-300 transition-colors cursor-pointer">
+                <Card className="border border-gray-200 dark:border-gray-600 hover:border-orange-300 transition-colors cursor-pointer">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">Transport Fees</h3>
-                    <p className="text-sm text-gray-600 mb-3">Transport fee collection report</p>
+                    <h3 className="font-semibold mb-2 dark:text-white">Transport Fees</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Transport fee collection report</p>
                     <div className="flex justify-between items-center">
                       <Badge variant="secondary">Ready</Badge>
                       <Button size="sm" variant="outline" onClick={generateTransportFeesReport}>Generate</Button>
@@ -2154,7 +2154,7 @@ const Reports = () => {
             {dailyAttendanceData.length === 0 ? (
               <div className="text-center py-8">
                 <UserCheck className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p className="text-gray-500">No attendance records found for today.</p>
+                <p className="text-gray-500 dark:text-gray-400">No attendance records found for today.</p>
                 <p className="text-sm text-gray-400 mt-2">
                   Attendance data may not have been marked yet or there might be no staff records in the system.
                 </p>

@@ -550,8 +550,8 @@ const BiometricDevices = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Biometric Devices</h1>
-          <p className="text-gray-600 mt-1">Monitor and manage ZKTeco attendance devices</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Biometric Devices</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor and manage ZKTeco attendance devices</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button 
@@ -585,8 +585,8 @@ const BiometricDevices = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Devices</p>
-                <p className="text-3xl font-bold text-gray-900">{totalDevices}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Devices</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalDevices}</p>
               </div>
               <Fingerprint className="h-8 w-8 text-blue-500" />
             </div>
@@ -596,7 +596,7 @@ const BiometricDevices = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Online Devices</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Online Devices</p>
                 <p className="text-3xl font-bold text-emerald-600">{onlineDevices}</p>
               </div>
               <Wifi className="h-8 w-8 text-emerald-500" />
@@ -607,7 +607,7 @@ const BiometricDevices = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Offline Devices</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Offline Devices</p>
                 <p className="text-3xl font-bold text-red-600">{totalDevices - onlineDevices}</p>
               </div>
               <WifiOff className="h-8 w-8 text-red-500" />
@@ -618,7 +618,7 @@ const BiometricDevices = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Today's Punches</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Punches</p>
                 <p className="text-3xl font-bold text-purple-600">{todayPunches}</p>
               </div>
               <Clock className="h-8 w-8 text-purple-500" />
@@ -647,7 +647,7 @@ const BiometricDevices = () => {
               <CardContent>
                 <div className="space-y-4">
                   {devices.map((device) => (
-                    <div key={device.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div key={device.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className={`p-2 rounded-full ${device.status === 'Online' ? 'bg-emerald-100' : 'bg-red-100'}`}>
                           {device.status === 'Online' ? 
@@ -1025,8 +1025,8 @@ const BiometricDevices = () => {
               {devicesList.length === 0 ? (
                 <div className="text-center py-12">
                   <Fingerprint className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Devices Configured</h3>
-                  <p className="text-gray-600 mb-4">Add your first biometric device to get started</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Devices Configured</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Add your first biometric device to get started</p>
                   <Button className="bg-emerald-500 hover:bg-emerald-600" onClick={handleAddNewDevice} disabled={loading}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add New Device
@@ -1041,7 +1041,7 @@ const BiometricDevices = () => {
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center space-x-2">
                               <div className={`w-3 h-3 rounded-full ${device.status === 'active' ? 'bg-green-500' : device.status === 'maintenance' ? 'bg-yellow-500' : 'bg-red-500'}`} />
-                              <h4 className="font-medium text-gray-900">{device.device_name}</h4>
+                              <h4 className="font-medium text-gray-900 dark:text-white">{device.device_name}</h4>
                             </div>
                             <Badge variant={device.status === 'active' ? 'default' : device.status === 'maintenance' ? 'secondary' : 'destructive'} 
                               className={`text-xs ${device.status === 'active' ? 'bg-emerald-100 text-emerald-800' : ''}`}>
@@ -1049,7 +1049,7 @@ const BiometricDevices = () => {
                             </Badge>
                           </div>
                           
-                          <div className="space-y-2 text-sm text-gray-600">
+                          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                             <div className="flex justify-between">
                               <span>Model:</span>
                               <span>{device.device_model}</span>
@@ -1089,23 +1089,23 @@ const BiometricDevices = () => {
                     ))}
                   </div>
                   
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                       <div>
                         <p className="text-2xl font-bold text-emerald-600">{devicesList.length}</p>
-                        <p className="text-sm text-gray-600">Total Devices</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Devices</p>
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-green-600">{devicesList.filter(d => d.status === 'active').length}</p>
-                        <p className="text-sm text-gray-600">Online</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Online</p>
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-yellow-600">{devicesList.filter(d => d.status === 'maintenance').length}</p>
-                        <p className="text-sm text-gray-600">Maintenance</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Maintenance</p>
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-red-600">{devicesList.filter(d => d.status === 'inactive').length}</p>
-                        <p className="text-sm text-gray-600">Offline</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Offline</p>
                       </div>
                     </div>
                   </div>
@@ -1156,48 +1156,48 @@ const BiometricDevices = () => {
               {!calendarData ? (
                 <div className="text-center py-12">
                   <Calendar className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Monthly Attendance View</h3>
-                  <p className="text-gray-600 mb-4">Select month/year and click Load Calendar to view attendance patterns</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Monthly Attendance View</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Select month/year and click Load Calendar to view attendance patterns</p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {/* Calendar Header */}
                   <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                       {calendarData.month_name} {calendarData.year}
                     </h2>
                   </div>
 
                   {/* Summary Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-blue-600">{calendarData.summary.total_days}</p>
-                      <p className="text-sm text-gray-600">Total Days</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Days</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-green-600">{calendarData.summary.working_days}</p>
-                      <p className="text-sm text-gray-600">Working Days</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Working Days</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-orange-600">{calendarData.summary.weekend_days}</p>
-                      <p className="text-sm text-gray-600">Weekends</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Weekends</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-emerald-600">{calendarData.summary.average_attendance_percentage}</p>
-                      <p className="text-sm text-gray-600">Avg Attendance</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Avg Attendance</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-purple-600">{calendarData.summary.highest_attendance}</p>
-                      <p className="text-sm text-gray-600">Highest Day</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Highest Day</p>
                     </div>
                   </div>
 
                   {/* Calendar Grid */}
                   <div className="border rounded-lg overflow-hidden">
                     {/* Days of Week Header */}
-                    <div className="grid grid-cols-7 bg-gray-100">
+                    <div className="grid grid-cols-7 bg-gray-100 dark:bg-gray-700">
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                        <div key={day} className="p-3 text-center font-medium text-gray-700 border-r border-gray-200 last:border-r-0">
+                        <div key={day} className="p-3 text-center font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600 last:border-r-0">
                           {day}
                         </div>
                       ))}
@@ -1214,7 +1214,7 @@ const BiometricDevices = () => {
                         // Empty cells for days before month starts
                         for (let i = 0; i < firstDay; i++) {
                           days.push(
-                            <div key={`empty-${i}`} className="p-3 h-24 border-r border-b border-gray-200 bg-gray-50"></div>
+                            <div key={`empty-${i}`} className="p-3 h-24 border-r border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"></div>
                           );
                         }
                         
@@ -1225,9 +1225,9 @@ const BiometricDevices = () => {
                           );
                           
                           days.push(
-                            <div key={day} className={`p-2 h-24 border-r border-b border-gray-200 ${dayData?.is_weekend ? 'bg-gray-50' : 'bg-white'}`}>
+                            <div key={day} className={`p-2 h-24 border-r border-b border-gray-200 dark:border-gray-600 ${dayData?.is_weekend ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'}`}>
                               <div className="flex flex-col h-full">
-                                <div className="text-sm font-medium text-gray-900 mb-1">{day}</div>
+                                <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">{day}</div>
                                 {dayData && !dayData.is_weekend && (
                                   <div className={`flex-1 rounded text-xs p-1 text-center border ${getStatusColor(dayData.present_count, dayData.total_staff)}`}>
                                     <div className="font-medium">{dayData.present_count}/{dayData.total_staff}</div>
@@ -1282,8 +1282,8 @@ const BiometricDevices = () => {
             <CardContent>
               <div className="text-center py-12">
                 <Download className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Comprehensive Status Report</h3>
-                <p className="text-gray-600 mb-4">Generate detailed device performance reports</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Comprehensive Status Report</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Generate detailed device performance reports</p>
                 <div className="flex justify-center space-x-3">
                   <Button variant="outline" onClick={handleDailyReport} disabled={loading}>Daily Report</Button>
                   <Button variant="outline" onClick={handleWeeklyReport} disabled={loading}>Weekly Report</Button>

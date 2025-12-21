@@ -1911,8 +1911,8 @@ const LeaveRequestsView = () => {
       {/* Create Leave Request Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">New Leave Request</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4 dark:text-white">New Leave Request</h2>
             
             <div className="space-y-4">
               <div>
@@ -1988,13 +1988,13 @@ const LeaveRequestsView = () => {
       {/* Action Modal (Approve/Reject) */}
       {actionModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4 dark:text-white">
               {actionModal.action === 'approved' ? 'Approve' : 'Reject'} Leave Request
             </h2>
             
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm">
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="text-sm dark:text-gray-300">
                 <div><strong>Staff:</strong> {actionModal.request?.staff_name}</div>
                 <div><strong>Type:</strong> {actionModal.request?.leave_type}</div>
                 <div><strong>Duration:</strong> {actionModal.request?.total_days} days</div>
@@ -2002,9 +2002,9 @@ const LeaveRequestsView = () => {
             </div>
             
             <div className="mb-4">
-              <Label>Note (Optional)</Label>
+              <Label className="dark:text-gray-300">Note (Optional)</Label>
               <textarea
-                className="w-full min-h-20 p-2 border border-gray-300 rounded-md resize-none"
+                className="w-full min-h-20 p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md resize-none"
                 value={actionNote}
                 onChange={(e) => setActionNote(e.target.value)}
                 placeholder="Add a note for the staff member..."

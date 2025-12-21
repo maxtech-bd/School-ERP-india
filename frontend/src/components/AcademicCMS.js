@@ -837,9 +837,9 @@ const AcademicCMS = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingId
                 ? `Edit ${isReference ? "Reference" : "Academic"} Book`
                 : `Add New ${isReference ? "Reference" : "Academic"} Book`}
@@ -849,7 +849,7 @@ const AcademicCMS = () => {
                 setShowModal(false);
                 resetFormFn(formType);
               }}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-400"
             >
               <X className="w-6 h-6" />
             </button>
@@ -917,8 +917,8 @@ const AcademicCMS = () => {
             </div>
 
             {/* PRELIMS Upload */}
-            <div className="border p-4 rounded-lg bg-gray-50">
-              <label className="block text-xs font-medium mb-2 text-gray-600 flex justify-between items-center">
+            <div className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+              <label className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-400 flex justify-between items-center">
                 <span>
                   PRELIMS / Full Book File (PDF, TXT, DOCX - Max 100MB Each)
                 </span>
@@ -962,23 +962,23 @@ const AcademicCMS = () => {
                       <File className="w-3 h-3" /> {formState.prelims_file_name}
                     </span>
                   ) : (
-                    <span className="text-gray-500">No file chosen</span>
+                    <span className="text-gray-500 dark:text-gray-400">No file chosen</span>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Dynamic Chapters Upload */}
-            <div className="space-y-3 p-4 border rounded-lg bg-white shadow-inner">
+            <div className="space-y-3 p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-inner">
               <h4 className="text-base font-semibold text-gray-800 border-b pb-2 mb-3">
                 Chapters (1-{formState.chapters.length})
               </h4>
               {formState.chapters.map((chapter, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 border p-3 rounded-lg bg-gray-50"
+                  className="flex items-center gap-2 border p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
                 >
-                  <span className="font-bold text-gray-700 min-w-[85px] text-sm">
+                  <span className="font-bold text-gray-700 dark:text-gray-300 min-w-[85px] text-sm">
                     CHAPTER {index + 1}:
                   </span>
                   <input
@@ -1068,8 +1068,8 @@ const AcademicCMS = () => {
             </div>
 
             {/* BULK UPLOAD for Chapters */}
-            <div className="border p-4 rounded-lg bg-gray-50">
-              <label className="block text-xs font-medium mb-2 text-gray-600 flex items-center gap-2">
+            <div className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+              <label className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-400 flex items-center gap-2">
                 <Upload className="w-4 h-4" />
                 BULK UPLOAD (All Chapters in One File - Max 100MB)
               </label>
@@ -1086,7 +1086,7 @@ const AcademicCMS = () => {
                 disabled={uploadingFile}
               />
               {formState.bulk_upload_file && (
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                   Selected: {formState.bulk_upload_file.name}
                 </p>
               )}
@@ -1107,7 +1107,7 @@ const AcademicCMS = () => {
                   setShowModal(false);
                   resetFormFn(formType);
                 }}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
               >
                 Cancel
               </button>
@@ -1124,24 +1124,24 @@ const AcademicCMS = () => {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Academic Content CMS
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Manage academic books, reference books, previous papers & Q&A
           knowledge base
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-gray-600 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("books")}
             className={`${
               activeTab === "books"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <Book className="w-4 h-4" />
@@ -1152,7 +1152,7 @@ const AcademicCMS = () => {
             className={`${
               activeTab === "reference"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <Book className="w-4 h-4" />
@@ -1163,7 +1163,7 @@ const AcademicCMS = () => {
             className={`${
               activeTab === "papers"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <FileText className="w-4 h-4" />
@@ -1174,7 +1174,7 @@ const AcademicCMS = () => {
             className={`${
               activeTab === "qa"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <FileText className="w-4 h-4" />
@@ -1188,7 +1188,7 @@ const AcademicCMS = () => {
         <div>
           {/* Breadcrumb Navigation */}
           {acadNavLevel.step !== "class" && (
-            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
+            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <button
                 onClick={() =>
                   setAcadNavLevel({
@@ -1243,9 +1243,9 @@ const AcademicCMS = () => {
                 </button>
               </div>
               {books.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
                     No academic books added yet
                   </p>
                   <button
@@ -1269,12 +1269,12 @@ const AcademicCMS = () => {
                             subject: "",
                           })
                         }
-                        className="border-2 border-gray-300 rounded-lg p-6 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-center"
+                        className="border-2 border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-center"
                       >
-                        <div className="text-3xl font-bold text-gray-900">
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white">
                           Class {classNum}
                         </div>
-                        <div className="text-sm text-gray-600 mt-2">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                           {
                             books.filter((b) => b.class_standard === classNum)
                               .length
@@ -1304,7 +1304,7 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                   >
                     ← Back to Classes
                   </button>
@@ -1332,12 +1332,12 @@ const AcademicCMS = () => {
                           subject,
                         })
                       }
-                      className="border-2 border-gray-300 rounded-lg p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
+                      className="border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
                     >
-                      <div className="text-xl font-semibold text-gray-900">
+                      <div className="text-xl font-semibold text-gray-900 dark:text-white">
                         {subject}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {
                           books.filter(
                             (b) =>
@@ -1370,7 +1370,7 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                   >
                     ← Back to Subjects
                   </button>
@@ -1405,7 +1405,7 @@ const AcademicCMS = () => {
                       className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900 flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white flex-1">
                           {book.title}
                         </h3>
                         <div className="flex gap-2">
@@ -1425,7 +1425,7 @@ const AcademicCMS = () => {
                           </button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600">by {book.author}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">by {book.author}</p>
                       <div className="mt-2 flex gap-2 flex-wrap">
                         <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
                           Class {book.class_standard}
@@ -1492,7 +1492,7 @@ const AcademicCMS = () => {
         <div>
           {/* Breadcrumb Navigation */}
           {refNavLevel.step !== "class" && (
-            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
+            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <button
                 onClick={() =>
                   setRefNavLevel({
@@ -1545,9 +1545,9 @@ const AcademicCMS = () => {
                 </button>
               </div>
               {referenceBooks.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
                     No reference books added yet
                   </p>
                   <button
@@ -1575,12 +1575,12 @@ const AcademicCMS = () => {
                             subject: "",
                           })
                         }
-                        className="border-2 border-gray-300 rounded-lg p-6 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-center"
+                        className="border-2 border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-center"
                       >
-                        <div className="text-3xl font-bold text-gray-900">
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white">
                           Class {classNum}
                         </div>
-                        <div className="text-sm text-gray-600 mt-2">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                           {
                             referenceBooks.filter(
                               (b) => b.class_standard === classNum,
@@ -1611,7 +1611,7 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                   >
                     ← Back to Classes
                   </button>
@@ -1639,12 +1639,12 @@ const AcademicCMS = () => {
                           subject,
                         })
                       }
-                      className="border-2 border-gray-300 rounded-lg p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
+                      className="border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
                     >
-                      <div className="text-xl font-semibold text-gray-900">
+                      <div className="text-xl font-semibold text-gray-900 dark:text-white">
                         {subject}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {
                           referenceBooks.filter(
                             (b) =>
@@ -1677,7 +1677,7 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                   >
                     ← Back to Subjects
                   </button>
@@ -1712,7 +1712,7 @@ const AcademicCMS = () => {
                       className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900 flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white flex-1">
                           {book.title}
                         </h3>
                         <div className="flex gap-2">
@@ -1732,7 +1732,7 @@ const AcademicCMS = () => {
                           </button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600">by {book.author}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">by {book.author}</p>
                       <div className="mt-2 flex gap-2 flex-wrap">
                         <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
                           Class {book.class_standard}
@@ -1820,7 +1820,7 @@ const AcademicCMS = () => {
                 className="border rounded-lg p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-gray-900 flex-1">
+                  <h3 className="font-semibold text-gray-900 dark:text-white flex-1">
                     {paper.title}
                   </h3>
                   <div className="flex gap-2">
@@ -1869,7 +1869,7 @@ const AcademicCMS = () => {
           {/* Add/Edit Paper Modal */}
           {showAddPaper && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-4">
                   {editingPaperId
                     ? "Edit Previous Year Paper"
@@ -2022,7 +2022,7 @@ const AcademicCMS = () => {
                         setShowAddPaper(false);
                         resetForm("paper");
                       }}
-                      className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                      className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
                     >
                       Cancel
                     </button>
@@ -2071,10 +2071,10 @@ const AcademicCMS = () => {
               <div key={qa.id} className="border rounded-lg p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 dark:text-white">
                       Q: {qa.question}
                     </p>
-                    <p className="text-sm text-gray-600 mt-2">A: {qa.answer}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">A: {qa.answer}</p>
                     <div className="mt-2 flex gap-2 flex-wrap">
                       <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                         {qa.subject}
@@ -2087,7 +2087,7 @@ const AcademicCMS = () => {
                           {qa.chapter_topic}
                         </span>
                       )}
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                      <span className="inline-block bg-gray-100 dark:bg-gray-800 text-gray-800 text-xs px-2 py-1 rounded">
                         {qa.difficulty_level}
                       </span>
                     </div>
@@ -2116,7 +2116,7 @@ const AcademicCMS = () => {
           {/* Add/Edit Q&A Modal */}
           {showAddQA && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-4">
                   {editingQAId ? "Edit Q&A Pair" : "Add New Q&A Pair"}
                 </h3>
@@ -2267,7 +2267,7 @@ const AcademicCMS = () => {
                         setShowAddQA(false);
                         resetForm("qa");
                       }}
-                      className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                      className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
                     >
                       Cancel
                     </button>
@@ -2280,7 +2280,7 @@ const AcademicCMS = () => {
           {/* Bulk Upload Modal */}
           {showBulkUpload && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full">
                 <h3 className="text-lg font-semibold mb-4">
                   Bulk Upload Q&amp;A Pairs
                 </h3>
@@ -2346,7 +2346,7 @@ const AcademicCMS = () => {
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                     {bulkUploadFile && (
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                         Selected: {bulkUploadFile.name}
                       </p>
                     )}
@@ -2397,7 +2397,7 @@ const AcademicCMS = () => {
                         setBulkUploadFile(null);
                         setUploadSummary(null);
                       }}
-                      className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                      className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
                     >
                       Close
                     </button>
@@ -2412,14 +2412,14 @@ const AcademicCMS = () => {
       {/* Chapters Viewer Modal (both Academic & Reference) */}
       {showChaptersModal && selectedBookForChapters && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4 border-b pb-4">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-emerald-600" />
                   {selectedBookForChapters.title}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {selectedBookForChapters.subject} – Class{" "}
                   {selectedBookForChapters.class_standard} • 
                   <span className={`ml-1 ${selectedBookForChapters.bookType === "academic" ? "text-purple-600" : "text-blue-600"}`}>
@@ -2435,7 +2435,7 @@ const AcademicCMS = () => {
                   setSelectedBookForChapters(null);
                   setChapterViewIndex(0);
                 }}
-                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-400 p-1 hover:bg-gray-100 dark:bg-gray-800 rounded"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -2444,18 +2444,18 @@ const AcademicCMS = () => {
             {chapterLoading ? (
               <div className="py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-3"></div>
-                <p className="text-gray-600">Loading chapters...</p>
+                <p className="text-gray-600 dark:text-gray-400">Loading chapters...</p>
               </div>
             ) : !selectedBookForChapters.chapters ||
               selectedBookForChapters.chapters.length === 0 ? (
-              <div className="py-12 text-center text-gray-600">
+              <div className="py-12 text-center text-gray-600 dark:text-gray-400">
                 <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                 <p>No chapters found for this book.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-medium text-gray-700">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     All Chapters ({selectedBookForChapters.chapters.length})
                   </h4>
                 </div>
@@ -2467,7 +2467,7 @@ const AcademicCMS = () => {
                   return (
                     <div 
                       key={chap.id || index} 
-                      className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:bg-gray-800 transition-colors"
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
@@ -2475,9 +2475,9 @@ const AcademicCMS = () => {
                             {chap.chapter_number || index + 1}
                           </span>
                           <div>
-                            <h5 className="font-medium text-gray-900">{title}</h5>
+                            <h5 className="font-medium text-gray-900 dark:text-white">{title}</h5>
                             {fileName && (
-                              <p className="text-xs text-gray-500 mt-0.5">{fileName}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{fileName}</p>
                             )}
                           </div>
                         </div>
@@ -2500,7 +2500,7 @@ const AcademicCMS = () => {
                             View Content
                           </button>
                         ) : (
-                          <span className="text-xs text-gray-400 bg-gray-200 px-3 py-1.5 rounded">
+                          <span className="text-xs text-gray-400 bg-gray-200 dark:bg-gray-600 px-3 py-1.5 rounded">
                             No file
                           </span>
                         )}

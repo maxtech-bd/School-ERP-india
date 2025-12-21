@@ -325,11 +325,11 @@ const RatingSurveys = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
             <Star className="h-7 w-7 mr-3 text-yellow-500" />
             Rating & Reviews
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Collect feedback through surveys and ratings
           </p>
         </div>
@@ -360,11 +360,11 @@ const RatingSurveys = () => {
               {pendingSurveys.map((survey) => (
                 <div
                   key={survey.id}
-                  className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm"
+                  className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
                 >
                   <div>
                     <h4 className="font-medium">{survey.title}</h4>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {survey.description}
                     </p>
                   </div>
@@ -403,7 +403,7 @@ const RatingSurveys = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Total Surveys</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Surveys</p>
                 <p className="text-2xl font-bold">{surveys.length}</p>
               </div>
               <Star className="h-8 w-8 text-yellow-500" />
@@ -414,7 +414,7 @@ const RatingSurveys = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Pending Response</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Pending Response</p>
                 <p className="text-2xl font-bold text-orange-600">
                   {pendingSurveys.length}
                 </p>
@@ -427,7 +427,7 @@ const RatingSurveys = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Completed</p>
                 <p className="text-2xl font-bold text-green-600">
                   {surveys.filter((s) => s.has_responded).length}
                 </p>
@@ -440,7 +440,7 @@ const RatingSurveys = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Total Responses</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Responses</p>
                 <p className="text-2xl font-bold">
                   {surveys.reduce(
                     (acc, s) => acc + (s.responses_count || 0),
@@ -462,10 +462,10 @@ const RatingSurveys = () => {
         <Card>
           <CardContent className="p-12 text-center">
             <Star className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-600">
+            <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400">
               No surveys found
             </h3>
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-400 dark:text-gray-500 mt-2">
               {searchTerm
                 ? "Try a different search term"
                 : "No surveys to display"}
@@ -505,11 +505,11 @@ const RatingSurveys = () => {
                 </div>
 
                 <h3 className="font-semibold text-lg mb-2">{survey.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
                   {survey.description || "No description provided"}
                 </p>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                   <span className="flex items-center">
                     <Users className="h-4 w-4 mr-1" />
                     {
@@ -531,7 +531,7 @@ const RatingSurveys = () => {
                       null,
                       "sm",
                     )}
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
                       ({survey.average_rating.toFixed(1)})
                     </span>
                   </div>

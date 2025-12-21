@@ -422,24 +422,24 @@ const TestGenerator = () => {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <FileText className="w-8 h-8 text-emerald-600" />
           AI Test Generator
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Create and manage tests with AI assistance
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("generate")}
             className={`${
               activeTab === "generate"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <Plus size={18} />
@@ -450,7 +450,7 @@ const TestGenerator = () => {
             className={`${
               activeTab === "preview"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
             disabled={!generatedTest}
           >
@@ -462,7 +462,7 @@ const TestGenerator = () => {
             className={`${
               activeTab === "list"
                 ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
           >
             <FileText size={18} />
@@ -473,7 +473,7 @@ const TestGenerator = () => {
 
       {/* Generate Test Tab */}
       {activeTab === "generate" && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Generate New Test</h2>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
@@ -483,7 +483,7 @@ const TestGenerator = () => {
               <select
                 value={testForm.class_standard}
                 onChange={handleTestClassChange}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                 disabled={classLoading}
               >
                 <option value="">
@@ -510,7 +510,7 @@ const TestGenerator = () => {
                     difficulty_level: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border rounded-lg"
+                className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
               >
                 {difficultyLevels.map((d) => (
                   <option key={d} value={d}>
@@ -530,7 +530,7 @@ const TestGenerator = () => {
                   setTestForm({ ...testForm, chapter: e.target.value })
                 }
                 placeholder="Enter Chapter Name"
-                className="w-full px-3 py-2 border rounded-lg"
+                className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
               />
             </div>
 
@@ -556,7 +556,7 @@ const TestGenerator = () => {
             </label>
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                       Subject *
@@ -648,7 +648,7 @@ const TestGenerator = () => {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-gray-50">
+                <tfoot className="bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <td
                       colSpan="2"
@@ -698,7 +698,7 @@ const TestGenerator = () => {
                   className={`px-4 py-2 rounded-lg border ${
                     testForm.tags.includes(tag)
                       ? "bg-emerald-600 text-white border-emerald-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-emerald-600"
+                      : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-emerald-600"
                   }`}
                 >
                   {tag}
@@ -723,11 +723,11 @@ const TestGenerator = () => {
       {activeTab === "preview" && generatedTest && (
         <div className="space-y-6">
           {/* Test Header */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="text-xl font-semibold">{generatedTest.title}</h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {generatedTest.total_questions} Questions · Status:{" "}
                   {generatedTest.status}
                 </p>
@@ -735,7 +735,7 @@ const TestGenerator = () => {
               <button
                 onClick={handleGenerateTest}
                 disabled={loading}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center gap-2"
               >
                 <RefreshCw size={18} />
                 Regenerate
@@ -759,7 +759,7 @@ const TestGenerator = () => {
                         scheduled_start: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border rounded-lg"
+                    className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                   />
                 </div>
                 <div>
@@ -775,7 +775,7 @@ const TestGenerator = () => {
                         scheduled_end: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border rounded-lg"
+                    className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                   />
                 </div>
               </div>
@@ -783,13 +783,13 @@ const TestGenerator = () => {
           </div>
 
           {/* Questions Preview */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold mb-4">
               Questions (Click Edit to Modify)
             </h3>
             <div className="space-y-4">
               {generatedTest.questions.map((q, idx) => (
-                <div key={q.id} className="border rounded-lg p-4">
+                <div key={q.id} className="border dark:border-gray-700 rounded-lg p-4">
                   {editingQuestion && editingQuestion.id === q.id ? (
                     // Edit Mode
                     <div className="space-y-3">
@@ -909,7 +909,7 @@ const TestGenerator = () => {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
+                          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center gap-2"
                         >
                           <X size={18} />
                           Cancel
@@ -979,7 +979,7 @@ const TestGenerator = () => {
           </div>
 
           {/* Publish Button */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <button
               onClick={handlePublishTest}
               disabled={loading}
@@ -994,11 +994,11 @@ const TestGenerator = () => {
 
       {/* History Tab – class-wise with clickable cards */}
       {activeTab === "list" && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Test History</h2>
 
           {loading && tests.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">
+            <div className="text-center py-10 text-gray-500 dark:text-gray-400">
               Loading history...
             </div>
           ) : classHistory.length > 0 ? (
@@ -1014,14 +1014,14 @@ const TestGenerator = () => {
                       onClick={() => setSelectedHistoryClassId(cls.id)}
                       className={`border-2 rounded-2xl px-4 py-6 flex flex-col items-center justify-center text-center shadow-sm transition-all ${
                         isSelected
-                          ? "border-black bg-gray-100"
-                          : "border-black bg-white hover:bg-gray-50"
+                          ? "border-black dark:border-gray-600 bg-gray-100 dark:bg-gray-700"
+                          : "border-black dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}
                     >
                       <div className="text-lg font-bold uppercase tracking-wide">
                         {getClassLabel(cls)}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {cls.test_count}{" "}
                         {cls.test_count === 1 ? "test" : "tests"}
                       </div>
@@ -1042,7 +1042,7 @@ const TestGenerator = () => {
                       {testsForSelectedClass.map((test) => (
                         <div
                           key={test.id}
-                          className="border rounded-lg p-4 hover:bg-gray-50"
+                          className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                           <div className="flex justify-between items-start">
                             <div>

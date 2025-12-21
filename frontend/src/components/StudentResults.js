@@ -109,8 +109,8 @@ const StudentResults = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Results</h1>
-          <p className="text-gray-600 mt-1">View your examination results and performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">My Results</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">View your examination results and performance</p>
         </div>
       </div>
 
@@ -185,11 +185,11 @@ const StudentResults = () => {
 
             return (
               <Card key={result.id} className="overflow-hidden">
-                <CardHeader className="bg-gray-50 border-b">
+                <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <CardTitle className="text-lg">{examTerm?.name || 'Exam'}</CardTitle>
-                      <p className="text-sm text-gray-500">{examTerm?.academic_year}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{examTerm?.academic_year}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className={`flex items-center gap-2 ${performance.color}`}>
@@ -206,28 +206,28 @@ const StudentResults = () => {
                 <CardContent className="p-0">
                   <div className="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x">
                     {/* Score Summary */}
-                    <div className="p-6 text-center bg-white">
-                      <p className="text-gray-500 text-sm">Total Score</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-1">
+                    <div className="p-6 text-center bg-white dark:bg-gray-800">
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">Total Score</p>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                         {result.total_marks} / {result.total_max_marks}
                       </p>
                     </div>
-                    <div className="p-6 text-center bg-white">
-                      <p className="text-gray-500 text-sm">Percentage</p>
+                    <div className="p-6 text-center bg-white dark:bg-gray-800">
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">Percentage</p>
                       <p className="text-3xl font-bold text-emerald-600 mt-1">
                         {result.percentage}%
                       </p>
                     </div>
-                    <div className="p-6 text-center bg-white">
-                      <p className="text-gray-500 text-sm">Grade</p>
+                    <div className="p-6 text-center bg-white dark:bg-gray-800">
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">Grade</p>
                       <div className="mt-2">
                         <Badge className={`${getGradeColor(result.grade)} text-white text-lg px-4 py-1`}>
                           {result.grade}
                         </Badge>
                       </div>
                     </div>
-                    <div className="p-6 text-center bg-white">
-                      <p className="text-gray-500 text-sm">Rank</p>
+                    <div className="p-6 text-center bg-white dark:bg-gray-800">
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">Rank</p>
                       <p className="text-3xl font-bold text-blue-600 mt-1">
                         #{result.rank || '-'}
                       </p>
@@ -236,11 +236,11 @@ const StudentResults = () => {
 
                   {/* Subject-wise Marks */}
                   <div className="border-t p-6">
-                    <h4 className="font-medium text-gray-700 mb-4">Subject-wise Performance</h4>
+                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-4">Subject-wise Performance</h4>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b bg-gray-50">
+                          <tr className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                             <th className="text-left py-2 px-3">Subject</th>
                             <th className="text-center py-2 px-3">Marks Obtained</th>
                             <th className="text-center py-2 px-3">Max Marks</th>
@@ -257,12 +257,12 @@ const StudentResults = () => {
                             const isPassing = subject.obtained_marks >= subject.passing_marks;
                             
                             return (
-                              <tr key={idx} className="border-b hover:bg-gray-50">
+                              <tr key={idx} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td className="py-3 px-3 font-medium">{subject.subject_name}</td>
                                 <td className="py-3 px-3 text-center font-medium">
                                   {subject.obtained_marks}
                                 </td>
-                                <td className="py-3 px-3 text-center text-gray-600">
+                                <td className="py-3 px-3 text-center text-gray-600 dark:text-gray-400">
                                   {subject.max_marks}
                                 </td>
                                 <td className="py-3 px-3 text-center">
@@ -315,8 +315,8 @@ const StudentResults = () => {
         <Card>
           <CardContent className="py-16 text-center">
             <GraduationCap className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Results Published Yet</h3>
-            <p className="text-gray-500">Your examination results will appear here once they are published</p>
+            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No Results Published Yet</h3>
+            <p className="text-gray-500 dark:text-gray-400">Your examination results will appear here once they are published</p>
           </CardContent>
         </Card>
       )}

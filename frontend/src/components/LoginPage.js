@@ -115,7 +115,7 @@ const LoginPage = () => {
             variant="ghost"
             size="sm"
             onClick={toggleLanguage}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             <Globe className="h-4 w-4 mr-1" />
             {currentLang === 'en' ? 'বাংলা' : 'English'}
@@ -129,23 +129,23 @@ const LoginPage = () => {
               <GraduationCap className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">School ERP</h1>
-          <p className="text-gray-600 mt-2">{t('auth.loginTitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">School ERP</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{t('auth.loginTitle')}</p>
         </div>
 
         {/* Features showcase */}
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
             <Users className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">Student Management</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Student Management</p>
           </div>
-          <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
             <BookOpen className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">Academic Tracking</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Academic Tracking</p>
           </div>
-          <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
             <Award className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">Performance Reports</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Performance Reports</p>
           </div>
         </div>
 
@@ -193,7 +193,7 @@ const LoginPage = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -284,7 +284,7 @@ const LoginPage = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -302,7 +302,7 @@ const LoginPage = () => {
                       required
                       className="form-input"
                     />
-                    <p className="text-xs text-gray-500">School CODE is provided by your institution (Settings → Institution)</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">School CODE is provided by your institution (Settings → Institution)</p>
                   </div>
 
                   <Button 
@@ -324,10 +324,10 @@ const LoginPage = () => {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Comprehensive School Management System
           </p>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             Multi-tenant • Role-based Access • Real-time Analytics
           </p>
         </div>
