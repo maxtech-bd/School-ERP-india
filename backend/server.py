@@ -2129,6 +2129,25 @@ async def system_reset(
         logging.error(f"System reset failed: {e}")
         raise HTTPException(status_code=500, detail=f"System reset failed: {str(e)}")
 
+# ==================== INSTITUTION ====================
+
+@api_router.get("/institution")
+async def get_institution(current_user: User = Depends(get_current_user)):
+    """Get current user's institution (tenant) details for branding"""
+    tenant = await db.tenants.find_one({"id": current_user.tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    
+    return {
+        "id": tenant.get("id"),
+        "name": tenant.get("name", "School ERP System"),
+        "address": tenant.get("address", ""),
+        "contact_phone": tenant.get("contact_phone", ""),
+        "contact_email": tenant.get("contact_email", ""),
+        "logo_url": tenant.get("logo_url", ""),
+        "domain": tenant.get("domain", "")
+    }
+
 # ==================== TENANT MANAGEMENT ====================
 
 @api_router.get("/tenants", response_model=List[Tenant])
