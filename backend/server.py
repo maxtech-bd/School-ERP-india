@@ -1728,6 +1728,15 @@ async def login_user(login_data: UserLogin):
         # Try finding by domain
         tenant = await db.tenants.find_one({"domain": input_tenant_id})
     
+    # If still not found, try finding school by school_code and get its tenant
+    if not tenant:
+        school = await db.schools.find_one({
+            "school_code": {"$regex": f"^{input_tenant_id}$", "$options": "i"},
+            "is_active": True
+        })
+        if school:
+            tenant = await db.tenants.find_one({"id": school.get("tenant_id")})
+    
     # Determine actual tenant_id
     if tenant:
         tenant_id = tenant["id"]
