@@ -2440,9 +2440,9 @@ async def create_student(student_data: StudentCreate, current_user: User = Depen
     if existing_student:
         raise HTTPException(status_code=400, detail=f"Student with admission number {student_data.admission_no} already exists")
     
-    # Get tenant info for username prefix
-    tenant = await db.tenants.find_one({"id": current_user.tenant_id})
-    school_code = tenant.get("domain", "SCH") if tenant else "SCH"
+    # Get school info for username prefix (use school_code from schools collection)
+    school = await db.schools.find_one({"id": school_id})
+    school_code = school.get("school_code", "SCH") if school else "SCH"
     
     # Generate student username and temporary password
     student_username = f"{school_code.lower()}_{student_data.admission_no.lower()}"
@@ -2460,7 +2460,7 @@ async def create_student(student_data: StudentCreate, current_user: User = Depen
         "email": student_email,
         "username": student_username,
         "full_name": student_data.name,
-        "hashed_password": hashed_password,
+        "password_hash": hashed_password,
         "role": "student",
         "school_id": school_id,
         "is_active": True,
