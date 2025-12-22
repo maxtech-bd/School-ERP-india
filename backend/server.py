@@ -3639,74 +3639,66 @@ async def create_staff(staff_data: StaffCreate, current_user: User = Depends(get
     
     # Use school_id from JWT context first, then fallback to database lookup
     school_id = getattr(current_user, 'school_id', None)
+    school = None
     
-    if not school_id:
-        # Fallback: find school for tenant
-        schools = await db.schools.find({
+    if school_id:
+        # Verify school exists
+        school = await db.schools.find_one({
+            "id": school_id,
             "tenant_id": current_user.tenant_id,
             "is_active": True
-        }).to_list(1)
+        })
+    
+    if not school:
+        # Fallback: find any school for tenant
+        school = await db.schools.find_one({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        })
+    
+    if not school:
+        # Check institutions collection (Settings creates institution records)
+        institution = await db.institutions.find_one({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        })
         
-        if not schools:
-            # Auto-create a default school for this tenant
-            tenant = await db.tenants.find_one({"id": current_user.tenant_id})
-            if not tenant:
-                # Also create tenant if missing
-                tenant = {
-                    "id": current_user.tenant_id,
-                    "name": "Default School",
-                    "domain": f"{current_user.tenant_id}.school.local",
-                    "is_active": True,
-                    "created_at": datetime.utcnow(),
-                    "updated_at": datetime.utcnow()
-                }
-                await db.tenants.insert_one(tenant)
-            
-            # Create default school
-            new_school_id = f"school-{current_user.tenant_id[:8]}"
-            new_school = {
-                "id": new_school_id,
+        if institution:
+            # Create school from institution data
+            school_id = institution.get("school_id") or f"school-{current_user.tenant_id[:8]}"
+            school = {
+                "id": school_id,
                 "tenant_id": current_user.tenant_id,
-                "name": tenant.get("name", "Default School"),
-                "code": f"SCH{current_user.tenant_id[:6].upper()}",
-                "school_code": f"SCH{current_user.tenant_id[:6].upper()}",
-                "address": tenant.get("address", ""),
-                "phone": tenant.get("contact_phone", ""),
-                "email": tenant.get("contact_email", ""),
+                "name": institution.get("school_name", "Default School"),
+                "code": institution.get("school_code", f"SCH{current_user.tenant_id[:6].upper()}"),
+                "school_code": institution.get("school_code", f"SCH{current_user.tenant_id[:6].upper()}"),
+                "address": institution.get("address", ""),
+                "phone": institution.get("phone", ""),
+                "email": institution.get("email", ""),
                 "is_active": True,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
-            await db.schools.insert_one(new_school)
-            logging.info(f"Auto-created default school for tenant {current_user.tenant_id}")
-            school_id = new_school_id
+            await db.schools.insert_one(school)
+            logging.info(f"Created school from institution for tenant {current_user.tenant_id}")
         else:
-            school_id = schools[0]["id"]
+            # No school or institution - create a default
+            tenant = await db.tenants.find_one({"id": current_user.tenant_id})
+            school_id = f"school-{current_user.tenant_id[:8]}"
+            school = {
+                "id": school_id,
+                "tenant_id": current_user.tenant_id,
+                "name": tenant.get("name", "Default School") if tenant else "Default School",
+                "code": f"SCH{current_user.tenant_id[:6].upper()}",
+                "school_code": f"SCH{current_user.tenant_id[:6].upper()}",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.schools.insert_one(school)
+            logging.info(f"Auto-created default school for tenant {current_user.tenant_id}")
     
-    # Verify school exists and is active
-    school = await db.schools.find_one({
-        "id": school_id,
-        "tenant_id": current_user.tenant_id,
-        "is_active": True
-    })
-    
-    if not school:
-        # Final fallback - create school now
-        new_school_id = f"school-{current_user.tenant_id[:8]}"
-        new_school = {
-            "id": new_school_id,
-            "tenant_id": current_user.tenant_id,
-            "name": "Default School",
-            "code": f"SCH{current_user.tenant_id[:6].upper()}",
-            "school_code": f"SCH{current_user.tenant_id[:6].upper()}",
-            "is_active": True,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
-        }
-        await db.schools.insert_one(new_school)
-        school = new_school
-        school_id = new_school_id
-        logging.info(f"Auto-created fallback school for tenant {current_user.tenant_id}")
+    school_id = school["id"]
     
     # Check for duplicate email
     existing_staff = await db.staff.find_one({
