@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Bot, Send, Mic, Volume2, User, Loader, Sparkles } from "lucide-react";
+import { Bot, Send, Mic, Volume2, Loader, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
@@ -25,23 +25,16 @@ export default function AIAssistant() {
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const userMessage = {
-      role: "user",
-      content: inputMessage,
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, { role: "user", content: inputMessage }]);
     setInputMessage("");
     setLoading(true);
 
     try {
       const token = localStorage.getItem("token");
-
-      const response = await axios.post(
+      const res = await axios.post(
         `${API_BASE_URL}/ai-engine/chat`,
         {
-          question: userMessage.content,
+          question: inputMessage,
           type: "text",
           ...(answerSource && { answer_source: answerSource }),
         },
@@ -50,11 +43,7 @@ export default function AIAssistant() {
 
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: response.data.answer,
-          tags: response.data.tags,
-        },
+        { role: "assistant", content: res.data.answer },
       ]);
     } catch {
       setMessages((prev) => [
@@ -71,21 +60,56 @@ export default function AIAssistant() {
   };
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = recorder;
-    audioChunksRef.current = [];
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "Voice recording is not supported in your browser. Please use text input instead.",
+            error: true,
+          },
+        ]);
+        return;
+      }
 
-    recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
 
-    recorder.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-      await processVoiceInput(audioBlob);
-      stream.getTracks().forEach((t) => t.stop());
-    };
+      recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        await processVoiceInput(blob);
+        stream.getTracks().forEach((t) => t.stop());
+      };
 
-    recorder.start();
-    setIsRecording(true);
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.warn("Microphone access error:", err.name, err.message);
+      let errorMessage = "Could not access microphone. ";
+      
+      if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        errorMessage += "No microphone detected. Please connect a microphone or use text input.";
+      } else if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        errorMessage += "Microphone permission denied. Please allow microphone access in your browser settings.";
+      } else if (err.name === "NotReadableError") {
+        errorMessage += "Microphone is being used by another application.";
+      } else {
+        errorMessage += "Please use text input instead.";
+      }
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: errorMessage,
+          error: true,
+        },
+      ]);
+    }
   };
 
   const stopRecording = () => {
@@ -123,7 +147,8 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="p-3 sm:p-5 space-y-4">
+    /* 🔥 BREAK OUT OF DASHBOARD COLUMN ON MOBILE */
+    <div className="w-screen max-w-none -mx-2 sm:mx-0 px-2 sm:px-5 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="p-2 bg-purple-100 rounded-lg">
@@ -138,7 +163,7 @@ export default function AIAssistant() {
       </div>
 
       {/* Filter */}
-      <Card>
+      <Card className="rounded-none sm:rounded-lg border-x-0 sm:border">
         <CardContent className="p-4">
           <select
             value={answerSource}
@@ -153,7 +178,15 @@ export default function AIAssistant() {
       </Card>
 
       {/* Chat */}
-      <Card className="flex flex-col h-[calc(100vh-220px)] sm:h-[500px]">
+      <Card
+        className="
+          flex flex-col
+          h-[calc(100vh-180px)]
+          sm:h-[500px]
+          rounded-none sm:rounded-lg
+          border-x-0 sm:border
+        "
+      >
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2">
             <Bot /> Chat
