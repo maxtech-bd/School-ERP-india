@@ -29,7 +29,8 @@ import {
   Info,
   Globe,
   Coffee,
-  User
+  User,
+  Upload
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -4480,15 +4481,66 @@ const Settings = () => {
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Logo URL</Label>
-                  <input
-                    type="url"
-                    className="w-full mt-1 px-3 py-2 border rounded-md"
-                    placeholder="https://example.com/logo.png"
-                    value={institutionData.logo_url}
-                    onChange={(e) => setInstitutionData({...institutionData, logo_url: e.target.value})}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Upload logo to cloud storage and paste URL here</p>
+                  <Label>School Logo</Label>
+                  <div className="mt-1 flex items-center space-x-4">
+                    {institutionData.logo_url && (
+                      <div className="relative w-16 h-16 border rounded-md overflow-hidden bg-gray-100">
+                        <img 
+                          src={institutionData.logo_url.startsWith('http') ? institutionData.logo_url : `${API_BASE_URL.replace('/api', '')}${institutionData.logo_url}`} 
+                          alt="Logo" 
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id="logo-upload"
+                        onChange={async (e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast.error('File size must be less than 2MB');
+                            return;
+                          }
+                          
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          
+                          try {
+                            setLoading(true);
+                            const response = await axios.post(`${API_BASE_URL}/institution/logo`, formData, {
+                              headers: {
+                                'Content-Type': 'multipart/form-data',
+                                Authorization: `Bearer ${localStorage.getItem('token')}`
+                              }
+                            });
+                            setInstitutionData({...institutionData, logo_url: response.data.logo_url});
+                            toast.success('Logo uploaded successfully');
+                          } catch (error) {
+                            console.error('Error uploading logo:', error);
+                            toast.error(error.response?.data?.detail || 'Failed to upload logo');
+                          } finally {
+                            setLoading(false);
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="logo-upload"
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Logo
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">Max 2MB (PNG, JPG, GIF, WebP)</p>
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <Label>Theme Color</Label>

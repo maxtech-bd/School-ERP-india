@@ -2401,6 +2401,51 @@ async def update_institution(
     
     return Institution(**updated_institution)
 
+@api_router.post("/institution/logo")
+async def upload_institution_logo(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload institution logo"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed (JPEG, PNG, GIF, WebP, SVG)")
+    
+    # Read file content
+    content = await file.read()
+    
+    # Validate file size (max 2MB)
+    if len(content) > 2 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File size exceeds 2MB limit")
+    
+    # Create uploads directory
+    upload_dir = f"uploads/{current_user.tenant_id}/institution"
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # Generate unique filename
+    file_ext = os.path.splitext(file.filename)[1] if file.filename else ".png"
+    unique_filename = f"logo_{current_user.tenant_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}{file_ext}"
+    file_path = os.path.join(upload_dir, unique_filename)
+    
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(content)
+    
+    # Generate URL path
+    logo_url = f"/uploads/{current_user.tenant_id}/institution/{unique_filename}"
+    
+    # Update institution with new logo URL
+    await db.institutions.update_one(
+        {"tenant_id": current_user.tenant_id, "is_active": True},
+        {"$set": {"logo_url": logo_url, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "Logo uploaded successfully", "logo_url": logo_url}
+
 # ==================== STUDENT MANAGEMENT ====================
 
 @api_router.get("/students", response_model=List[Student])
