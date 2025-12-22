@@ -13,10 +13,13 @@ export default function AIAssistant() {
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [answerSource, setAnswerSource] = useState("");
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const containerRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,6 +28,33 @@ export default function AIAssistant() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const heightDiff = window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(heightDiff > 50 ? heightDiff : 0);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener('scroll', handleResize);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.removeEventListener('scroll', handleResize);
+      }
+    };
+  }, []);
+
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 300);
+  };
 
   /* -------------------- CHAT -------------------- */
 
@@ -152,31 +182,35 @@ export default function AIAssistant() {
   /* -------------------- UI -------------------- */
 
   return (
-    <div className="h-[calc(100vh-140px)] sm:h-[calc(100vh-160px)] -mb-16 sm:-mb-24 flex flex-col gap-2 sm:gap-3 overflow-hidden">
-      {/* Header - Compact on mobile */}
+    <div 
+      ref={containerRef}
+      className="flex flex-col gap-2 sm:gap-3 p-1 sm:p-3 md:p-4 overflow-hidden"
+      style={{ height: `calc(100dvh - ${keyboardHeight}px - 60px)` }}
+    >
+      {/* Header */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
           <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
         </div>
         <div>
-          <h1 className="text-base sm:text-xl font-bold">GiNi AI Assistant</h1>
-          <p className="hidden sm:block text-xs sm:text-sm text-gray-600">
+          <h1 className="text-lg sm:text-xl font-bold">GiNi AI Assistant</h1>
+          <p className="text-xs sm:text-sm text-gray-600">
             Academic AI with source-based answers
           </p>
         </div>
       </div>
 
-      {/* Source Filter - Compact on mobile */}
-      <Card className="shrink-0">
-        <CardContent className="p-2 sm:p-3">
-          <div className="flex flex-row gap-2 items-center">
-            <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Source:</span>
+      {/* Source Filter */}
+      <Card>
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+            <span className="text-sm font-medium">Answer Source</span>
             <select
               value={answerSource}
               onChange={(e) => setAnswerSource(e.target.value)}
-              className="flex-1 border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:ring-2 focus:ring-purple-500"
+              className="w-full sm:flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
             >
-              <option value="">All</option>
+              <option value="">All Sources</option>
               <option value="Academic Book">Academic Books</option>
               <option value="Reference Book">Reference Books</option>
             </select>
@@ -184,15 +218,15 @@ export default function AIAssistant() {
         </CardContent>
       </Card>
 
-      {/* Chat - Takes all remaining space */}
-      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <CardHeader className="border-b py-2 sm:py-3 px-3 sm:px-4 shrink-0">
-          <CardTitle className="flex gap-2 items-center text-xs sm:text-sm">
-            <Bot className="h-4 w-4 sm:h-5 sm:w-5" /> Chat
+      {/* Chat */}
+      <Card className="flex-1 min-h-0 flex flex-col">
+        <CardHeader className="border-b">
+          <CardTitle className="flex gap-2 items-center text-sm">
+            <Bot className="h-5 w-5" /> Chat
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-4 py-2 sm:py-3 space-y-3 sm:space-y-4">
+        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-4 py-3 space-y-4">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -246,32 +280,36 @@ export default function AIAssistant() {
           <div ref={messagesEndRef} />
         </CardContent>
 
-        {/* Input - Compact on mobile */}
-        <div className="border-t p-1.5 sm:p-3 bg-white dark:bg-gray-800 shrink-0">
-          <div className="flex flex-row items-center gap-1.5 sm:gap-2 max-w-screen-xl mx-auto">
+        {/* Input */}
+        <div className="border-t p-2 sm:p-4 sticky bottom-0 bg-white z-10">
+          {/* Container: Flex row, center items, small gap */}
+          <div className="flex flex-row items-center gap-2 max-w-screen-xl mx-auto">
             {/* MIC BUTTON */}
             <Button
               size="icon"
               variant="outline"
               onClick={isRecording ? stopRecording : startRecording}
               disabled={loading}
-              className={`h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full ${
+              /* FIX 1: shrink-0 keeps the button from disappearing or squishing */
+              className={`h-10 w-10 shrink-0 rounded-full ${
                 isRecording ? "bg-red-100 border-red-200" : ""
               }`}
             >
               <Mic
-                className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isRecording ? "text-red-600 animate-pulse" : "text-gray-500"}`}
+                className={`h-4 w-4 ${isRecording ? "text-red-600 animate-pulse" : "text-gray-500"}`}
               />
             </Button>
 
             {/* INPUT FIELD */}
             <input
+              ref={inputRef}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              onFocus={handleInputFocus}
               placeholder="Ask..."
               disabled={loading}
-              className="flex-1 min-w-0 border rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
+              className="flex-1 min-w-0 border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50"
             />
 
             {/* SEND BUTTON */}
@@ -279,9 +317,10 @@ export default function AIAssistant() {
               size="icon"
               onClick={sendMessage}
               disabled={loading || !inputMessage.trim()}
-              className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
+              /* FIX 3: shrink-0 ensures this button never gets pushed off screen */
+              className="h-10 w-10 shrink-0 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
             >
-              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
+              <Send className="h-4 w-4 text-white" />
             </Button>
           </div>
         </div>
