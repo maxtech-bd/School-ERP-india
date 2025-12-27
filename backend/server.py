@@ -5386,154 +5386,110 @@ async def seed_all_modules_data(
         async for sub in subjects_cursor:
             subject_list.append(sub)
         
-        existing_gini_logs = await db.ai_logs.count_documents({"tenant_id": tenant_id})
-        if existing_gini_logs == 0 and student_list:
-            # Sample AI Assistant conversations
-            ai_questions = [
-                {"q": "What is photosynthesis?", "a": "Photosynthesis is the process by which plants convert sunlight, water, and carbon dioxide into glucose and oxygen. It occurs in the chloroplasts of plant cells.", "subject": "Science"},
-                {"q": "Explain Newton's First Law of Motion", "a": "Newton's First Law states that an object at rest stays at rest, and an object in motion stays in motion with the same speed and direction, unless acted upon by an unbalanced force.", "subject": "Physics"},
-                {"q": "What is the Pythagorean theorem?", "a": "The Pythagorean theorem states that in a right triangle, the square of the hypotenuse (the longest side) equals the sum of squares of the other two sides: a² + b² = c².", "subject": "Mathematics"},
-                {"q": "Who was Mahatma Gandhi?", "a": "Mahatma Gandhi (1869-1948) was an Indian lawyer and political leader who led India's non-violent independence movement against British rule through civil disobedience.", "subject": "History"},
-                {"q": "What is the water cycle?", "a": "The water cycle describes how water continuously moves through evaporation, condensation, precipitation, and collection, cycling between the Earth's surface and atmosphere.", "subject": "Science"},
-                {"q": "Explain the parts of speech", "a": "The main parts of speech are: nouns (names), verbs (actions), adjectives (describing words), adverbs (modify verbs), pronouns (replace nouns), prepositions (show relationships), conjunctions (connect words), and interjections (express emotions).", "subject": "English"},
-                {"q": "What causes earthquakes?", "a": "Earthquakes are caused by the movement of tectonic plates beneath Earth's surface. When plates collide, pull apart, or slide past each other, they release energy in the form of seismic waves.", "subject": "Geography"},
-                {"q": "How do plants reproduce?", "a": "Plants reproduce through seeds (sexual reproduction) or through vegetative propagation (asexual reproduction) like runners, bulbs, and cuttings. Pollination helps in seed formation.", "subject": "Biology"},
-            ]
-            
-            # Create AI logs for past 30 days
-            for i in range(45):
-                question_data = random.choice(ai_questions)
-                student = random.choice(student_list) if student_list else None
-                log_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
-                
-                await db.ai_logs.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "user_id": student.get("id") if student else current_user.id,
-                    "user_name": student.get("full_name", "Demo Student") if student else "Demo User",
-                    "user_role": "student",
-                    "question": question_data["q"],
-                    "question_type": "text",
-                    "answer": question_data["a"],
-                    "model": random.choice(["CMS", "gpt-4o"]),
-                    "tokens_used": random.randint(100, 500),
-                    "source": random.choice(["CMS", "GPT"]),
-                    "answer_source_filter": "all",
-                    "tags": [question_data["subject"]],
-                    "cms_matches_count": random.randint(0, 5),
-                    "created_at": log_date
-                })
-                results["ai_assistant"] += 1
-            
-            # Create AI chat sessions
-            for i in range(25):
-                student = random.choice(student_list) if student_list else None
-                session_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
-                class_obj = random.choice(class_list) if class_list else None
-                subject_obj = random.choice(subject_list) if subject_list else None
+        # Seed GiNi Dashboard data - using correct collections and field names for analytics
+        class_standards = ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"]
+        subjects_list = ["Mathematics", "Science", "English", "History", "Geography", "Physics", "Chemistry", "Biology"]
+        
+        # Seed AI Chat Sessions (for AI Assistant analytics)
+        existing_chat_sessions = await db.ai_chat_sessions.count_documents({"tenant_id": tenant_id})
+        if existing_chat_sessions == 0:
+            for i in range(35):
+                session_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+                class_std = random.choice(class_standards)
+                subject = random.choice(subjects_list)
                 
                 await db.ai_chat_sessions.insert_one({
                     "id": str(uuid.uuid4()),
                     "tenant_id": tenant_id,
                     "school_id": current_user.school_id,
-                    "user_id": student.get("id") if student else current_user.id,
-                    "user_name": student.get("full_name", "Demo Student") if student else "Demo User",
+                    "user_id": str(uuid.uuid4()),
+                    "user_name": f"Student {i+1}",
                     "user_role": "student",
-                    "class_id": class_obj.get("id") if class_obj else None,
-                    "class_name": class_obj.get("name") if class_obj else "Class 5",
-                    "subject": subject_obj.get("name") if subject_obj else "General",
+                    "class_standard": class_std,
+                    "subject": subject,
                     "messages_count": random.randint(3, 15),
                     "total_tokens": random.randint(500, 2000),
                     "created_at": session_date,
                     "updated_at": session_date
                 })
+                results["ai_assistant"] += 1
         
-        # Seed Quiz data
-        existing_quizzes = await db.quizzes.count_documents({"tenant_id": tenant_id})
-        if existing_quizzes == 0 and class_list:
-            quiz_topics = ["Algebra Basics", "Photosynthesis", "World War II", "English Grammar", "Chemical Reactions", "Geography Continents", "Cell Biology", "Fractions"]
-            
-            for i in range(20):
-                student = random.choice(student_list) if student_list else None
-                class_obj = random.choice(class_list) if class_list else None
-                subject_obj = random.choice(subject_list) if subject_list else None
-                quiz_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
+        # Seed Quiz submissions (assessment_submissions with type quiz)
+        existing_quiz_submissions = await db.assessment_submissions.count_documents({"tenant_id": tenant_id, "assessment_type": "quiz"})
+        if existing_quiz_submissions == 0:
+            for i in range(30):
+                quiz_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+                class_std = random.choice(class_standards)
+                subject = random.choice(subjects_list)
                 total_q = random.randint(5, 15)
                 correct = random.randint(int(total_q * 0.5), total_q)
                 
-                await db.quizzes.insert_one({
+                await db.assessment_submissions.insert_one({
                     "id": str(uuid.uuid4()),
                     "tenant_id": tenant_id,
                     "school_id": current_user.school_id,
-                    "user_id": student.get("id") if student else current_user.id,
-                    "user_name": student.get("full_name", "Demo Student") if student else "Demo User",
-                    "user_role": "student",
-                    "class_id": class_obj.get("id") if class_obj else None,
-                    "class_name": class_obj.get("name") if class_obj else "Class 5",
-                    "subject": subject_obj.get("name") if subject_obj else "Mathematics",
-                    "topic": random.choice(quiz_topics),
+                    "student_id": str(uuid.uuid4()),
+                    "student_name": f"Student {i+1}",
+                    "student_class": class_std,
+                    "subject": subject,
+                    "assessment_type": "quiz",
                     "total_questions": total_q,
                     "correct_answers": correct,
                     "score": round((correct / total_q) * 100, 1),
-                    "time_taken": random.randint(180, 900),
                     "status": "completed",
                     "created_at": quiz_date,
-                    "completed_at": quiz_date
+                    "submitted_at": quiz_date
                 })
                 results["quizzes"] += 1
         
-        # Seed Test Generator data
-        existing_tests = await db.ai_tests.count_documents({"tenant_id": tenant_id})
-        if existing_tests == 0 and class_list:
+        # Seed Tests (assessments with type test)
+        existing_assessments = await db.assessments.count_documents({"tenant_id": tenant_id, "type": "test"})
+        if existing_assessments == 0:
             test_titles = ["Mid-Term Science Test", "Mathematics Weekly Test", "English Grammar Assessment", "History Chapter Test", "Physics Unit Test", "Biology Quiz"]
             
-            for i in range(12):
-                class_obj = random.choice(class_list) if class_list else None
-                subject_obj = random.choice(subject_list) if subject_list else None
-                test_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
+            for i in range(15):
+                test_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+                class_std = random.choice(class_standards)
+                subject = random.choice(subjects_list)
                 
-                await db.ai_tests.insert_one({
+                await db.assessments.insert_one({
                     "id": str(uuid.uuid4()),
                     "tenant_id": tenant_id,
                     "school_id": current_user.school_id,
                     "created_by": current_user.id,
                     "created_by_name": current_user.full_name,
-                    "class_id": class_obj.get("id") if class_obj else None,
-                    "class_name": class_obj.get("name") if class_obj else "Class 8",
-                    "subject": subject_obj.get("name") if subject_obj else "Science",
+                    "class_standard": class_std,
+                    "subject": subject,
                     "title": random.choice(test_titles),
+                    "type": "test",
                     "total_questions": random.randint(10, 30),
                     "total_marks": random.randint(25, 100),
                     "duration_minutes": random.randint(30, 90),
-                    "question_types": ["mcq", "short_answer", "fill_blanks"],
                     "status": random.choice(["draft", "published", "completed"]),
                     "created_at": test_date,
                     "updated_at": test_date
                 })
                 results["tests"] += 1
         
-        # Seed AI Summary data
-        existing_summaries = await db.ai_summaries.count_documents({"tenant_id": tenant_id})
-        if existing_summaries == 0 and student_list:
+        # Seed AI Summary requests
+        existing_summary_requests = await db.ai_summary_requests.count_documents({"tenant_id": tenant_id})
+        if existing_summary_requests == 0:
             summary_topics = ["Photosynthesis Process", "French Revolution", "Quadratic Equations", "Human Digestive System", "Shakespeare's Works", "Climate Change"]
             
-            for i in range(18):
-                student = random.choice(student_list) if student_list else None
-                class_obj = random.choice(class_list) if class_list else None
-                subject_obj = random.choice(subject_list) if subject_list else None
-                summary_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
+            for i in range(20):
+                summary_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+                class_std = random.choice(class_standards)
+                subject = random.choice(subjects_list)
                 
-                await db.ai_summaries.insert_one({
+                await db.ai_summary_requests.insert_one({
                     "id": str(uuid.uuid4()),
                     "tenant_id": tenant_id,
                     "school_id": current_user.school_id,
-                    "user_id": student.get("id") if student else current_user.id,
-                    "user_name": student.get("full_name", "Demo Student") if student else "Demo User",
+                    "user_id": str(uuid.uuid4()),
+                    "user_name": f"Student {i+1}",
                     "user_role": "student",
-                    "class_id": class_obj.get("id") if class_obj else None,
-                    "class_name": class_obj.get("name") if class_obj else "Class 7",
-                    "subject": subject_obj.get("name") if subject_obj else "Science",
+                    "class_standard": class_std,
+                    "subject": subject,
                     "topic": random.choice(summary_topics),
                     "summary_length": random.choice(["short", "medium", "detailed"]),
                     "word_count": random.randint(200, 800),
@@ -5542,27 +5498,25 @@ async def seed_all_modules_data(
                 })
                 results["summaries"] += 1
         
-        # Seed AI Notes data
-        existing_notes = await db.ai_notes.count_documents({"tenant_id": tenant_id})
-        if existing_notes == 0 and student_list:
+        # Seed AI Notes requests
+        existing_notes_requests = await db.ai_notes_requests.count_documents({"tenant_id": tenant_id})
+        if existing_notes_requests == 0:
             notes_topics = ["Algebra Fundamentals", "Cell Structure", "World Geography", "English Literature", "Chemical Bonding", "Indian History"]
             
-            for i in range(15):
-                student = random.choice(student_list) if student_list else None
-                class_obj = random.choice(class_list) if class_list else None
-                subject_obj = random.choice(subject_list) if subject_list else None
-                notes_date = datetime.utcnow() - timedelta(days=random.randint(0, 30))
+            for i in range(18):
+                notes_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+                class_std = random.choice(class_standards)
+                subject = random.choice(subjects_list)
                 
-                await db.ai_notes.insert_one({
+                await db.ai_notes_requests.insert_one({
                     "id": str(uuid.uuid4()),
                     "tenant_id": tenant_id,
                     "school_id": current_user.school_id,
-                    "user_id": student.get("id") if student else current_user.id,
-                    "user_name": student.get("full_name", "Demo Student") if student else "Demo User",
+                    "user_id": str(uuid.uuid4()),
+                    "user_name": f"Student {i+1}",
                     "user_role": "student",
-                    "class_id": class_obj.get("id") if class_obj else None,
-                    "class_name": class_obj.get("name") if class_obj else "Class 6",
-                    "subject": subject_obj.get("name") if subject_obj else "Mathematics",
+                    "class_standard": class_std,
+                    "subject": subject,
                     "topic": random.choice(notes_topics),
                     "notes_type": random.choice(["detailed", "bullet_points", "outline"]),
                     "word_count": random.randint(500, 2000),
