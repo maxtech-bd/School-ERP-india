@@ -1953,7 +1953,12 @@ const Settings = () => {
       const totalSeeded = Object.values(results).reduce((sum, val) => sum + val, 0);
       
       if (totalSeeded > 0) {
-        toast.success(`Demo data seeded successfully! Created: ${results.students} students, ${results.staff} staff, ${results.classes} classes, ${results.subjects} subjects, ${results.vehicles} vehicles, ${results.fees} fee types, ${results.calendar_events} events`);
+        const giniData = (results.ai_assistant || 0) + (results.quizzes || 0) + (results.tests || 0) + (results.summaries || 0) + (results.notes || 0);
+        let message = `Demo data seeded! Created: ${results.students || 0} students, ${results.staff || 0} staff, ${results.classes || 0} classes, ${results.subjects || 0} subjects`;
+        if (giniData > 0) {
+          message += `, ${results.ai_assistant || 0} AI chats, ${results.quizzes || 0} quizzes, ${results.tests || 0} tests, ${results.summaries || 0} summaries, ${results.notes || 0} notes`;
+        }
+        toast.success(message);
       } else {
         toast.info('Demo data already exists. No new records were created.');
       }
