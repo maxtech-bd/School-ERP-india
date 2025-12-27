@@ -970,34 +970,36 @@ const AcademicCMS = () => {
 
             {/* Dynamic Chapters Upload */}
             <div className="space-y-3 p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-inner">
-              <h4 className="text-base font-semibold text-gray-800 border-b pb-2 mb-3">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 border-b dark:border-gray-600 pb-2 mb-3">
                 Chapters (1-{formState.chapters.length})
               </h4>
               {formState.chapters.map((chapter, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 border p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
+                  className="flex flex-col sm:flex-row sm:items-center gap-2 border p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
                 >
-                  <span className="font-bold text-gray-700 dark:text-gray-300 min-w-[85px] text-sm">
-                    CHAPTER {index + 1}:
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Chapter Title"
-                    value={chapter.title}
-                    onChange={(e) =>
-                      handleChapterChange(
-                        formType,
-                        index,
-                        "title",
-                        e.target.value,
-                      )
-                    }
-                    className="w-1/3 px-2 py-1 border rounded-lg text-sm"
-                    required
-                  />
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <span className="font-bold text-gray-700 dark:text-gray-300 min-w-[85px] text-sm">
+                      CHAPTER {index + 1}:
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Chapter Title"
+                      value={chapter.title}
+                      onChange={(e) =>
+                        handleChapterChange(
+                          formType,
+                          index,
+                          "title",
+                          e.target.value,
+                        )
+                      }
+                      className="flex-1 sm:w-40 px-2 py-1 border rounded-lg text-sm dark:bg-gray-600 dark:text-white dark:border-gray-500"
+                      required
+                    />
+                  </div>
 
-                  <div className="flex items-center w-1/3 text-xs">
+                  <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-1">
                     <input
                       type="file"
                       accept=".pdf,.txt,.docx,.doc"
@@ -1015,42 +1017,42 @@ const AcademicCMS = () => {
                           });
                         }
                       }}
-                      className="text-sm flex-1"
+                      className="text-sm flex-1 min-w-0"
                       disabled={uploadingFile || chapter.file_url}
                     />
-                  </div>
-
-                  <div className="w-1/4 text-xs flex items-center justify-end gap-2">
-                    {uploadingFile && (
-                      <span className="text-blue-600">Uploading...</span>
-                    )}
-                    {chapter.file_name && (
-                      <span className="text-green-600 flex items-center gap-1">
-                        <File className="w-3 h-3" /> File
-                      </span>
-                    )}
-                    {chapter.file_url && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleChapterChange(formType, index, "file_url", "")
-                        }
-                        className="text-red-500 hover:text-red-700 p-1"
-                        title="Clear Chapter File"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                    {formState.chapters.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeChapterField(formType, index)}
-                        className="text-red-600 hover:text-red-800 p-1 rounded-full"
-                        title="Remove Chapter"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
+                    
+                    <div className="flex items-center gap-1 text-xs shrink-0">
+                      {uploadingFile && (
+                        <span className="text-blue-600">Uploading...</span>
+                      )}
+                      {chapter.file_name && (
+                        <span className="text-green-600 flex items-center gap-1">
+                          <File className="w-3 h-3" /> File
+                        </span>
+                      )}
+                      {chapter.file_url && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleChapterChange(formType, index, "file_url", "")
+                          }
+                          className="text-red-500 hover:text-red-700 p-1"
+                          title="Clear Chapter File"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      {formState.chapters.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeChapterField(formType, index)}
+                          className="text-red-600 hover:text-red-800 p-1 rounded-full"
+                          title="Remove Chapter"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
