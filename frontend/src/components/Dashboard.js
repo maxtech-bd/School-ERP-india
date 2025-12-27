@@ -431,69 +431,71 @@ const Dashboard = () => {
       </div>
 
       {/* Filters Row */}
-      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm border dark:border-gray-700">
-        {/* Time period */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Time Period:
-          </label>
-          <select
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            value={timePeriod}
-            onChange={(e) => setTimePeriod(Number(e.target.value))}
-          >
-            <option value={7}>Week</option>
-            <option value={30}>Month</option>
-          </select>
-        </div>
+      <div className="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-lg shadow-sm border dark:border-gray-700">
+        <div className="grid grid-cols-3 gap-2">
+          {/* Time period */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+              Period
+            </label>
+            <select
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-1.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full"
+              value={timePeriod}
+              onChange={(e) => setTimePeriod(Number(e.target.value))}
+            >
+              <option value={7}>Week</option>
+              <option value={30}>Month</option>
+            </select>
+          </div>
 
-        {/* Class filter – from API */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Class:</label>
-          <select
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-          >
-            <option value="all">All Classes</option>
-            {classes.map((cls) => {
-              // backend usually exposes standard & name
-              const value = cls.standard?.toString() || cls.name;
-              if (!value) return null;
-              return (
-                <option key={cls.id} value={value}>
-                  {cls.name || `Class ${value}`}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+          {/* Class filter – from API */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] sm:text-sm font-medium text-gray-700 dark:text-gray-300">Class</label>
+            <select
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-1.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full"
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+            >
+              <option value="all">All</option>
+              {classes.map((cls) => {
+                // backend usually exposes standard & name
+                const value = cls.standard?.toString() || cls.name;
+                if (!value) return null;
+                return (
+                  <option key={cls.id} value={value}>
+                    {cls.name || `Class ${value}`}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
 
-        {/* Subject filter – from API */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Subject:</label>
-          <select
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-          >
-            <option value="all">All Subjects</option>
-            {subjects.map((subj) => {
-              const value =
-                subj.name || subj.title || subj.subject_name || subj.code;
-              if (!value) return null;
-              return (
-                <option key={subj.id} value={value}>
-                  {value}
-                </option>
-              );
-            })}
-          </select>
+          {/* Subject filter – from API */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] sm:text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
+            <select
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-1.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full"
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+            >
+              <option value="all">All</option>
+              {subjects.map((subj) => {
+                const value =
+                  subj.name || subj.title || subj.subject_name || subj.code;
+                if (!value) return null;
+                return (
+                  <option key={subj.id} value={value}>
+                    {value}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
         <Card className="shadow-md hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">

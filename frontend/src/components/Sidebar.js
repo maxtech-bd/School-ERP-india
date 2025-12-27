@@ -527,21 +527,21 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-6 border-b border-white/10">
-        <div className="flex items-center space-x-3">
-          <div className="bg-emerald-500 p-2 rounded-lg">
-            <GraduationCap className="h-6 w-6 text-white" />
+      <div className="p-4 sm:p-6 border-b border-white/10">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="bg-emerald-500 p-1.5 sm:p-2 rounded-lg">
+            <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           </div>
-          <div>
-            <h1 className="text-white font-bold text-lg">School ERP</h1>
-            <p className="text-gray-300 text-xs">{user?.full_name}</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-white font-bold text-sm sm:text-lg truncate">School ERP</h1>
+            <p className="text-gray-300 text-[10px] sm:text-xs truncate">{user?.full_name}</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-4">
-        <nav className="py-4 space-y-2">
+      <ScrollArea className="flex-1 px-2 sm:px-4">
+        <nav className="py-3 sm:py-4 space-y-1 sm:space-y-2">
           {filteredMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = isActiveMenu(item);
@@ -556,15 +556,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 >
                   <CollapsibleTrigger asChild>
                     <button
-                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-all hover:bg-white/10 ${
+                      className={`w-full flex items-center justify-between p-2 sm:p-3 rounded-lg transition-all hover:bg-white/10 ${
                         isActive
                           ? "bg-emerald-500/20 text-emerald-300"
                           : "text-gray-300 hover:text-white"
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium">{item.title}</span>
+                      <div className="flex items-center space-x-2 sm:space-x-3">
+                        <Icon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                        <span className="font-medium text-sm sm:text-base truncate">{item.title}</span>
                       </div>
                       {isOpen ? (
                         <ChevronDown className="h-4 w-4" />
@@ -573,7 +573,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                       )}
                     </button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-1 mt-2 ml-8">
+                  <CollapsibleContent className="space-y-1 mt-1 sm:mt-2 ml-6 sm:ml-8">
                     {item.subItems
                       .filter(
                         (subItem) =>
@@ -583,7 +583,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         <button
                           key={index}
                           onClick={() => handleNavigation(subItem.path)}
-                          className={`w-full text-left p-2 rounded-md text-sm transition-all hover:bg-white/10 ${
+                          className={`w-full text-left p-1.5 sm:p-2 rounded-md text-xs sm:text-sm transition-all hover:bg-white/10 ${
                             location.pathname === subItem.path
                               ? "bg-emerald-500/20 text-emerald-300"
                               : "text-gray-400 hover:text-white"
@@ -601,14 +601,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               <button
                 key={item.key}
                 onClick={() => handleNavigation(item.path)}
-                className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all hover:bg-white/10 ${
+                className={`w-full flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-all hover:bg-white/10 ${
                   isActive
                     ? "bg-emerald-500/20 text-emerald-300"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="font-medium">{item.title}</span>
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="font-medium text-sm sm:text-base truncate">{item.title}</span>
               </button>
             );
           })}
@@ -616,13 +616,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-3 sm:p-4 border-t border-white/10">
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10"
+          className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10 text-sm sm:text-base"
         >
-          <LogOut className="h-5 w-5 mr-3" />
+          <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
           {t("common.logout")}
         </Button>
       </div>
@@ -645,7 +645,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             className="absolute inset-0 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative flex w-64 h-full glass-sidebar overflow-y-auto">
+          <div className="relative flex w-[85%] max-w-64 h-full glass-sidebar overflow-y-auto">
             <div className="flex flex-col w-full min-h-full">
               {/* Close button only - no duplicate header */}
               <div className="absolute top-4 right-4 z-10">

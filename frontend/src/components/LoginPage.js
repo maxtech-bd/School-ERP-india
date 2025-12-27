@@ -123,35 +123,35 @@ const LoginPage = () => {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-emerald-500 p-3 rounded-xl">
-              <GraduationCap className="h-8 w-8 text-white" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
+            <div className="bg-emerald-500 p-2 sm:p-3 rounded-xl">
+              <GraduationCap className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">School ERP</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">{t('auth.loginTitle')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">School ERP</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">{t('auth.loginTitle')}</p>
         </div>
 
         {/* Features showcase */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
-            <Users className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Student Management</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <div className="text-center p-2 sm:p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500 mx-auto mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight">Student Management</p>
           </div>
-          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
-            <BookOpen className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Academic Tracking</p>
+          <div className="text-center p-2 sm:p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mx-auto mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight">Academic Tracking</p>
           </div>
-          <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
-            <Award className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Performance Reports</p>
+          <div className="text-center p-2 sm:p-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-white/20 dark:border-gray-700/20">
+            <Award className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500 mx-auto mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight">Performance Reports</p>
           </div>
         </div>
 
         {/* Login/Register Form */}
         <Card className="glass-card border-0 shadow-2xl">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
