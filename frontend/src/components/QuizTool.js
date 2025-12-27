@@ -602,16 +602,16 @@ const QuizTool = () => {
 
       {/* Take Quiz Tab */}
       {activeTab === "quiz" && currentQuiz && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
             <div>
-              <h2 className="text-lg font-semibold">{currentQuiz.title}</h2>
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">{currentQuiz.title}</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {currentQuiz.total_questions} Questions ·{" "}
-                {currentQuiz.duration_minutes} Minutes
+                {currentQuiz.duration_minutes} Min
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Timer */}
               <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
                 <Clock size={20} className="text-blue-600" />

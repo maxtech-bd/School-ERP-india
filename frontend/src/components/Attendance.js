@@ -328,20 +328,22 @@ const AttendanceReport = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-start">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Report</h1>
-          <p className="text-gray-600 mt-1">View and export attendance reports</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Attendance Report</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">View and export reports</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleExport('excel')}>
-            <Download className="h-4 w-4 mr-2" />
-            Export Excel
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => handleExport('excel')} className="text-sm">
+            <Download className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Excel</span>
+            <span className="hidden sm:inline">Export Excel</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
-            <Download className="h-4 w-4 mr-2" />
-            Export PDF
+          <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} className="text-sm">
+            <Download className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">PDF</span>
+            <span className="hidden sm:inline">Export PDF</span>
           </Button>
         </div>
       </div>

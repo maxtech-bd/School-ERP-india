@@ -386,22 +386,23 @@ const Notifications = () => {
   );
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-            <Bell className="h-7 w-7 mr-3 text-emerald-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+            <Bell className="h-6 w-6 sm:h-7 sm:w-7 mr-2 sm:mr-3 text-emerald-600" />
             Notifications
           </h1>
-          <p className="text-gray-500 mt-1">
-            Manage and view school notifications
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Manage school notifications
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2">
           {unreadCount > 0 && (
-            <Button variant="outline" onClick={handleMarkAllAsRead}>
-              <CheckCheck className="h-4 w-4 mr-2" />
-              Mark All Read ({unreadCount})
+            <Button variant="outline" onClick={handleMarkAllAsRead} className="text-sm">
+              <CheckCheck className="h-4 w-4 mr-1" />
+              <span className="sm:hidden">Read All</span>
+              <span className="hidden sm:inline">Mark All Read ({unreadCount})</span>
             </Button>
           )}
           {canManageNotifications && (
@@ -410,10 +411,11 @@ const Notifications = () => {
                 resetForm();
                 setIsCreateModalOpen(true);
               }}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-700 text-sm"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Notification
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="sm:hidden">Create</span>
+              <span className="hidden sm:inline">Create Notification</span>
             </Button>
           )}
         </div>

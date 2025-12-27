@@ -661,12 +661,12 @@ const ClassManagement = () => {
 
         {/* Classes Tab */}
         <TabsContent value="classes" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Classes</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <h2 className="text-lg sm:text-xl font-semibold dark:text-white">Classes</h2>
             <Dialog open={isClassModalOpen} onOpenChange={setIsClassModalOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-emerald-500 hover:bg-emerald-600"
+                  className="bg-emerald-500 hover:bg-emerald-600 text-sm"
                   onClick={() => {
                     console.log('🔄 Add Class button clicked!');
                     console.log('Modal state before:', isClassModalOpen);
@@ -674,7 +674,7 @@ const ClassManagement = () => {
                     console.log('Modal state set to true');
                   }}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                   Add Class
                 </Button>
               </DialogTrigger>
@@ -853,12 +853,12 @@ const ClassManagement = () => {
 
         {/* Sections Tab */}
         <TabsContent value="sections" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Sections</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <h2 className="text-lg sm:text-xl font-semibold dark:text-white">Sections</h2>
             <Dialog open={isSectionModalOpen} onOpenChange={setIsSectionModalOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-emerald-500 hover:bg-emerald-600"
+                  className="bg-emerald-500 hover:bg-emerald-600 text-sm"
                   onClick={() => {
                     console.log('🔄 Add Section button clicked!');
                     console.log('Modal state before:', isSectionModalOpen);
@@ -866,7 +866,7 @@ const ClassManagement = () => {
                     console.log('Modal state set to true');
                   }}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                   Add Section
                 </Button>
               </DialogTrigger>

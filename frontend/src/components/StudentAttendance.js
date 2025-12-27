@@ -156,8 +156,8 @@ const MarkStudentAttendance = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Mark Student Attendance</h2>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold dark:text-white">Mark Student Attendance</h2>
       </div>
 
       {/* Filters */}
@@ -426,16 +426,18 @@ const StudentAttendanceReport = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Student Attendance Report</h2>
-        <div className="flex gap-2">
-          <Button onClick={() => exportReport('excel')} variant="outline" className="gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold dark:text-white">Student Attendance Report</h2>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => exportReport('excel')} variant="outline" className="gap-1 sm:gap-2 text-sm">
             <FileSpreadsheet className="h-4 w-4" />
-            Export Excel
+            <span className="sm:hidden">Excel</span>
+            <span className="hidden sm:inline">Export Excel</span>
           </Button>
-          <Button onClick={() => exportReport('pdf')} variant="outline" className="gap-2">
+          <Button onClick={() => exportReport('pdf')} variant="outline" className="gap-1 sm:gap-2 text-sm">
             <Download className="h-4 w-4" />
-            Export PDF
+            <span className="sm:hidden">PDF</span>
+            <span className="hidden sm:inline">Export PDF</span>
           </Button>
         </div>
       </div>

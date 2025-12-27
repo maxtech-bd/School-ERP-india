@@ -322,15 +322,15 @@ const RatingSurveys = () => {
   );
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-            <Star className="h-7 w-7 mr-3 text-yellow-500" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+            <Star className="h-6 w-6 sm:h-7 sm:w-7 mr-2 sm:mr-3 text-yellow-500" />
             Rating & Reviews
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Collect feedback through surveys and ratings
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Collect feedback through surveys
           </p>
         </div>
         {canManageSurveys && (
@@ -339,10 +339,11 @@ const RatingSurveys = () => {
               resetForm();
               setIsCreateModalOpen(true);
             }}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-emerald-600 hover:bg-emerald-700 text-sm"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Survey
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Create</span>
+            <span className="hidden sm:inline">Create Survey</span>
           </Button>
         )}
       </div>

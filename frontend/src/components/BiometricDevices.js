@@ -548,33 +548,35 @@ const BiometricDevices = () => {
   return (
     <div className="space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Biometric Devices</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor and manage ZKTeco attendance devices</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Biometric Devices</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage ZKTeco attendance devices</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleGenerateSampleData}
             disabled={sampleDataLoading}
-            className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+            className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 text-sm"
           >
-            <FileText className="h-4 w-4 mr-2" />
-            {sampleDataLoading ? 'Generating...' : '📊 Create Sample Data (Test)'}
+            <FileText className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Sample</span>
+            <span className="hidden sm:inline">{sampleDataLoading ? 'Generating...' : 'Create Sample Data'}</span>
           </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
+          <Button variant="outline" size="sm" className="text-sm">
+            <Download className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Export</span>
           </Button>
-          <Button variant="outline" size="sm">
-            <Settings className="h-4 w-4 mr-2" />
-            Device Settings
+          <Button variant="outline" size="sm" className="text-sm">
+            <Settings className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Settings</span>
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600">
-            <Fingerprint className="h-4 w-4 mr-2" />
-            Sync All Devices
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-sm">
+            <Fingerprint className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Sync</span>
+            <span className="hidden sm:inline">Sync All</span>
           </Button>
         </div>
       </div>

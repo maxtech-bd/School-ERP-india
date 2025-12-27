@@ -331,23 +331,25 @@ const UserManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="h-6 w-6" />
+          <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2 dark:text-white">
+            <Shield className="h-5 w-5 sm:h-6 sm:w-6" />
             User Management
           </h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Manage system users, roles, and permissions (Super Admin Only)
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Manage users, roles, and permissions
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleViewAuditLogs} variant="outline">
-            View Audit Logs
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={handleViewAuditLogs} variant="outline" className="text-sm">
+            <span className="sm:hidden">Logs</span>
+            <span className="hidden sm:inline">View Audit Logs</span>
           </Button>
-          <Button onClick={() => setIsCreateUserModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create User
+          <Button onClick={() => setIsCreateUserModalOpen(true)} className="text-sm">
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Create</span>
+            <span className="hidden sm:inline">Create User</span>
           </Button>
         </div>
       </div>

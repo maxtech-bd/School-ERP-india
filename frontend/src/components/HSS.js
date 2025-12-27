@@ -539,22 +539,24 @@ const HSSMainView = () => {
   return (
     <div className="space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">HSS Module</h1>
-          <p className="text-gray-600 mt-1">Higher Secondary School management and certification</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">HSS Module</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">HSS management and certification</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" className="text-sm">
+            <Download className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Export</span>
+            <span className="hidden sm:inline">Export Data</span>
           </Button>
           <Button 
-            className="bg-emerald-500 hover:bg-emerald-600"
+            className="bg-emerald-500 hover:bg-emerald-600 text-sm"
             onClick={() => navigate('/hss/enroll/new')}
           >
-            <UserPlus className="h-4 w-4 mr-2" />
-            New Enrollment
+            <UserPlus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">Enroll</span>
+            <span className="hidden sm:inline">New Enrollment</span>
           </Button>
         </div>
       </div>

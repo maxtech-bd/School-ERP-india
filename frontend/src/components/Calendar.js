@@ -282,21 +282,21 @@ const Calendar = () => {
     .slice(0, 5);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <CalendarIcon className="h-6 w-6 text-emerald-600" />
+          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 dark:text-white">
+            <CalendarIcon className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
             School Calendar
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            View holidays, events, and important dates
+            View holidays, events, and dates
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-40">
-              <Filter className="h-4 w-4 mr-2" />
+            <SelectTrigger className="w-32 sm:w-40">
+              <Filter className="h-4 w-4 mr-1 sm:mr-2" />
               <SelectValue placeholder="Filter" />
             </SelectTrigger>
             <SelectContent>
@@ -307,9 +307,10 @@ const Calendar = () => {
             </SelectContent>
           </Select>
           {canManageEvents && (
-            <Button onClick={() => setIsAddEventModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
+            <Button onClick={() => setIsAddEventModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-sm">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="sm:hidden">Add</span>
+              <span className="hidden sm:inline">Add Event</span>
             </Button>
           )}
         </div>

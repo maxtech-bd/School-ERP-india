@@ -1009,23 +1009,25 @@ const StudentList = () => {
                 <li>Gender values: Male or Female</li>
               </ul>
             </div>
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-2">
-                <Button variant="outline" onClick={() => downloadSampleTemplate('excel')}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Excel Template
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => downloadSampleTemplate('excel')} className="text-sm">
+                  <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="sm:hidden">Excel</span>
+                  <span className="hidden sm:inline">Download Excel Template</span>
                 </Button>
-                <Button variant="outline" onClick={() => downloadSampleTemplate('csv')}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download CSV Template
+                <Button variant="outline" onClick={() => downloadSampleTemplate('csv')} className="text-sm">
+                  <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="sm:hidden">CSV</span>
+                  <span className="hidden sm:inline">Download CSV Template</span>
                 </Button>
               </div>
               <Button 
-                className="bg-emerald-500 hover:bg-emerald-600"
+                className="bg-emerald-500 hover:bg-emerald-600 text-sm"
                 onClick={handleImportStudents}
                 disabled={loading || !importFile}
               >
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload className="h-4 w-4 mr-1 sm:mr-2" />
                 {uploadProgress || 'Start Import'}
               </Button>
             </div>

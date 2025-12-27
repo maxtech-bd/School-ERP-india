@@ -368,17 +368,17 @@ const AdmissionSummary = () => {
   return (
     <div className="space-y-6 fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admission Summary</h1>
-          <p className="text-gray-600 mt-1">
-            Comprehensive overview of student admissions and analytics
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Admission Summary</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Student admissions and analytics
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={selectedYear} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-48">
-              <Calendar className="h-4 w-4 mr-2" />
+            <SelectTrigger className="w-36 sm:w-48 text-sm">
+              <Calendar className="h-4 w-4 mr-1 sm:mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
