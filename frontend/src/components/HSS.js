@@ -609,14 +609,16 @@ const HSSMainView = () => {
 
       {/* HSS Module Tabs */}
       <Tabs defaultValue="enrollment" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="enrollment">Enroll Student</TabsTrigger>
-          <TabsTrigger value="register">Admission Register</TabsTrigger>
-          <TabsTrigger value="transfer">Transfer Certificate</TabsTrigger>
-          <TabsTrigger value="conduct">Conduct Certificate</TabsTrigger>
-          <TabsTrigger value="consolidated">Consolidated Report</TabsTrigger>
-          <TabsTrigger value="tags">Set Tags</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto scrollbar-hide">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-6 h-auto">
+            <TabsTrigger value="enrollment" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Enroll</TabsTrigger>
+            <TabsTrigger value="register" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Register</TabsTrigger>
+            <TabsTrigger value="transfer" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Transfer</TabsTrigger>
+            <TabsTrigger value="conduct" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Conduct</TabsTrigger>
+            <TabsTrigger value="consolidated" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Report</TabsTrigger>
+            <TabsTrigger value="tags" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Tags</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="enrollment" className="space-y-4">
           <Card>

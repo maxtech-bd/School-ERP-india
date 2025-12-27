@@ -111,6 +111,7 @@ const Settings = () => {
   const [newApiKey, setNewApiKey] = useState('');
   const [showNewApiKey, setShowNewApiKey] = useState(false);
   const [selectedModel, setSelectedModel] = useState('gpt-4o');
+  const [seedingData, setSeedingData] = useState(false);
 
   const fetchAiConfig = async () => {
     try {
@@ -1937,6 +1938,33 @@ const Settings = () => {
     }
   };
 
+  const handleSeedDemoData = async () => {
+    try {
+      setSeedingData(true);
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.post(
+        `${API_BASE_URL}/seed/all-modules`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const results = response.data.results;
+      const totalSeeded = Object.values(results).reduce((sum, val) => sum + val, 0);
+      
+      if (totalSeeded > 0) {
+        toast.success(`Demo data seeded successfully! Created: ${results.students} students, ${results.staff} staff, ${results.classes} classes, ${results.subjects} subjects, ${results.vehicles} vehicles, ${results.fees} fee types, ${results.calendar_events} events`);
+      } else {
+        toast.info('Demo data already exists. No new records were created.');
+      }
+    } catch (error) {
+      console.error('Error seeding demo data:', error);
+      toast.error(error.response?.data?.detail || 'Failed to seed demo data. Please try again.');
+    } finally {
+      setSeedingData(false);
+    }
+  };
+
   // ==================== STAFF SETTINGS HANDLERS ====================
 
   const handleOpenStaffSettings = async () => {
@@ -2767,10 +2795,33 @@ const Settings = () => {
             <CardContent>
               <div className="text-center py-12">
                 <Building className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">School Information</h3>
-                <p className="text-gray-600 mb-4">Update school details, contact information, and branding</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">School Information</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Update school details, contact information, and branding</p>
                 <Button className="bg-emerald-500 hover:bg-emerald-600" onClick={handleUpdateInstitution} disabled={loading}>
                   {loading ? 'Loading...' : 'Update Details'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Database className="h-5 w-5 text-orange-500" />
+                <span>Demo Data Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Database className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Seed Demo Data</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">Populate your system with sample data including students, staff, classes, subjects, vehicles, fees, and calendar events</p>
+                <Button 
+                  className="bg-orange-500 hover:bg-orange-600" 
+                  onClick={handleSeedDemoData} 
+                  disabled={seedingData}
+                >
+                  {seedingData ? 'Seeding Data...' : 'Seed Demo Data'}
                 </Button>
               </div>
             </CardContent>

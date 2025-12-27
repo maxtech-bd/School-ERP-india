@@ -5155,6 +5155,225 @@ async def create_sample_attendance_data(
         logging.error(f"Failed to create sample attendance data: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create sample attendance data")
 
+@api_router.post("/seed/all-modules")
+async def seed_all_modules_data(
+    current_user: User = Depends(get_current_user)
+):
+    """Seed demo data for all modules (Admin only)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only administrators can seed demo data")
+    
+    from datetime import datetime, timedelta
+    import random
+    
+    results = {
+        "students": 0,
+        "staff": 0,
+        "classes": 0,
+        "subjects": 0,
+        "fees": 0,
+        "attendance": 0,
+        "vehicles": 0,
+        "calendar_events": 0,
+        "notifications": 0
+    }
+    
+    try:
+        tenant_id = current_user.tenant_id
+        
+        existing_classes = await db.classes.count_documents({"tenant_id": tenant_id})
+        if existing_classes == 0:
+            sample_classes = [
+                {"name": "Class 1", "section": "A", "capacity": 40},
+                {"name": "Class 2", "section": "A", "capacity": 40},
+                {"name": "Class 3", "section": "A", "capacity": 40},
+                {"name": "Class 4", "section": "A", "capacity": 40},
+                {"name": "Class 5", "section": "A", "capacity": 40},
+                {"name": "Class 6", "section": "A", "capacity": 35},
+                {"name": "Class 7", "section": "A", "capacity": 35},
+                {"name": "Class 8", "section": "A", "capacity": 35},
+                {"name": "Class 9", "section": "A", "capacity": 30},
+                {"name": "Class 10", "section": "A", "capacity": 30},
+            ]
+            for cls in sample_classes:
+                await db.classes.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "name": cls["name"],
+                    "section": cls["section"],
+                    "capacity": cls["capacity"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["classes"] += 1
+        
+        existing_subjects = await db.subjects.count_documents({"tenant_id": tenant_id})
+        if existing_subjects == 0:
+            sample_subjects = ["Mathematics", "English", "Science", "Social Studies", "Hindi", "Computer Science", "Physical Education", "Art & Craft"]
+            for subj in sample_subjects:
+                await db.subjects.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "name": subj,
+                    "code": subj[:3].upper(),
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["subjects"] += 1
+        
+        existing_students = await db.students.count_documents({"tenant_id": tenant_id})
+        if existing_students < 10:
+            first_names = ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai", "Reyansh", "Ayaan", "Krishna", "Ishaan", "Ananya", "Diya", "Aadhya", "Pihu", "Sara", "Myra", "Aanya", "Navya", "Kiara", "Saanvi"]
+            last_names = ["Sharma", "Verma", "Gupta", "Singh", "Kumar", "Patel", "Reddy", "Das", "Mishra", "Yadav"]
+            
+            classes_list = await db.classes.find({"tenant_id": tenant_id}).to_list(length=10)
+            
+            for i in range(20):
+                fname = random.choice(first_names)
+                lname = random.choice(last_names)
+                gender = "Male" if fname in ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai", "Reyansh", "Ayaan", "Krishna", "Ishaan"] else "Female"
+                cls = random.choice(classes_list) if classes_list else {"name": "Class 1", "section": "A"}
+                
+                await db.students.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "admission_no": f"STU{2024}{1000 + i}",
+                    "full_name": f"{fname} {lname}",
+                    "first_name": fname,
+                    "last_name": lname,
+                    "gender": gender,
+                    "date_of_birth": (datetime.now() - timedelta(days=random.randint(3000, 5000))).strftime("%Y-%m-%d"),
+                    "class_name": cls.get("name", "Class 1"),
+                    "section": cls.get("section", "A"),
+                    "roll_number": str(i + 1),
+                    "parent_name": f"Mr. {lname}",
+                    "parent_phone": f"98{random.randint(10000000, 99999999)}",
+                    "parent_email": f"parent.{lname.lower()}{i}@email.com",
+                    "address": f"{random.randint(1, 999)} Main Street, City",
+                    "is_active": True,
+                    "admission_date": datetime.now().strftime("%Y-%m-%d"),
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["students"] += 1
+        
+        existing_staff = await db.staff.count_documents({"tenant_id": tenant_id})
+        if existing_staff < 5:
+            staff_names = [
+                {"name": "Rajesh Kumar", "designation": "Principal", "department": "Administration"},
+                {"name": "Priya Sharma", "designation": "Vice Principal", "department": "Administration"},
+                {"name": "Amit Singh", "designation": "Senior Teacher", "department": "Science"},
+                {"name": "Sunita Devi", "designation": "Teacher", "department": "Mathematics"},
+                {"name": "Vikram Patel", "designation": "Teacher", "department": "English"},
+                {"name": "Neha Gupta", "designation": "Teacher", "department": "Hindi"},
+                {"name": "Rakesh Yadav", "designation": "Lab Assistant", "department": "Science"},
+                {"name": "Kavita Mishra", "designation": "Librarian", "department": "Library"},
+                {"name": "Suresh Verma", "designation": "Accountant", "department": "Accounts"},
+                {"name": "Meena Kumari", "designation": "Clerk", "department": "Administration"}
+            ]
+            for i, staff in enumerate(staff_names):
+                await db.staff.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "employee_id": f"EMP{2024}{100 + i}",
+                    "full_name": staff["name"],
+                    "designation": staff["designation"],
+                    "department": staff["department"],
+                    "email": f"{staff['name'].lower().replace(' ', '.')}@school.edu",
+                    "phone": f"98{random.randint(10000000, 99999999)}",
+                    "joining_date": (datetime.now() - timedelta(days=random.randint(100, 2000))).strftime("%Y-%m-%d"),
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["staff"] += 1
+        
+        existing_vehicles = await db.vehicles.count_documents({"tenant_id": tenant_id})
+        if existing_vehicles == 0:
+            vehicles_data = [
+                {"number": "DL01AB1234", "type": "Bus", "capacity": 40, "driver": "Ram Singh", "route": "Route 1 - North"},
+                {"number": "DL01CD5678", "type": "Bus", "capacity": 40, "driver": "Shyam Kumar", "route": "Route 2 - South"},
+                {"number": "DL01EF9012", "type": "Van", "capacity": 15, "driver": "Mohan Das", "route": "Route 3 - East"},
+                {"number": "DL01GH3456", "type": "Bus", "capacity": 50, "driver": "Lakshman Yadav", "route": "Route 4 - West"},
+            ]
+            for v in vehicles_data:
+                await db.vehicles.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "vehicle_number": v["number"],
+                    "vehicle_type": v["type"],
+                    "capacity": v["capacity"],
+                    "driver_name": v["driver"],
+                    "route_name": v["route"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["vehicles"] += 1
+        
+        existing_events = await db.calendar_events.count_documents({"tenant_id": tenant_id})
+        if existing_events == 0:
+            events = [
+                {"title": "Annual Day Celebration", "type": "event", "days_offset": 30},
+                {"title": "Parent-Teacher Meeting", "type": "meeting", "days_offset": 14},
+                {"title": "Mid-Term Examination", "type": "exam", "days_offset": 21},
+                {"title": "Sports Day", "type": "event", "days_offset": 45},
+                {"title": "Winter Vacation Starts", "type": "holiday", "days_offset": 60},
+                {"title": "Republic Day", "type": "holiday", "days_offset": random.randint(1, 30)},
+            ]
+            for evt in events:
+                event_date = datetime.now() + timedelta(days=evt["days_offset"])
+                await db.calendar_events.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "title": evt["title"],
+                    "event_type": evt["type"],
+                    "start_date": event_date,
+                    "end_date": event_date,
+                    "all_day": True,
+                    "description": f"Scheduled {evt['title']}",
+                    "created_by": current_user.id,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["calendar_events"] += 1
+        
+        existing_fees = await db.fee_types.count_documents({"tenant_id": tenant_id})
+        if existing_fees == 0:
+            fee_types = [
+                {"name": "Tuition Fee", "amount": 5000, "frequency": "monthly"},
+                {"name": "Admission Fee", "amount": 15000, "frequency": "one-time"},
+                {"name": "Examination Fee", "amount": 2000, "frequency": "term"},
+                {"name": "Library Fee", "amount": 500, "frequency": "annual"},
+                {"name": "Transport Fee", "amount": 2000, "frequency": "monthly"},
+                {"name": "Lab Fee", "amount": 1000, "frequency": "annual"},
+            ]
+            for fee in fee_types:
+                await db.fee_types.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "name": fee["name"],
+                    "amount": fee["amount"],
+                    "frequency": fee["frequency"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                })
+                results["fees"] += 1
+        
+        logging.info(f"Seed data created for tenant {tenant_id}: {results}")
+        return {
+            "message": "Demo data seeded successfully for all modules",
+            "results": results,
+            "tenant_id": tenant_id
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to seed demo data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to seed demo data: {str(e)}")
+
 @api_router.get("/reports/attendance/staff-attendance")
 async def generate_staff_attendance_report(
     format: str = "pdf",

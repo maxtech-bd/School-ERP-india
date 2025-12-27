@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -15,7 +15,12 @@ import {
   GraduationCap,
   Download,
   Share2,
+  Loader2,
 } from "lucide-react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
+import html2canvas from "html2canvas";
 import {
   LineChart,
   Line,
@@ -209,8 +214,161 @@ const Dashboard = () => {
     return tableRows.slice(0, 20);
   };
 
-  const handleExport = (format) => {
-    toast.info(`Exporting report as ${format}... (Feature coming soon)`);
+  const [exporting, setExporting] = useState(false);
+  const dashboardRef = useRef(null);
+
+  const handleExport = async (format) => {
+    setExporting(true);
+    try {
+      if (format === "PDF") {
+        await exportToPDF();
+      } else if (format === "Excel") {
+        exportToExcel();
+      } else if (format === "Share") {
+        await shareReport();
+      }
+    } catch (error) {
+      console.error(`Export error:`, error);
+      toast.error(`Failed to export as ${format}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportToPDF = async () => {
+    toast.info("Generating PDF report...");
+    
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    doc.setFontSize(20);
+    doc.setTextColor(16, 185, 129);
+    doc.text("GiNi School Dashboard Report", pageWidth / 2, 20, { align: "center" });
+    
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, 30, { align: "center" });
+    doc.text(`Period: Last ${timePeriod} days`, pageWidth / 2, 37, { align: "center" });
+    
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text("Summary Statistics", 14, 50);
+    
+    const summaryData = [
+      ["Total Students", stats.totalStudents.toString()],
+      ["Total Interactions", stats.totalInteractions.toLocaleString()],
+      ["Active Classes", stats.activeClasses.toString()],
+      ["Weekly Growth", `${stats.weeklyGrowth > 0 ? "+" : ""}${stats.weeklyGrowth}%`],
+    ];
+    
+    doc.autoTable({
+      startY: 55,
+      head: [["Metric", "Value"]],
+      body: summaryData,
+      theme: "striped",
+      headStyles: { fillColor: [16, 185, 129] },
+    });
+    
+    if (tableData.length > 0) {
+      doc.text("Class & Subject Performance", 14, doc.lastAutoTable.finalY + 15);
+      
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 20,
+        head: [["Class", "Subject", "Total Interactions", "Active Students"]],
+        body: tableData.map(row => [
+          `Class ${row.class}`,
+          row.subject,
+          row.totalInteractions.toString(),
+          row.activeStudents.toString()
+        ]),
+        theme: "striped",
+        headStyles: { fillColor: [16, 185, 129] },
+      });
+    }
+    
+    doc.save(`gini_dashboard_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success("PDF report downloaded successfully!");
+  };
+
+  const exportToExcel = () => {
+    toast.info("Generating Excel report...");
+    
+    const wb = XLSX.utils.book_new();
+    
+    const summaryData = [
+      ["GiNi School Dashboard Report"],
+      [`Generated: ${new Date().toLocaleDateString()}`],
+      [`Period: Last ${timePeriod} days`],
+      [],
+      ["Summary Statistics"],
+      ["Metric", "Value"],
+      ["Total Students", stats.totalStudents],
+      ["Total Interactions", stats.totalInteractions],
+      ["Active Classes", stats.activeClasses],
+      ["Weekly Growth", `${stats.weeklyGrowth}%`],
+    ];
+    
+    const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, summaryWS, "Summary");
+    
+    if (tableData.length > 0) {
+      const performanceData = [
+        ["Class", "Subject", "Total Interactions", "Active Students"],
+        ...tableData.map(row => [
+          `Class ${row.class}`,
+          row.subject,
+          row.totalInteractions,
+          row.activeStudents
+        ])
+      ];
+      const performanceWS = XLSX.utils.aoa_to_sheet(performanceData);
+      XLSX.utils.book_append_sheet(wb, performanceWS, "Performance");
+    }
+    
+    if (usageTrendData.length > 0) {
+      const trendHeaders = ["Date", ...Object.keys(usageTrendData[0]).filter(k => k !== "date")];
+      const trendRows = usageTrendData.map(row => [
+        row.date,
+        ...Object.entries(row).filter(([k]) => k !== "date").map(([, v]) => v)
+      ]);
+      const trendWS = XLSX.utils.aoa_to_sheet([trendHeaders, ...trendRows]);
+      XLSX.utils.book_append_sheet(wb, trendWS, "Usage Trend");
+    }
+    
+    XLSX.writeFile(wb, `gini_dashboard_report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success("Excel report downloaded successfully!");
+  };
+
+  const shareReport = async () => {
+    const reportUrl = window.location.href;
+    const reportTitle = `GiNi School Dashboard Report - ${new Date().toLocaleDateString()}`;
+    const reportText = `Check out the GiNi School Dashboard Report!\n\nSummary:\n- Total Students: ${stats.totalStudents}\n- Total Interactions: ${stats.totalInteractions.toLocaleString()}\n- Active Classes: ${stats.activeClasses}\n- Weekly Growth: ${stats.weeklyGrowth}%`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: reportTitle,
+          text: reportText,
+          url: reportUrl,
+        });
+        toast.success("Report shared successfully!");
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          await copyToClipboard(reportUrl);
+        }
+      }
+    } else {
+      await copyToClipboard(reportUrl);
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Report link copied to clipboard!");
+    } catch (error) {
+      toast.error("Failed to copy link");
+    }
   };
 
   const stats = getSummaryStats();
@@ -573,24 +731,27 @@ const Dashboard = () => {
           variant="outline"
           className="gap-2 text-xs sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
           onClick={() => handleExport("PDF")}
+          disabled={exporting}
         >
-          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+          {exporting ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Download className="h-3 w-3 sm:h-4 sm:w-4" />}
           Export PDF
         </Button>
         <Button
           variant="outline"
           className="gap-2 text-xs sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
           onClick={() => handleExport("Excel")}
+          disabled={exporting}
         >
-          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+          {exporting ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Download className="h-3 w-3 sm:h-4 sm:w-4" />}
           Export Excel
         </Button>
         <Button
           variant="outline"
           className="gap-2 text-xs sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
           onClick={() => handleExport("Share")}
+          disabled={exporting}
         >
-          <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
+          {exporting ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />}
           Share Report
         </Button>
       </div>

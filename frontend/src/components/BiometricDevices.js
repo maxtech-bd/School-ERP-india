@@ -629,14 +629,16 @@ const BiometricDevices = () => {
 
       {/* Biometric Management Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="staff">Staff List</TabsTrigger>
-          <TabsTrigger value="punch-log">Punch Log</TabsTrigger>
-          <TabsTrigger value="devices">Devices</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="status">Status Report</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto scrollbar-hide">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-6 h-auto">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Overview</TabsTrigger>
+            <TabsTrigger value="staff" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Staff List</TabsTrigger>
+            <TabsTrigger value="punch-log" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Punch Log</TabsTrigger>
+            <TabsTrigger value="devices" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Devices</TabsTrigger>
+            <TabsTrigger value="calendar" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Calendar</TabsTrigger>
+            <TabsTrigger value="status" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap">Status</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
