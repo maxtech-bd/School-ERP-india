@@ -5390,140 +5390,134 @@ async def seed_all_modules_data(
         class_standards = ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"]
         subjects_list = ["Mathematics", "Science", "English", "History", "Geography", "Physics", "Chemistry", "Biology"]
         
+        # Clear existing GiNi demo data first to ensure correct field names
+        await db.ai_chat_sessions.delete_many({"tenant_id": tenant_id, "user_name": {"$regex": "^Student"}})
+        await db.assessment_submissions.delete_many({"tenant_id": tenant_id, "assessment_type": "quiz", "student_name": {"$regex": "^Student"}})
+        await db.assessments.delete_many({"tenant_id": tenant_id, "type": "test", "created_by": current_user.id})
+        await db.ai_summary_requests.delete_many({"tenant_id": tenant_id, "user_name": {"$regex": "^Student"}})
+        await db.ai_notes_requests.delete_many({"tenant_id": tenant_id, "user_name": {"$regex": "^Student"}})
+        
         # Seed AI Chat Sessions (for AI Assistant analytics)
-        existing_chat_sessions = await db.ai_chat_sessions.count_documents({"tenant_id": tenant_id})
-        if existing_chat_sessions == 0:
-            for i in range(35):
-                session_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
-                class_std = random.choice(class_standards)
-                subject = random.choice(subjects_list)
-                
-                await db.ai_chat_sessions.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "user_id": str(uuid.uuid4()),
-                    "user_name": f"Student {i+1}",
-                    "user_role": "student",
-                    "class_standard": class_std,
-                    "subject": subject,
-                    "messages_count": random.randint(3, 15),
-                    "total_tokens": random.randint(500, 2000),
-                    "created_at": session_date,
-                    "updated_at": session_date
-                })
-                results["ai_assistant"] += 1
+        for i in range(35):
+            session_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+            class_std = random.choice(class_standards)
+            subject = random.choice(subjects_list)
+            
+            await db.ai_chat_sessions.insert_one({
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "school_id": current_user.school_id,
+                "user_id": str(uuid.uuid4()),
+                "user_name": f"Student {i+1}",
+                "user_role": "student",
+                "class_standard": class_std,
+                "subject": subject,
+                "messages_count": random.randint(3, 15),
+                "total_tokens": random.randint(500, 2000),
+                "created_at": session_date,
+                "updated_at": session_date
+            })
+            results["ai_assistant"] += 1
         
         # Seed Quiz submissions (assessment_submissions with type quiz)
-        existing_quiz_submissions = await db.assessment_submissions.count_documents({"tenant_id": tenant_id, "assessment_type": "quiz"})
-        if existing_quiz_submissions == 0:
-            for i in range(30):
-                quiz_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
-                class_std = random.choice(class_standards)
-                subject = random.choice(subjects_list)
-                total_q = random.randint(5, 15)
-                correct = random.randint(int(total_q * 0.5), total_q)
-                
-                await db.assessment_submissions.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "student_id": str(uuid.uuid4()),
-                    "student_name": f"Student {i+1}",
-                    "student_class": class_std,
-                    "subject": subject,
-                    "assessment_type": "quiz",
-                    "total_questions": total_q,
-                    "correct_answers": correct,
-                    "score": round((correct / total_q) * 100, 1),
-                    "status": "completed",
-                    "created_at": quiz_date,
-                    "submitted_at": quiz_date
-                })
-                results["quizzes"] += 1
+        for i in range(30):
+            quiz_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+            class_std = random.choice(class_standards)
+            subject = random.choice(subjects_list)
+            total_q = random.randint(5, 15)
+            correct = random.randint(int(total_q * 0.5), total_q)
+            
+            await db.assessment_submissions.insert_one({
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "school_id": current_user.school_id,
+                "student_id": str(uuid.uuid4()),
+                "student_name": f"Student {i+1}",
+                "student_class": class_std,
+                "subject": subject,
+                "assessment_type": "quiz",
+                "total_questions": total_q,
+                "correct_answers": correct,
+                "score": round((correct / total_q) * 100, 1),
+                "status": "completed",
+                "created_at": quiz_date,
+                "submitted_at": quiz_date
+            })
+            results["quizzes"] += 1
         
         # Seed Tests (assessments with type test)
-        existing_assessments = await db.assessments.count_documents({"tenant_id": tenant_id, "type": "test"})
-        if existing_assessments == 0:
-            test_titles = ["Mid-Term Science Test", "Mathematics Weekly Test", "English Grammar Assessment", "History Chapter Test", "Physics Unit Test", "Biology Quiz"]
+        test_titles = ["Mid-Term Science Test", "Mathematics Weekly Test", "English Grammar Assessment", "History Chapter Test", "Physics Unit Test", "Biology Quiz"]
+        for i in range(15):
+            test_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+            class_std = random.choice(class_standards)
+            subject = random.choice(subjects_list)
             
-            for i in range(15):
-                test_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
-                class_std = random.choice(class_standards)
-                subject = random.choice(subjects_list)
-                
-                await db.assessments.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "created_by": current_user.id,
-                    "created_by_name": current_user.full_name,
-                    "class_standard": class_std,
-                    "subject": subject,
-                    "title": random.choice(test_titles),
-                    "type": "test",
-                    "total_questions": random.randint(10, 30),
-                    "total_marks": random.randint(25, 100),
-                    "duration_minutes": random.randint(30, 90),
-                    "status": random.choice(["draft", "published", "completed"]),
-                    "created_at": test_date,
-                    "updated_at": test_date
-                })
-                results["tests"] += 1
+            await db.assessments.insert_one({
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "school_id": current_user.school_id,
+                "created_by": current_user.id,
+                "created_by_name": current_user.full_name,
+                "class_standard": class_std,
+                "subject": subject,
+                "title": random.choice(test_titles),
+                "type": "test",
+                "total_questions": random.randint(10, 30),
+                "total_marks": random.randint(25, 100),
+                "duration_minutes": random.randint(30, 90),
+                "status": random.choice(["draft", "published", "completed"]),
+                "created_at": test_date,
+                "updated_at": test_date
+            })
+            results["tests"] += 1
         
         # Seed AI Summary requests
-        existing_summary_requests = await db.ai_summary_requests.count_documents({"tenant_id": tenant_id})
-        if existing_summary_requests == 0:
-            summary_topics = ["Photosynthesis Process", "French Revolution", "Quadratic Equations", "Human Digestive System", "Shakespeare's Works", "Climate Change"]
+        summary_topics = ["Photosynthesis Process", "French Revolution", "Quadratic Equations", "Human Digestive System", "Shakespeare's Works", "Climate Change"]
+        for i in range(20):
+            summary_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+            class_std = random.choice(class_standards)
+            subject = random.choice(subjects_list)
             
-            for i in range(20):
-                summary_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
-                class_std = random.choice(class_standards)
-                subject = random.choice(subjects_list)
-                
-                await db.ai_summary_requests.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "user_id": str(uuid.uuid4()),
-                    "user_name": f"Student {i+1}",
-                    "user_role": "student",
-                    "class_standard": class_std,
-                    "subject": subject,
-                    "topic": random.choice(summary_topics),
-                    "summary_length": random.choice(["short", "medium", "detailed"]),
-                    "word_count": random.randint(200, 800),
-                    "source": random.choice(["CMS", "GPT"]),
-                    "created_at": summary_date
-                })
-                results["summaries"] += 1
+            await db.ai_summary_requests.insert_one({
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "school_id": current_user.school_id,
+                "user_id": str(uuid.uuid4()),
+                "user_name": f"Student {i+1}",
+                "user_role": "student",
+                "class_standard": class_std,
+                "subject": subject,
+                "topic": random.choice(summary_topics),
+                "summary_length": random.choice(["short", "medium", "detailed"]),
+                "word_count": random.randint(200, 800),
+                "source": random.choice(["CMS", "GPT"]),
+                "created_at": summary_date
+            })
+            results["summaries"] += 1
         
         # Seed AI Notes requests
-        existing_notes_requests = await db.ai_notes_requests.count_documents({"tenant_id": tenant_id})
-        if existing_notes_requests == 0:
-            notes_topics = ["Algebra Fundamentals", "Cell Structure", "World Geography", "English Literature", "Chemical Bonding", "Indian History"]
+        notes_topics = ["Algebra Fundamentals", "Cell Structure", "World Geography", "English Literature", "Chemical Bonding", "Indian History"]
+        for i in range(18):
+            notes_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
+            class_std = random.choice(class_standards)
+            subject = random.choice(subjects_list)
             
-            for i in range(18):
-                notes_date = datetime.utcnow() - timedelta(days=random.randint(0, 6))
-                class_std = random.choice(class_standards)
-                subject = random.choice(subjects_list)
-                
-                await db.ai_notes_requests.insert_one({
-                    "id": str(uuid.uuid4()),
-                    "tenant_id": tenant_id,
-                    "school_id": current_user.school_id,
-                    "user_id": str(uuid.uuid4()),
-                    "user_name": f"Student {i+1}",
-                    "user_role": "student",
-                    "class_standard": class_std,
-                    "subject": subject,
-                    "topic": random.choice(notes_topics),
-                    "notes_type": random.choice(["detailed", "bullet_points", "outline"]),
-                    "word_count": random.randint(500, 2000),
-                    "source": random.choice(["CMS", "GPT"]),
-                    "created_at": notes_date
-                })
-                results["notes"] += 1
+            await db.ai_notes_requests.insert_one({
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "school_id": current_user.school_id,
+                "user_id": str(uuid.uuid4()),
+                "user_name": f"Student {i+1}",
+                "user_role": "student",
+                "class_standard": class_std,
+                "subject": subject,
+                "topic": random.choice(notes_topics),
+                "notes_type": random.choice(["detailed", "bullet_points", "outline"]),
+                "word_count": random.randint(500, 2000),
+                "source": random.choice(["CMS", "GPT"]),
+                "created_at": notes_date
+            })
+            results["notes"] += 1
         
         logging.info(f"Seed data created for tenant {tenant_id}: {results}")
         return {
