@@ -1816,19 +1816,19 @@ const AcademicCMS = () => {
       {/* Previous Years' Papers Tab (C) */}
       {activeTab === "papers" && (
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">
-              Previous Years&apos; Papers ({previousPapers.length}) (5-12)
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+              Previous Years&apos; Papers ({previousPapers.length})
             </h2>
             <button
               onClick={() => {
                 resetForm("paper");
                 setShowAddPaper(true);
               }}
-              className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2"
+              className="bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1 sm:gap-2 text-sm"
             >
               <Plus className="h-4 w-4" />
-              Add New Paper
+              Add Paper
             </button>
           </div>
           {/* Papers List */}
@@ -2056,9 +2056,9 @@ const AcademicCMS = () => {
       {/* Q&A Tab (D) */}
       {activeTab === "qa" && (
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">
-              Q&amp;A Knowledge Base ({qaPairs.length}) (5-12)
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+              Q&amp;A Knowledge Base ({qaPairs.length})
             </h2>
             <div className="flex gap-2">
               <button
@@ -2066,17 +2066,17 @@ const AcademicCMS = () => {
                   setShowBulkUpload(true);
                   setUploadSummary(null);
                 }}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="flex items-center gap-1 sm:gap-2 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
               >
                 <Upload className="w-4 h-4" />
-                Bulk Upload
+                <span className="hidden sm:inline">Bulk</span> Upload
               </button>
               <button
                 onClick={() => {
                   resetForm("qa");
                   setShowAddQA(true);
                 }}
-                className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                className="flex items-center gap-1 sm:gap-2 bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm"
               >
                 <Plus className="w-4 h-4" />
                 Add Q&amp;A
