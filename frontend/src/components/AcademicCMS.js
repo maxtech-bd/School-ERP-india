@@ -976,83 +976,85 @@ const AcademicCMS = () => {
               {formState.chapters.map((chapter, index) => (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row sm:items-center gap-2 border p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
+                  className="border p-3 rounded-lg bg-gray-50 dark:bg-gray-700 space-y-2"
                 >
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <span className="font-bold text-gray-700 dark:text-gray-300 min-w-[85px] text-sm">
-                      CHAPTER {index + 1}:
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-gray-700 dark:text-gray-300 text-sm">
+                      Chapter {index + 1}
                     </span>
-                    <input
-                      type="text"
-                      placeholder="Chapter Title"
-                      value={chapter.title}
-                      onChange={(e) =>
-                        handleChapterChange(
-                          formType,
-                          index,
-                          "title",
-                          e.target.value,
-                        )
-                      }
-                      className="flex-1 sm:w-40 px-2 py-1 border rounded-lg text-sm dark:bg-gray-600 dark:text-white dark:border-gray-500"
-                      required
-                    />
+                    {formState.chapters.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeChapterField(formType, index)}
+                        className="text-red-600 hover:text-red-800 p-1 rounded-full"
+                        title="Remove Chapter"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
+                  
+                  <input
+                    type="text"
+                    placeholder="Chapter Title"
+                    value={chapter.title}
+                    onChange={(e) =>
+                      handleChapterChange(
+                        formType,
+                        index,
+                        "title",
+                        e.target.value,
+                      )
+                    }
+                    className="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-600 dark:text-white dark:border-gray-500"
+                    required
+                  />
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-1">
-                    <input
-                      type="file"
-                      accept=".pdf,.txt,.docx,.doc"
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          await handleFileUpload(file, (url, fileName) => {
-                            handleChapterChange(
-                              formType,
-                              index,
-                              "file_url",
-                              url,
-                              fileName,
-                            );
-                          });
-                        }
-                      }}
-                      className="text-sm flex-1 min-w-0"
-                      disabled={uploadingFile || chapter.file_url}
-                    />
-                    
-                    <div className="flex items-center gap-1 text-xs shrink-0">
-                      {uploadingFile && (
-                        <span className="text-blue-600">Uploading...</span>
-                      )}
-                      {chapter.file_name && (
-                        <span className="text-green-600 flex items-center gap-1">
-                          <File className="w-3 h-3" /> File
+                  <div className="flex items-center gap-2">
+                    {chapter.file_url ? (
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="text-green-600 dark:text-green-400 flex items-center gap-1 text-sm">
+                          <File className="w-4 h-4" /> {chapter.file_name || "File uploaded"}
                         </span>
-                      )}
-                      {chapter.file_url && (
                         <button
                           type="button"
                           onClick={() =>
                             handleChapterChange(formType, index, "file_url", "")
                           }
                           className="text-red-500 hover:text-red-700 p-1"
-                          title="Clear Chapter File"
+                          title="Remove file"
                         >
                           <X className="w-4 h-4" />
                         </button>
-                      )}
-                      {formState.chapters.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeChapterField(formType, index)}
-                          className="text-red-600 hover:text-red-800 p-1 rounded-full"
-                          title="Remove Chapter"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <label className="flex items-center gap-2 px-3 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 flex-1">
+                        <Upload className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {uploadingFile ? "Uploading..." : "Upload PDF/DOCX"}
+                        </span>
+                        <input
+                          type="file"
+                          accept=".pdf,.txt,.docx,.doc"
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              await handleFileUpload(file, (url, fileName) => {
+                                handleChapterChange(
+                                  formType,
+                                  index,
+                                  "file_url",
+                                  url,
+                                  fileName,
+                                );
+                              });
+                            }
+                          }}
+                          className="hidden"
+                          disabled={uploadingFile}
+                        />
+                      </label>
+                    )}
                   </div>
                 </div>
               ))}
