@@ -1246,16 +1246,16 @@ const AcademicCMS = () => {
           {/* Step 1: Select Class */}
           {acadNavLevel.step === "class" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
-                  Academic Books – Select Class (5-12)
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+                  Academic Books – Select Class
                 </h2>
                 <button
                   onClick={() => {
                     resetForm("book");
                     setShowAddBook(true);
                   }}
-                  className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                  className="flex items-center gap-1 sm:gap-2 bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm"
                 >
                   <Plus className="w-4 h-4" />
                   Add Book
@@ -1310,24 +1310,22 @@ const AcademicCMS = () => {
           {/* Step 2: Select Subject */}
           {acadNavLevel.step === "subject" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
                   Class {acadNavLevel.class} – Select Subject
                 </h2>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setAcadNavLevel({
-                        step: "class",
-                        class: "",
-                        subject: "",
-                      })
-                    }
-                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
-                  >
-                    ← Back to Classes
-                  </button>
-                </div>
+                <button
+                  onClick={() =>
+                    setAcadNavLevel({
+                      step: "class",
+                      class: "",
+                      subject: "",
+                    })
+                  }
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white text-sm"
+                >
+                  ← Back to Classes
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1375,10 +1373,9 @@ const AcademicCMS = () => {
           {/* Step 3: List Books */}
           {acadNavLevel.step === "books" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
-                  Academic Books – Class {acadNavLevel.class} –{" "}
-                  {acadNavLevel.subject}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+                  Class {acadNavLevel.class} – {acadNavLevel.subject}
                 </h2>
                 <div className="flex gap-2">
                   <button
@@ -1389,9 +1386,9 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white text-sm"
                   >
-                    ← Back to Subjects
+                    ← Back
                   </button>
                   <button
                     onClick={() => {
@@ -1403,7 +1400,7 @@ const AcademicCMS = () => {
                       }));
                       setShowAddBook(true);
                     }}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                    className="flex items-center gap-1 sm:gap-2 bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     Add Book
@@ -1548,19 +1545,19 @@ const AcademicCMS = () => {
           {/* Step 1: Select Class */}
           {refNavLevel.step === "class" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
-                  Reference Books – Select Class (5-12)
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+                  Reference Books – Select Class
                 </h2>
                 <button
                   onClick={() => {
                     resetForm("reference");
                     setShowAddReferenceBook(true);
                   }}
-                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2"
+                  className="bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1 sm:gap-2 text-sm"
                 >
                   <Plus className="h-4 w-4" />
-                  Add New Book
+                  Add Book
                 </button>
               </div>
               {referenceBooks.length === 0 ? (
@@ -1617,24 +1614,22 @@ const AcademicCMS = () => {
           {/* Step 2: Select Subject */}
           {refNavLevel.step === "subject" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
                   Class {refNavLevel.class} – Select Subject
                 </h2>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setRefNavLevel({
-                        step: "class",
-                        class: "",
-                        subject: "",
-                      })
-                    }
-                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
-                  >
-                    ← Back to Classes
-                  </button>
-                </div>
+                <button
+                  onClick={() =>
+                    setRefNavLevel({
+                      step: "class",
+                      class: "",
+                      subject: "",
+                    })
+                  }
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white text-sm"
+                >
+                  ← Back to Classes
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1682,10 +1677,9 @@ const AcademicCMS = () => {
           {/* Step 3: List Reference Books */}
           {refNavLevel.step === "books" && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
-                  Reference Books – Class {refNavLevel.class} –{" "}
-                  {refNavLevel.subject}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">
+                  Class {refNavLevel.class} – {refNavLevel.subject}
                 </h2>
                 <div className="flex gap-2">
                   <button
@@ -1696,9 +1690,9 @@ const AcademicCMS = () => {
                         subject: "",
                       })
                     }
-                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white"
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white text-sm"
                   >
-                    ← Back to Subjects
+                    ← Back
                   </button>
                   <button
                     onClick={() => {
@@ -1710,7 +1704,7 @@ const AcademicCMS = () => {
                       }));
                       setShowAddReferenceBook(true);
                     }}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                    className="flex items-center gap-1 sm:gap-2 bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     Add Book
