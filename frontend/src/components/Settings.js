@@ -3162,10 +3162,10 @@ const Settings = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h4 className="font-medium">Holidays & School Breaks</h4>
-              <Button size="sm" onClick={addNewHoliday}>
-                <Plus className="h-4 w-4 mr-2" />
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <h4 className="font-medium dark:text-white">Holidays & School Breaks</h4>
+              <Button size="sm" onClick={addNewHoliday} className="text-sm">
+                <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                 Add Holiday
               </Button>
             </div>
@@ -4242,10 +4242,10 @@ const Settings = () => {
             <DialogTitle>Curriculum Management - Course Structure</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <div>
                 <select
-                  className="px-3 py-2 border rounded-md"
+                  className="px-2 sm:px-3 py-2 border rounded-md text-sm w-full sm:w-auto"
                   value={selectedClassFilter}
                   onChange={(e) => setSelectedClassFilter(e.target.value)}
                 >
@@ -4259,8 +4259,8 @@ const Settings = () => {
                   <option value="12th">12th Standard</option>
                 </select>
               </div>
-              <Button className="bg-emerald-500 hover:bg-emerald-600" onClick={handleAddSubject}>
-                + Add New Subject
+              <Button className="bg-emerald-500 hover:bg-emerald-600 text-sm" onClick={handleAddSubject}>
+                + Add Subject
               </Button>
             </div>
 
@@ -5283,13 +5283,14 @@ const Settings = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600">
-                Manage user roles and their access permissions
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Manage user roles and permissions
               </p>
-              <Button onClick={handleManagePermissions} className="bg-emerald-500 hover:bg-emerald-600">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Role
+              <Button onClick={handleManagePermissions} className="bg-emerald-500 hover:bg-emerald-600 text-sm">
+                <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="sm:hidden">Create Role</span>
+                <span className="hidden sm:inline">Create New Role</span>
               </Button>
             </div>
             
