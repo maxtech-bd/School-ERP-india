@@ -918,54 +918,51 @@ const AcademicCMS = () => {
 
             {/* PRELIMS Upload */}
             <div className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-              <label className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-400 flex justify-between items-center">
-                <span>
-                  PRELIMS / Full Book File (PDF, TXT, DOCX - Max 100MB Each)
-                </span>
-                {formState.prelims_file_url && (
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                PRELIMS / Full Book File
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">PDF, TXT, DOCX - Max 100MB</p>
+              
+              {formState.prelims_file_url ? (
+                <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-600 rounded-lg border">
+                  <span className="text-green-600 dark:text-green-400 flex items-center gap-2 text-sm">
+                    <File className="w-4 h-4" /> {formState.prelims_file_name || "File uploaded"}
+                  </span>
                   <button
                     type="button"
-                    onClick={() =>
-                      handleFormChange(formType, "prelims_file_url", "")
-                    }
-                    className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                    onClick={() => {
+                      handleFormChange(formType, "prelims_file_url", "");
+                      handleFormChange(formType, "prelims_file_name", "");
+                    }}
+                    className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove file"
                   >
-                    <X className="w-3 h-3" /> Clear File
+                    <X className="w-4 h-4" />
                   </button>
-                )}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  accept=".pdf,.txt,.docx,.doc"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      await handleFileUpload(file, (url, fileName) => {
-                        handleFormChange(formType, "prelims_file_url", url);
-                        handleFormChange(
-                          formType,
-                          "prelims_file_name",
-                          fileName,
-                        );
-                      });
-                    }
-                  }}
-                  className="flex-1 text-sm border p-1 rounded"
-                  disabled={uploadingFile || formState.prelims_file_url}
-                />
-                <div className="text-xs w-1/4">
-                  {uploadingFile ? (
-                    <span className="text-blue-600">Uploading...</span>
-                  ) : formState.prelims_file_name ? (
-                    <span className="text-green-600 flex items-center gap-1">
-                      <File className="w-3 h-3" /> {formState.prelims_file_name}
-                    </span>
-                  ) : (
-                    <span className="text-gray-500 dark:text-gray-400">No file chosen</span>
-                  )}
                 </div>
-              </div>
+              ) : (
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                  <Upload className="w-5 h-5 text-gray-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {uploadingFile ? "Uploading..." : "Click to upload file"}
+                  </span>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.docx,.doc"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        await handleFileUpload(file, (url, fileName) => {
+                          handleFormChange(formType, "prelims_file_url", url);
+                          handleFormChange(formType, "prelims_file_name", fileName);
+                        });
+                      }
+                    }}
+                    className="hidden"
+                    disabled={uploadingFile}
+                  />
+                </label>
+              )}
             </div>
 
             {/* Dynamic Chapters Upload */}
@@ -1073,26 +1070,44 @@ const AcademicCMS = () => {
 
             {/* BULK UPLOAD for Chapters */}
             <div className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-              <label className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                BULK UPLOAD (All Chapters in One File - Max 100MB)
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Bulk Upload
               </label>
-              <input
-                type="file"
-                accept=".pdf,.txt,.docx,.doc"
-                onChange={(e) =>
-                  setFormState({
-                    ...formState,
-                    bulk_upload_file: e.target.files[0],
-                  })
-                }
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                disabled={uploadingFile}
-              />
-              {formState.bulk_upload_file && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  Selected: {formState.bulk_upload_file.name}
-                </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">All chapters in one file - Max 100MB</p>
+              
+              {formState.bulk_upload_file ? (
+                <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-600 rounded-lg border">
+                  <span className="text-green-600 dark:text-green-400 flex items-center gap-2 text-sm">
+                    <File className="w-4 h-4" /> {formState.bulk_upload_file.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFormState({ ...formState, bulk_upload_file: null })}
+                    className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove file"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                  <Upload className="w-5 h-5 text-gray-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {uploadingFile ? "Uploading..." : "Click to upload bulk file"}
+                  </span>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.docx,.doc"
+                    onChange={(e) =>
+                      setFormState({
+                        ...formState,
+                        bulk_upload_file: e.target.files[0],
+                      })
+                    }
+                    className="hidden"
+                    disabled={uploadingFile}
+                  />
+                </label>
               )}
             </div>
 
