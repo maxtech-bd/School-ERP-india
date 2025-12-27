@@ -16,6 +16,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (December 2025)
 - **Dark Mode Fixes**: Added comprehensive dark mode support to 15+ components including LoginPage, Calendar, Results, StudentResults, ParentResults, RatingSurveys, QuizTool, TestGenerator, AINotes, AISummary, BiometricDevices, Reports, AcademicCMS, Vehicle, and StaffList.
+- **AI Model Upgrade**: Upgraded AI Assistant and all AI modules from GPT-4o-mini to GPT-4o (Turbo) for improved response quality.
+- **OpenAI Key Management**: Added secure API key management in Settings allowing admins to configure custom OpenAI API keys per tenant without exposing the key to frontend.
+- **Mobile Responsiveness**: Enhanced mobile responsiveness across all modules with scrollable tabs (overflow-x-auto, scrollbar-hide), improved layouts for AI Assistant, AI Logs, Academic CMS, and Settings components.
 
 ## Technical Implementations
 - **Frontend**: React 19, React Router DOM, Axios, Context API.
@@ -29,7 +32,7 @@ Preferred communication style: Simple, everyday language.
 - **Core Modules**: Student admissions, attendance, fee management, curriculum, transport, staff management, certificate generation, and user management.
 - **Academic Content CMS**: Hierarchical content management system for academic books, reference books, previous years' question papers, and a Q&A knowledge base, supporting file uploads and CRUD operations.
 - **AI Modules**:
-    - **AI Assistant**: GPT-4o-mini powered chatbot with multi-modal input (text, OCR, voice), RAG, and a CMS-first approach for academic content.
+    - **AI Assistant**: GPT-4o (Turbo) powered chatbot with multi-modal input (text, OCR, voice), RAG, and a CMS-first approach for academic content.
     - **AI Quiz Tool (Student)**: AI-powered quiz generation with customizable filters, auto-grading, and performance tracking.
     - **AI Test Generator (Teacher/Admin)**: AI-powered test generation with curriculum alignment, mixed question types, inline editing, and scheduling.
     - **AI Summary Generator**: Generates structured summaries using a 3-tier RAG CMS-first strategy.
@@ -63,7 +66,7 @@ Preferred communication style: Simple, everyday language.
 - **Authentication/Security**: PyJWT, bcrypt, python-jose.
 - **Data & Configuration**: Pydantic, python-dotenv, Pandas, NumPy.
 - **File Handling**: python-multipart.
-- **AI/ML**: OpenAI (GPT-4o-mini, Whisper, TTS), Tesseract OCR (Pytesseract), Pillow.
+- **AI/ML**: OpenAI (GPT-4o Turbo, Whisper, TTS), Tesseract OCR (Pytesseract), Pillow.
 - **Reporting**: ReportLab (PDF), openpyxl (Excel).
 
 ## Cloud Services & Integrations
