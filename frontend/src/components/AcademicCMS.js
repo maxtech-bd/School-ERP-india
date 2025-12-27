@@ -1121,31 +1121,31 @@ const AcademicCMS = () => {
   // --- Main Render ---
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-4 md:p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
           Academic Content CMS
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           Manage academic books, reference books, previous papers & Q&A
           knowledge base
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-600 mb-6">
-        <nav className="-mb-px flex space-x-8">
+      {/* Tabs - Scrollable on mobile */}
+      <div className="border-b border-gray-200 dark:border-gray-600 mb-6 overflow-x-auto scrollbar-hide">
+        <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max pb-px">
           <button
             onClick={() => setActiveTab("books")}
             className={`${
               activeTab === "books"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 shrink-0`}
           >
-            <Book className="w-4 h-4" />
-            Academic Books
+            <Book className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">Academic</span> Books
           </button>
           <button
             onClick={() => setActiveTab("reference")}
@@ -1153,10 +1153,10 @@ const AcademicCMS = () => {
               activeTab === "reference"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 shrink-0`}
           >
-            <Book className="w-4 h-4" />
-            Reference Books
+            <Book className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">Reference</span> Books
           </button>
           <button
             onClick={() => setActiveTab("papers")}
@@ -1164,10 +1164,10 @@ const AcademicCMS = () => {
               activeTab === "papers"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 shrink-0`}
           >
-            <FileText className="w-4 h-4" />
-            Previous Years&apos; Papers
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Previous Years&apos;</span> Papers
           </button>
           <button
             onClick={() => setActiveTab("qa")}
@@ -1175,10 +1175,10 @@ const AcademicCMS = () => {
               activeTab === "qa"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-700"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 shrink-0`}
           >
-            <FileText className="w-4 h-4" />
-            Q&amp;A Knowledge Base
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+            Q&amp;A <span className="hidden sm:inline">Knowledge Base</span>
           </button>
         </nav>
       </div>

@@ -18156,6 +18156,119 @@ async def update_term_dates_settings(config: dict, current_user: User = Depends(
         logging.error(f"Failed to update term dates settings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update term dates settings")
 
+# ==================== OpenAI API Key Management ====================
+@api_router.get("/settings/ai-config")
+async def get_ai_config(current_user: User = Depends(get_current_user)):
+    """Get AI configuration status (does not reveal actual key)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only admins can view AI configuration")
+    
+    try:
+        collection = db["settings_ai_config"]
+        config_doc = await collection.find_one({"tenant_id": current_user.tenant_id})
+        
+        env_key = os.environ.get('OPENAI_API_KEY', '')
+        has_env_key = bool(env_key and len(env_key) > 10)
+        
+        has_custom_key = False
+        last_updated = None
+        updated_by = None
+        model = "gpt-4o"
+        custom_key = ""
+        
+        if config_doc:
+            custom_key = config_doc.get("openai_api_key", "")
+            has_custom_key = bool(custom_key and len(custom_key) > 10)
+            last_updated = config_doc.get("updatedAt")
+            updated_by = config_doc.get("updatedBy")
+            model = config_doc.get("model", "gpt-4o")
+        
+        key_preview = None
+        if has_custom_key and len(custom_key) > 4:
+            key_preview = f"sk-...{custom_key[-4:]}"
+        
+        return {
+            "has_api_key": has_env_key or has_custom_key,
+            "key_source": "custom" if has_custom_key else ("environment" if has_env_key else "none"),
+            "model": model,
+            "last_updated": last_updated.isoformat() if last_updated else None,
+            "updated_by": updated_by,
+            "key_preview": key_preview
+        }
+    except Exception as e:
+        logging.error(f"Failed to get AI config: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve AI configuration")
+
+@api_router.put("/settings/ai-config")
+async def update_ai_config(config: dict, current_user: User = Depends(get_current_user)):
+    """Update AI configuration (OpenAI API key and model)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only admins can update AI configuration")
+    
+    try:
+        collection = db["settings_ai_config"]
+        
+        new_key = config.get("openai_api_key", "")
+        model = config.get("model", "gpt-4o")
+        
+        if new_key and not new_key.startswith("sk-"):
+            raise HTTPException(status_code=400, detail="Invalid OpenAI API key format. Key should start with 'sk-'")
+        
+        config_doc = {
+            "tenant_id": current_user.tenant_id,
+            "model": model,
+            "updatedBy": current_user.full_name,
+            "updatedAt": datetime.now(timezone.utc)
+        }
+        
+        if new_key:
+            config_doc["openai_api_key"] = new_key
+        
+        await collection.update_one(
+            {"tenant_id": current_user.tenant_id},
+            {"$set": config_doc},
+            upsert=True
+        )
+        
+        logging.info(f"AI configuration updated by {current_user.full_name}")
+        return {
+            "success": True,
+            "message": "AI configuration updated successfully",
+            "model": model,
+            "key_updated": bool(new_key),
+            "updatedBy": current_user.full_name,
+            "updatedAt": datetime.now().isoformat()
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to update AI configuration: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update AI configuration")
+
+@api_router.delete("/settings/ai-config/key")
+async def delete_ai_config_key(current_user: User = Depends(get_current_user)):
+    """Remove custom OpenAI API key (will fallback to environment variable)"""
+    if current_user.role not in ["super_admin", "admin"]:
+        raise HTTPException(status_code=403, detail="Only admins can delete AI configuration")
+    
+    try:
+        collection = db["settings_ai_config"]
+        
+        await collection.update_one(
+            {"tenant_id": current_user.tenant_id},
+            {"$unset": {"openai_api_key": ""}, "$set": {"updatedBy": current_user.full_name, "updatedAt": datetime.now(timezone.utc)}}
+        )
+        
+        logging.info(f"AI API key removed by {current_user.full_name}")
+        return {
+            "success": True,
+            "message": "Custom API key removed. System will use environment variable if available.",
+            "updatedBy": current_user.full_name
+        }
+    except Exception as e:
+        logging.error(f"Failed to delete AI API key: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete AI API key")
+
 @api_router.get("/settings/notifications")
 async def get_notification_settings(current_user: User = Depends(get_current_user)):
     """Get notification settings for the school"""
@@ -18636,8 +18749,22 @@ async def search_academic_content(
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
 # ============================================================================
-# AI ASSISTANT MODULE - GPT-4o-mini with OCR, Voice, and n8n Integration
+# AI ASSISTANT MODULE - GPT-4o (Turbo) with OCR, Voice, and n8n Integration
 # ============================================================================
+
+async def get_openai_client_for_tenant(tenant_id: str):
+    """Get OpenAI client with tenant-specific key if available, else use env key"""
+    from openai import AsyncOpenAI
+    
+    config_doc = await db["settings_ai_config"].find_one({"tenant_id": tenant_id})
+    custom_key = config_doc.get("openai_api_key") if config_doc else None
+    
+    api_key = custom_key if custom_key else os.environ.get('OPENAI_API_KEY')
+    
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OpenAI API key not configured")
+    
+    return AsyncOpenAI(api_key=api_key)
 
 @api_router.post("/ai-engine/chat")
 async def ai_chat(
@@ -18645,17 +18772,16 @@ async def ai_chat(
     current_user: User = Depends(get_current_user)
 ):
     """
-    GiNi AI Assistant (Updated) - GPT-4o-mini with Tag-Based Responses and Source Filtering
+    GiNi AI Assistant (Updated) - GPT-4o (Turbo) with Tag-Based Responses and Source Filtering
     1. Searches CMS database for relevant academic content
     2. Returns structured tag-based responses (Subject, Chapter, Topic, Book Type, etc.)
     3. Filters answers by selected source (Academic Books OR Reference Books)
     """
     try:
-        from openai import AsyncOpenAI
         import base64
         
-        # Initialize OpenAI client
-        openai_client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        # Initialize OpenAI client (uses tenant-specific key if available)
+        openai_client = await get_openai_client_for_tenant(current_user.tenant_id)
         
         question = request.get("question", "")
         question_type = request.get("type", "text")  # text, voice (image/OCR removed)
@@ -18892,9 +19018,9 @@ async def ai_chat(
                         "timestamp": datetime.now().isoformat()
                     }
         
-        # STEP 4: No CMS match - Fallback to GPT-4o-mini
-        print(f"⚠️ CMS NOT FOUND - Sending to GPT-4o-mini")
-        logger.info(f"⚠️ No CMS match - Using GPT-4o-mini fallback")
+        # STEP 4: No CMS match - Fallback to GPT-4o (Turbo)
+        print(f"⚠️ CMS NOT FOUND - Sending to GPT-4o")
+        logger.info(f"⚠️ No CMS match - Using GPT-4o fallback")
         
         # Build GPT prompt with strict academic-only restriction
         system_prompt = """You are GiNi, a School Academic Assistant designed exclusively for educational purposes.
@@ -18927,7 +19053,7 @@ Remember: You are GiNi, a SCHOOL assistant. Stay strictly within academic bounda
         
         # STEP 4: Get AI response from GPT
         response = await openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=800
@@ -18952,7 +19078,7 @@ Remember: You are GiNi, a SCHOOL assistant. Stay strictly within academic bounda
             "question": question,
             "question_type": question_type,
             "answer": ai_answer,
-            "model": "gpt-4o-mini",
+            "model": "gpt-4o",
             "tokens_used": response.usage.total_tokens,
             "source": response_source,
             "answer_source_filter": answer_source,
@@ -19602,7 +19728,7 @@ Format as JSON array:
 [{{"question": "...", "answer": "...", "tag": "..."}}]"""
             
             response = await openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are a quiz generator for school students. Generate educational questions."},
                     {"role": "user", "content": prompt}
@@ -20218,7 +20344,7 @@ Format as JSON array:
 }}]"""
             
             response = await openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are an expert exam question generator for schools. Create balanced, curriculum-aligned questions."},
                     {"role": "user", "content": prompt}
@@ -21081,7 +21207,7 @@ Make it educational, clear, and appropriate for Class {class_standard} students.
 Use simple language and include definitions where necessary."""
         
         response = await openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an expert educational content creator for schools. Generate clear, curriculum-aligned summaries."},
                 {"role": "user", "content": prompt}
@@ -21419,7 +21545,7 @@ Make notes comprehensive, well-structured, and suitable for Class {class_standar
 Use clear language, proper formatting, and include diagrams descriptions where helpful."""
         
         response = await openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an expert teacher creating detailed study notes. Make notes comprehensive, well-organized, and student-friendly."},
                 {"role": "user", "content": prompt}

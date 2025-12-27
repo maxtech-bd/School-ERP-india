@@ -30,7 +30,13 @@ import {
   Globe,
   Coffee,
   User,
-  Upload
+  Upload,
+  Bot,
+  Key,
+  Eye,
+  EyeOff,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -52,6 +58,7 @@ const Settings = () => {
       '/settings/institution': 'institution',
       '/settings/staff': 'staff-settings',
       '/settings/permissions': 'permissions',
+      '/settings/ai-config': 'ai-config',
       '/settings/users': 'user-management'
     };
     return tabMap[pathname] || 'academic';
@@ -74,6 +81,7 @@ const Settings = () => {
       'institution': '/settings/institution',
       'staff-settings': '/settings/staff',
       'permissions': '/settings/permissions',
+      'ai-config': '/settings/ai-config',
       'user-management': '/settings/users'
     };
     setActiveTab(value);
@@ -88,6 +96,84 @@ const Settings = () => {
   const [isSemesterSystemModalOpen, setIsSemesterSystemModalOpen] = useState(false);
   const [isHolidayCalendarModalOpen, setIsHolidayCalendarModalOpen] = useState(false);
   const [isTermDatesModalOpen, setIsTermDatesModalOpen] = useState(false);
+  
+  // AI Configuration states
+  const [aiConfig, setAiConfig] = useState({
+    has_api_key: false,
+    key_source: 'none',
+    model: 'gpt-4o',
+    last_updated: null,
+    updated_by: null,
+    key_preview: null
+  });
+  const [aiConfigLoading, setAiConfigLoading] = useState(false);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [newApiKey, setNewApiKey] = useState('');
+  const [showNewApiKey, setShowNewApiKey] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('gpt-4o');
+
+  const fetchAiConfig = async () => {
+    try {
+      setAiConfigLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE_URL}/settings/ai-config`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAiConfig(response.data);
+      setSelectedModel(response.data.model || 'gpt-4o');
+    } catch (error) {
+      console.error('Failed to fetch AI config:', error);
+    } finally {
+      setAiConfigLoading(false);
+    }
+  };
+
+  const handleSaveAiConfig = async () => {
+    try {
+      setAiConfigLoading(true);
+      const token = localStorage.getItem('token');
+      const payload = {
+        model: selectedModel,
+        ...(newApiKey && { openai_api_key: newApiKey })
+      };
+      await axios.put(`${API_BASE_URL}/settings/ai-config`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('AI configuration saved successfully');
+      setNewApiKey('');
+      setShowApiKeyInput(false);
+      fetchAiConfig();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save AI configuration');
+    } finally {
+      setAiConfigLoading(false);
+    }
+  };
+
+  const handleDeleteApiKey = async () => {
+    if (!window.confirm('Are you sure you want to remove the custom API key? The system will fall back to the environment variable if available.')) {
+      return;
+    }
+    try {
+      setAiConfigLoading(true);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/settings/ai-config/key`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Custom API key removed');
+      fetchAiConfig();
+    } catch (error) {
+      toast.error('Failed to remove API key');
+    } finally {
+      setAiConfigLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'ai-config') {
+      fetchAiConfig();
+    }
+  }, [activeTab]);
   
   // Configuration states
   const [academicYearConfig, setAcademicYearConfig] = useState({
@@ -2370,13 +2456,14 @@ const Settings = () => {
       {/* Settings Categories Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-7 h-auto">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-8 h-auto">
             <TabsTrigger value="academic" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Academic Period</TabsTrigger>
             <TabsTrigger value="classes" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Manage Classes</TabsTrigger>
             <TabsTrigger value="timetable" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Time Table</TabsTrigger>
             <TabsTrigger value="institution" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Institution</TabsTrigger>
             <TabsTrigger value="staff-settings" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Staff Setting</TabsTrigger>
             <TabsTrigger value="permissions" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">Permission</TabsTrigger>
+            <TabsTrigger value="ai-config" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">AI Config</TabsTrigger>
             <TabsTrigger value="user-management" className="text-[10px] sm:text-xs lg:text-sm py-2 px-2 sm:px-3 whitespace-nowrap">User Management</TabsTrigger>
           </TabsList>
         </div>
@@ -2733,6 +2820,140 @@ const Settings = () => {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="ai-config" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Bot className="h-5 w-5 text-purple-500" />
+                <span>AI Configuration (GPT-4o Turbo)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {aiConfigLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading AI configuration...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <Key className="h-5 w-5 text-gray-600" />
+                        <h4 className="font-medium">OpenAI API Key Status</h4>
+                      </div>
+                      {aiConfig.has_api_key ? (
+                        <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          Configured
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          Not Configured
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {aiConfig.has_api_key && (
+                      <div className="text-sm text-gray-600 space-y-1 mb-4">
+                        <p>Source: <span className="font-medium capitalize">{aiConfig.key_source}</span></p>
+                        {aiConfig.key_preview && <p>Key: <span className="font-mono">{aiConfig.key_preview}</span></p>}
+                        {aiConfig.updated_by && <p>Last updated by: {aiConfig.updated_by}</p>}
+                        {aiConfig.last_updated && <p>Updated: {new Date(aiConfig.last_updated).toLocaleString()}</p>}
+                      </div>
+                    )}
+
+                    {!showApiKeyInput ? (
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setShowApiKeyInput(true)}
+                          className="flex items-center gap-2"
+                        >
+                          <Key className="h-4 w-4" />
+                          {aiConfig.has_api_key ? 'Update API Key' : 'Add API Key'}
+                        </Button>
+                        {aiConfig.key_source === 'custom' && (
+                          <Button 
+                            variant="outline" 
+                            onClick={handleDeleteApiKey}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Remove Custom Key
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <Input
+                            type={showNewApiKey ? 'text' : 'password'}
+                            placeholder="sk-..."
+                            value={newApiKey}
+                            onChange={(e) => setNewApiKey(e.target.value)}
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewApiKey(!showNewApiKey)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          >
+                            {showNewApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Your API key is stored securely and never exposed in the frontend.
+                        </p>
+                        <div className="flex gap-2">
+                          <Button onClick={handleSaveAiConfig} disabled={!newApiKey || aiConfigLoading}>
+                            {aiConfigLoading ? 'Saving...' : 'Save Key'}
+                          </Button>
+                          <Button variant="outline" onClick={() => { setShowApiKeyInput(false); setNewApiKey(''); }}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Bot className="h-5 w-5 text-purple-600" />
+                      <h4 className="font-medium">AI Model Selection</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>GPT Model</Label>
+                        <select
+                          value={selectedModel}
+                          onChange={(e) => setSelectedModel(e.target.value)}
+                          className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="gpt-4o">GPT-4o (Turbo 2.0) - Recommended</option>
+                          <option value="gpt-4o-mini">GPT-4o Mini (Faster, Lower Cost)</option>
+                          <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        </select>
+                        <p className="text-xs text-gray-500 mt-1">
+                          GPT-4o is the latest and most capable model with improved reasoning.
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={handleSaveAiConfig} 
+                        disabled={aiConfigLoading}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        {aiConfigLoading ? 'Saving...' : 'Save Model Selection'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

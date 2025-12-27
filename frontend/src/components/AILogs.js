@@ -156,23 +156,23 @@ export default function AILogs() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 bg-purple-100 rounded-lg">
-            <Activity className="h-6 w-6 text-purple-600" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="p-2 sm:p-3 bg-purple-100 rounded-lg shrink-0">
+            <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
               AI Activity Logs
             </h1>
-            <p className="text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-600">
               Track your AI interactions by Subject, Chapter, and Topic
             </p>
           </div>
         </div>
-        <Button onClick={resetFilters} variant="outline">
+        <Button onClick={resetFilters} variant="outline" className="w-full sm:w-auto text-sm">
           Clear Filters
         </Button>
       </div>
@@ -186,7 +186,7 @@ export default function AILogs() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             {/* Content Source */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
