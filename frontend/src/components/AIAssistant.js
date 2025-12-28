@@ -184,8 +184,8 @@ export default function AIAssistant() {
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2 md:p-3 overflow-hidden"
-      style={{ height: `calc(100dvh - ${keyboardHeight}px - 60px)` }}
+      className="flex flex-col gap-1 p-1 sm:p-2 overflow-hidden"
+      style={{ height: `calc(100dvh - ${keyboardHeight}px - 56px)` }}
     >
       {/* Compact Header with Source Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0 bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 border dark:border-gray-700">
@@ -215,14 +215,14 @@ export default function AIAssistant() {
       </div>
 
       {/* Chat */}
-      <Card className="flex-1 min-h-0 flex flex-col dark:bg-gray-800 dark:border-gray-700">
-        <CardHeader className="border-b dark:border-gray-700 py-2 px-3">
+      <Card className="flex-1 min-h-0 flex flex-col dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
+        <CardHeader className="border-b dark:border-gray-700 py-1.5 px-2 shrink-0">
           <CardTitle className="flex gap-2 items-center text-xs sm:text-sm dark:text-white">
             <Bot className="h-4 w-4" /> Chat
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-3 py-2 space-y-3">
+        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 py-2 space-y-2">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -277,17 +277,16 @@ export default function AIAssistant() {
         </CardContent>
 
         {/* Input */}
-        <div className="border-t dark:border-gray-700 p-2 sticky bottom-0 bg-white dark:bg-gray-800 z-10">
+        <div className="border-t dark:border-gray-700 p-1.5 shrink-0 bg-white dark:bg-gray-800">
           {/* Container: Flex row, center items, small gap */}
-          <div className="flex flex-row items-center gap-1.5 sm:gap-2 max-w-screen-xl mx-auto">
+          <div className="flex flex-row items-center gap-1.5 sm:gap-2">
             {/* MIC BUTTON */}
             <Button
               size="icon"
               variant="outline"
               onClick={isRecording ? stopRecording : startRecording}
               disabled={loading}
-              /* FIX 1: shrink-0 keeps the button from disappearing or squishing */
-              className={`h-10 w-10 shrink-0 rounded-full ${
+              className={`h-9 w-9 shrink-0 rounded-full ${
                 isRecording ? "bg-red-100 border-red-200" : ""
               }`}
             >
@@ -313,8 +312,7 @@ export default function AIAssistant() {
               size="icon"
               onClick={sendMessage}
               disabled={loading || !inputMessage.trim()}
-              /* FIX 3: shrink-0 ensures this button never gets pushed off screen */
-              className="h-10 w-10 shrink-0 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
+              className="h-9 w-9 shrink-0 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
             >
               <Send className="h-4 w-4 text-white" />
             </Button>
