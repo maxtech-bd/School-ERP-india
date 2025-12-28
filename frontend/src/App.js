@@ -247,8 +247,20 @@ const Layout = ({ children }) => {
           ref={mainRef}
           className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8"
         >
-          <div className={`max-w-full overflow-x-hidden ${isAIAssistant ? '' : 'min-h-[calc(100vh-100px)] pb-16 sm:pb-24'}`}>
+          <div className={`max-w-full overflow-x-hidden ${isAIAssistant ? '' : 'min-h-[calc(100vh-100px)]'}`}>
             {children}
+            {!isAIAssistant && (
+              <div className="mt-8 py-4 text-center border-t border-gray-200 dark:border-gray-700">
+                <a 
+                  href="https://maxtechbd.com/?utm_source=footer-badge" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                >
+                  Developed by MaxTechBD
+                </a>
+              </div>
+            )}
           </div>
         </main>
       </div>
