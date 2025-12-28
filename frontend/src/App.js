@@ -213,6 +213,7 @@ const Layout = ({ children }) => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
 
   const isLoginPage = location.pathname === "/login";
+  const isAIAssistant = location.pathname === "/ai-assistant";
 
   // Smooth scroll to top on route change
   React.useEffect(() => {
@@ -246,7 +247,7 @@ const Layout = ({ children }) => {
           ref={mainRef}
           className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8"
         >
-          <div className="min-h-[calc(100vh-100px)] pb-16 sm:pb-24 max-w-full overflow-x-hidden">
+          <div className={`max-w-full overflow-x-hidden ${isAIAssistant ? '' : 'min-h-[calc(100vh-100px)] pb-16 sm:pb-24'}`}>
             {children}
           </div>
         </main>
