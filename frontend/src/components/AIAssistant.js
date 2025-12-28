@@ -184,8 +184,8 @@ export default function AIAssistant() {
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col gap-1 p-1 sm:p-2 overflow-hidden"
-      style={{ height: `calc(100dvh - ${keyboardHeight}px - 56px)` }}
+      className="flex flex-col gap-1 overflow-hidden -mx-3 -my-4 sm:-mx-4 sm:-my-6 md:-mx-6 md:-my-8 p-1 sm:p-2"
+      style={{ height: `calc(100dvh - ${keyboardHeight}px - 64px)` }}
     >
       {/* Compact Header with Source Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0 bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 border dark:border-gray-700">
