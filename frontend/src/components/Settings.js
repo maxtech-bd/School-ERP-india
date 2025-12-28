@@ -2885,7 +2885,7 @@ const Settings = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Bot className="h-5 w-5 text-purple-500" />
-                <span>AI Configuration (GPT-4o Turbo)</span>
+                <span>AI Configuration (GPT-4o Latest)</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -2991,12 +2991,12 @@ const Settings = () => {
                           onChange={(e) => setSelectedModel(e.target.value)}
                           className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500"
                         >
-                          <option value="gpt-4o">GPT-4o (Turbo 2.0) - Recommended</option>
+                          <option value="gpt-4o">GPT-4o (Latest Version) - Recommended</option>
                           <option value="gpt-4o-mini">GPT-4o Mini (Faster, Lower Cost)</option>
-                          <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                          <option value="gpt-4-turbo">GPT-4 Turbo 2.0</option>
                         </select>
                         <p className="text-xs text-gray-500 mt-1">
-                          GPT-4o is the latest and most capable model with improved reasoning.
+                          GPT-4o is the latest and most capable model with improved reasoning and multimodal support.
                         </p>
                       </div>
                       <Button 

@@ -184,49 +184,45 @@ export default function AIAssistant() {
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col gap-2 sm:gap-3 p-1 sm:p-3 md:p-4 overflow-hidden"
+      className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2 md:p-3 overflow-hidden"
       style={{ height: `calc(100dvh - ${keyboardHeight}px - 60px)` }}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
-          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+      {/* Compact Header with Source Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0 bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 border dark:border-gray-700">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+            <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-bold dark:text-white">GiNi AI</h1>
+            <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+              Academic AI Assistant
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-lg sm:text-xl font-bold">GiNi AI Assistant</h1>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Academic AI with source-based answers
-          </p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Source:</span>
+          <select
+            value={answerSource}
+            onChange={(e) => setAnswerSource(e.target.value)}
+            className="border dark:border-gray-600 rounded-lg px-2 py-1 text-xs focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">All</option>
+            <option value="Academic Book">Academic</option>
+            <option value="Reference Book">Reference</option>
+          </select>
         </div>
       </div>
 
-      {/* Source Filter */}
-      <Card>
-        <CardContent className="p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-            <span className="text-sm font-medium">Answer Source</span>
-            <select
-              value={answerSource}
-              onChange={(e) => setAnswerSource(e.target.value)}
-              className="w-full sm:flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Sources</option>
-              <option value="Academic Book">Academic Books</option>
-              <option value="Reference Book">Reference Books</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Chat */}
-      <Card className="flex-1 min-h-0 flex flex-col">
-        <CardHeader className="border-b">
-          <CardTitle className="flex gap-2 items-center text-sm">
-            <Bot className="h-5 w-5" /> Chat
+      <Card className="flex-1 min-h-0 flex flex-col dark:bg-gray-800 dark:border-gray-700">
+        <CardHeader className="border-b dark:border-gray-700 py-2 px-3">
+          <CardTitle className="flex gap-2 items-center text-xs sm:text-sm dark:text-white">
+            <Bot className="h-4 w-4" /> Chat
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-4 py-3 space-y-4">
+        <CardContent className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-3 py-2 space-y-3">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -235,19 +231,19 @@ export default function AIAssistant() {
               } gap-2`}
             >
               {m.role === "assistant" && (
-                <div className="p-2 bg-purple-100 rounded-full">
-                  <Bot className="h-4 w-4 text-purple-600" />
+                <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-full">
+                  <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 dark:text-purple-400" />
                 </div>
               )}
 
               <div
-                className={`rounded-lg p-3 text-sm sm:text-base max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%]
+                className={`rounded-lg p-2 sm:p-3 text-xs sm:text-sm max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%]
                 ${
                   m.role === "user"
                     ? "bg-emerald-500 text-white"
                     : m.error
-                      ? "bg-red-50 text-red-800"
-                      : "bg-gray-100"
+                      ? "bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                      : "bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
                 }`}
               >
                 <p className="whitespace-pre-wrap">{m.content}</p>
@@ -263,8 +259,8 @@ export default function AIAssistant() {
               </div>
 
               {m.role === "user" && (
-                <div className="p-2 bg-emerald-100 rounded-full">
-                  <User className="h-4 w-4 text-emerald-600" />
+                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
               )}
             </div>
@@ -281,9 +277,9 @@ export default function AIAssistant() {
         </CardContent>
 
         {/* Input */}
-        <div className="border-t p-2 sm:p-4 sticky bottom-0 bg-white z-10">
+        <div className="border-t dark:border-gray-700 p-2 sticky bottom-0 bg-white dark:bg-gray-800 z-10">
           {/* Container: Flex row, center items, small gap */}
-          <div className="flex flex-row items-center gap-2 max-w-screen-xl mx-auto">
+          <div className="flex flex-row items-center gap-1.5 sm:gap-2 max-w-screen-xl mx-auto">
             {/* MIC BUTTON */}
             <Button
               size="icon"
@@ -309,7 +305,7 @@ export default function AIAssistant() {
               onFocus={handleInputFocus}
               placeholder="Ask..."
               disabled={loading}
-              className="flex-1 min-w-0 border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50"
+              className="flex-1 min-w-0 border dark:border-gray-600 rounded-full px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 dark:bg-gray-700 dark:text-white"
             />
 
             {/* SEND BUTTON */}

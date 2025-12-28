@@ -164,11 +164,11 @@ export default function AILogs() {
             <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
               AI Activity Logs
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600">
-              Track your AI interactions by Subject, Chapter, and Topic
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Track AI queries including FAQ questions and GPT interactions
             </p>
           </div>
         </div>
@@ -208,6 +208,8 @@ export default function AILogs() {
                 <option value="">All Sources</option>
                 <option value="Academic Book">Academic Books</option>
                 <option value="Reference Book">Reference Books</option>
+                <option value="FAQ">FAQ Questions</option>
+                <option value="GPT">GPT Responses</option>
 
                 {/* Any other backend-defined sources */}
                 {dynamicSources.map((source) => (
@@ -442,8 +444,14 @@ export default function AILogs() {
                           </span>
                         </div>
                         {log?.source && (
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
-                            Source: {log.source}
+                          <span className={`px-2 py-0.5 rounded ${
+                            log.source === 'FAQ' 
+                              ? 'bg-blue-100 text-blue-700' 
+                              : log.source === 'GPT' 
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {log.source === 'FAQ' ? '❓ FAQ' : log.source === 'GPT' ? '🤖 GPT' : `Source: ${log.source}`}
                           </span>
                         )}
                         {log?.user_name && (
