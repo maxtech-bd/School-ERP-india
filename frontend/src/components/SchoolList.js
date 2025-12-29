@@ -190,7 +190,8 @@ const SchoolList = () => {
   };
 
   const filteredSchools = schools.filter((school) => {
-    const matchesSearch = school.school_name
+    const schoolName = school.school_name || "";
+    const matchesSearch = schoolName
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesType =
