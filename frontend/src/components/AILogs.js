@@ -6,6 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -13,12 +15,123 @@ import { Button } from "./ui/button";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
+const AccordionItem = ({ log, isOpen, onToggle, formatDate }) => {
+  const tags = log?.tags || {};
+  const hasTags = tags.subject || tags.chapter || tags.topic || 
+    tags.academic_book || tags.reference_book || 
+    tags.qa_knowledge_base || tags.previous_papers;
+
+  return (
+    <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full px-4 py-3 flex items-start justify-between bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left"
+      >
+        <div className="flex-1 pr-3">
+          <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
+            {log?.question || "No question recorded"}
+          </p>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {log?.created_at ? formatDate(log.created_at) : "—"}
+            </span>
+            {log?.source && (
+              <span className={`px-2 py-0.5 rounded text-xs ${
+                log.source === 'FAQ' 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                  : log.source === 'GPT' 
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
+                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+              }`}>
+                {log.source === 'FAQ' ? '❓ FAQ' : log.source === 'GPT' ? '🤖 GPT' : log.source}
+              </span>
+            )}
+            {log?.user_name && (
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded text-xs">
+                {log.user_name}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex-shrink-0 p-1 rounded-full bg-gray-100 dark:bg-gray-700">
+          {isOpen ? (
+            <Minus className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          ) : (
+            <Plus className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          )}
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700">
+          {log?.answer && (
+            <div className="mb-3">
+              <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                Answer:
+              </p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                {log.answer}
+              </p>
+            </div>
+          )}
+
+          {hasTags && (
+            <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs font-semibold mb-2 text-gray-600 dark:text-gray-400">
+                📚 Source Tags:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {tags.subject && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded text-xs">
+                    Subject: {tags.subject}
+                  </span>
+                )}
+                {tags.chapter && (
+                  <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded text-xs">
+                    Chapter: {tags.chapter}
+                  </span>
+                )}
+                {tags.topic && (
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 rounded text-xs">
+                    Topic: {tags.topic}
+                  </span>
+                )}
+                {tags.academic_book && (
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 rounded text-xs">
+                    📖 Academic Book: {tags.academic_book}
+                  </span>
+                )}
+                {tags.reference_book && (
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300 rounded text-xs">
+                    📚 Reference Book: {tags.reference_book}
+                  </span>
+                )}
+                {tags.qa_knowledge_base && (
+                  <span className="px-2 py-1 bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 rounded text-xs">
+                    ❓ Q&A Knowledge Base
+                  </span>
+                )}
+                {tags.previous_papers && (
+                  <span className="px-2 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded text-xs">
+                    📝 Previous Papers: {tags.previous_papers}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function AILogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
+  const [expandedItems, setExpandedItems] = useState({});
 
-  // Filter states
   const [contentSource, setContentSource] = useState("");
   const [subject, setSubject] = useState("");
   const [chapter, setChapter] = useState("");
@@ -27,7 +140,6 @@ export default function AILogs() {
   const [sortOrder, setSortOrder] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Available filter options
   const [filterOptions, setFilterOptions] = useState({
     content_sources: [],
     subjects: [],
@@ -61,6 +173,7 @@ export default function AILogs() {
 
       setLogs(Array.isArray(data?.logs) ? data.logs : []);
       setPagination(data?.pagination ?? null);
+      setExpandedItems({});
     } catch (error) {
       console.error("Error fetching logs:", error);
       setLogs([]);
@@ -150,18 +263,35 @@ export default function AILogs() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Merge fixed sources (All/Academic/Reference) with dynamic API sources
+  const toggleItem = (index) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  const expandAll = () => {
+    const newExpanded = {};
+    logs.forEach((_, index) => {
+      newExpanded[index] = true;
+    });
+    setExpandedItems(newExpanded);
+  };
+
+  const collapseAll = () => {
+    setExpandedItems({});
+  };
+
   const dynamicSources = (filterOptions.content_sources || []).filter(
     (s) => s !== "Academic Book" && s !== "Reference Book",
   );
 
   return (
     <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="p-2 sm:p-3 bg-purple-100 rounded-lg shrink-0">
-            <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+          <div className="p-2 sm:p-3 bg-purple-100 dark:bg-purple-900 rounded-lg shrink-0">
+            <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 dark:text-purple-400" />
           </div>
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
@@ -177,19 +307,17 @@ export default function AILogs() {
         </Button>
       </div>
 
-      {/* Filtering */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 dark:text-white">
             <Filter className="h-5 w-5" />
-            <span>Filter by Content Source &amp; Tags</span>
+            <span>Filter by Content Source & Tags</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-            {/* Content Source */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Content Source
               </label>
               <select
@@ -202,16 +330,13 @@ export default function AILogs() {
                   setReferenceBook("");
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
               >
-                {/* Fixed options from screenshot */}
                 <option value="">All Sources</option>
                 <option value="Academic Book">Academic Books</option>
                 <option value="Reference Book">Reference Books</option>
                 <option value="FAQ">FAQ Questions</option>
                 <option value="GPT">GPT Responses</option>
-
-                {/* Any other backend-defined sources */}
                 {dynamicSources.map((source) => (
                   <option key={source} value={source}>
                     {source}
@@ -220,9 +345,8 @@ export default function AILogs() {
               </select>
             </div>
 
-            {/* Subject */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Subject
               </label>
               <select
@@ -234,7 +358,7 @@ export default function AILogs() {
                   setReferenceBook("");
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Subjects</option>
                 {(filterOptions.subjects || []).map((sub) => (
@@ -245,9 +369,8 @@ export default function AILogs() {
               </select>
             </div>
 
-            {/* Chapter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Chapter
               </label>
               <select
@@ -258,7 +381,7 @@ export default function AILogs() {
                   setReferenceBook("");
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Chapters</option>
                 {(filterOptions.chapters || []).map((chap) => (
@@ -269,9 +392,8 @@ export default function AILogs() {
               </select>
             </div>
 
-            {/* Topic */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Topic (Optional)
               </label>
               <select
@@ -280,7 +402,7 @@ export default function AILogs() {
                   setTopic(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Topics</option>
                 {(filterOptions.topics || []).map((top) => (
@@ -291,9 +413,8 @@ export default function AILogs() {
               </select>
             </div>
 
-            {/* Reference Book */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Reference Book (Optional)
               </label>
               <select
@@ -302,7 +423,7 @@ export default function AILogs() {
                   setReferenceBook(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Reference Books</option>
                 {(filterOptions.reference_books || []).map((rb) => (
@@ -314,9 +435,8 @@ export default function AILogs() {
             </div>
           </div>
 
-          {/* Sort Order */}
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Sort Order
             </label>
             <select
@@ -325,7 +445,7 @@ export default function AILogs() {
                 setSortOrder(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full md:w-48 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full md:w-48 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:text-white"
             >
               <option value="latest">Latest First</option>
               <option value="oldest">Oldest First</option>
@@ -334,143 +454,72 @@ export default function AILogs() {
         </CardContent>
       </Card>
 
-      {/* Activity Logs */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Activity History</CardTitle>
-          {pagination && (
-            <p className="text-sm text-gray-600">
-              Showing {logs.length} of {pagination.total_count}
-            </p>
-          )}
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            <CardTitle className="dark:text-white">Activity History</CardTitle>
+            {pagination && (
+              <p className="text-sm text-gray-600 dark:text-gray-400 sm:hidden">
+                {logs.length} of {pagination.total_count}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {pagination && (
+              <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
+                Showing {logs.length} of {pagination.total_count}
+              </p>
+            )}
+            {logs.length > 0 && (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={expandAll}
+                  className="text-xs"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Expand All
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={collapseAll}
+                  className="text-xs"
+                >
+                  <Minus className="h-3 w-3 mr-1" />
+                  Collapse All
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               Loading logs...
             </div>
           ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               No activity logs found. Try adjusting your filters.
             </div>
           ) : (
-            <div className="space-y-4">
-              {logs.map((log, index) => {
-                const tags = log?.tags || {};
-                return (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="space-y-3">
-                      {log?.question && (
-                        <div>
-                          <p className="text-sm font-semibold text-gray-700 mb-1">
-                            Question:
-                          </p>
-                          <p className="text-sm text-gray-900">
-                            {log.question}
-                          </p>
-                        </div>
-                      )}
-
-                      {log?.answer && (
-                        <div>
-                          <p className="text-sm font-semibold text-gray-700 mb-1">
-                            Answer:
-                          </p>
-                          <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                            {log.answer}
-                          </p>
-                        </div>
-                      )}
-
-                      {(tags.subject ||
-                        tags.chapter ||
-                        tags.topic ||
-                        tags.academic_book ||
-                        tags.reference_book ||
-                        tags.qa_knowledge_base ||
-                        tags.previous_papers) && (
-                        <div className="pt-3 border-t border-gray-200">
-                          <p className="text-xs font-semibold mb-2 text-gray-600">
-                            📚 Source Tags:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {tags.subject && (
-                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                Subject: {tags.subject}
-                              </span>
-                            )}
-                            {tags.chapter && (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
-                                Chapter: {tags.chapter}
-                              </span>
-                            )}
-                            {tags.topic && (
-                              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
-                                Topic: {tags.topic}
-                              </span>
-                            )}
-                            {tags.academic_book && (
-                              <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
-                                📖 Academic Book: {tags.academic_book}
-                              </span>
-                            )}
-                            {tags.reference_book && (
-                              <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">
-                                📚 Reference Book: {tags.reference_book}
-                              </span>
-                            )}
-                            {tags.qa_knowledge_base && (
-                              <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                                ❓ Q&amp;A Knowledge Base
-                              </span>
-                            )}
-                            {tags.previous_papers && (
-                              <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs">
-                                📝 Previous Papers: {tags.previous_papers}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>
-                            {log?.created_at ? formatDate(log.created_at) : "—"}
-                          </span>
-                        </div>
-                        {log?.source && (
-                          <span className={`px-2 py-0.5 rounded ${
-                            log.source === 'FAQ' 
-                              ? 'bg-blue-100 text-blue-700' 
-                              : log.source === 'GPT' 
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {log.source === 'FAQ' ? '❓ FAQ' : log.source === 'GPT' ? '🤖 GPT' : `Source: ${log.source}`}
-                          </span>
-                        )}
-                        {log?.user_name && (
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">
-                            {log.user_name}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-2">
+              {logs.map((log, index) => (
+                <AccordionItem
+                  key={index}
+                  log={log}
+                  isOpen={!!expandedItems[index]}
+                  onToggle={() => toggleItem(index)}
+                  formatDate={formatDate}
+                />
+              ))}
             </div>
           )}
 
-          {/* Pagination */}
           {pagination && pagination.total_pages > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t">
-              <div className="text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 pt-4 border-t dark:border-gray-700">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 Page {pagination.current_page} of {pagination.total_pages}
               </div>
               <div className="flex items-center space-x-2">
