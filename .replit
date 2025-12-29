@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "python-3.11", "web", "bash"]
+modules = ["nodejs-20", "python-3.11", "web", "bash", "postgresql-16"]
 [agent]
 expertMode = true
 integrations = ["replitmail:1.0.0", "twilio_send_message:1.0.0"]

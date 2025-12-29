@@ -334,31 +334,31 @@ const SchoolList = () => {
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
               {filteredSchools.map((school) => (
-                <tr key={school.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={school.id || school._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-3 sm:px-4 py-3">
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white text-sm">
-                        {school.school_name}
+                        {school.school_name || "Unnamed School"}
                       </p>
                       <div className="sm:hidden flex items-center gap-2 mt-1">
                         <Badge className={`text-xs ${getSchoolTypeBadge(school.school_type)}`}>
-                          {school.school_type}
+                          {school.school_type || "N/A"}
                         </Badge>
                         <span className="text-xs text-gray-500">
-                          ₹{school.package_amount?.toLocaleString()}
+                          ₹{school.package_amount ? school.package_amount.toLocaleString() : "0"}
                         </span>
                       </div>
                     </div>
                   </td>
                   <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">
                     <Badge className={getSchoolTypeBadge(school.school_type)}>
-                      {school.school_type?.charAt(0).toUpperCase() + school.school_type?.slice(1)}
+                      {school.school_type ? school.school_type.charAt(0).toUpperCase() + school.school_type.slice(1) : "N/A"}
                     </Badge>
                   </td>
                   <td className="px-3 sm:px-4 py-3 hidden md:table-cell">
                     <span className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
                       <IndianRupee className="h-3 w-3 mr-1" />
-                      {school.package_amount?.toLocaleString()}
+                      {school.package_amount ? school.package_amount.toLocaleString() : "0"}
                     </span>
                   </td>
                   <td className="px-3 sm:px-4 py-3 hidden lg:table-cell">
