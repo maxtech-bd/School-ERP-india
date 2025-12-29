@@ -15,6 +15,13 @@ Preferred communication style: Simple, everyday language.
 - **Responsiveness**: Fully responsive design across all devices using Tailwind CSS breakpoints and adaptive layouts.
 
 ## Recent Changes (December 2025)
+- **School List (Super Admin Panel)**: New centralized control panel for Super Admin to manage all ERP-linked schools (genuine and demo). Features include: school CRUD operations, type classification (small/medium/large), package amount tracking, genuine vs demo school distinction with deletion protection for genuine schools.
+- **Mobile Responsiveness Enhancements**: 
+  - AI Quiz Tool and AI Test Generator tabs now scroll horizontally on mobile
+  - Subject Configuration table converts to card layout on mobile devices
+  - Notifications and Rating/Reviews modules optimized for 320px+ screens
+  - Footer appears inline at bottom of all routes with background styling
+- **Role-Based Route Protection**: Enhanced ProtectedRoute component now supports allowedRoles parameter for route-level access control.
 - **Dark Mode Fixes**: Added comprehensive dark mode support to 15+ components including LoginPage, Calendar, Results, StudentResults, ParentResults, RatingSurveys, QuizTool, TestGenerator, AINotes, AISummary, BiometricDevices, Reports, AcademicCMS, Vehicle, and StaffList.
 - **AI Model Upgrade**: Upgraded AI Assistant and all AI modules from GPT-4o-mini to GPT-4o (Turbo) for improved response quality.
 - **OpenAI Key Management**: Added secure API key management in Settings allowing admins to configure custom OpenAI API keys per tenant without exposing the key to frontend.

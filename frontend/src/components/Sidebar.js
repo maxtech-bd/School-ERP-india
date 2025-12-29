@@ -93,6 +93,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const menuItems = [
     {
+      key: "school-list",
+      title: "School List",
+      icon: BookOpen,
+      path: "/school-list",
+      roles: ["super_admin"],
+    },
+    {
       key: "home",
       title: "Home",
       icon: Home,

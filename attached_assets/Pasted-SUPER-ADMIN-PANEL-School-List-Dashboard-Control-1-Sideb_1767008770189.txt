@@ -1,0 +1,107 @@
+SUPER ADMIN PANEL – School List & Dashboard
+Control
+1. Sidebar Navigation Structure
+Add a new menu item in the left sidebar.
+Menu Name: School List
+Position:
+Top-most position
+Above Home
+Above Admission Summary
+2. Purpose of “School List”
+The School List acts as a centralized control panel for the Super Admin to manage all schools associated
+with the ERP system.
+It includes:
+Schools where the ERP is genuinely sold and deployed
+Dummy / Demo schools created for testing, demos, and sales presentations
+3. School List Contents
+The School List should display the following fields:
+School Name
+School Type : Small / medium / Large
+Package : Money xxxx(RS)
+Created Date
+4. Genuine Schools (Actual Clients)
+Example
+ERP sold to the following schools:
+A
+B
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+1
+C
+D
+Behavior
+All schools A, B, C, D appear in the School List
+On Clicking a Genuine School (Example: School A)
+Super Admin is redirected to:
+A School → HOME → GiNi School Dashboard
+The dashboard represents School A’s *( GiNi School Dashboard ) live environment
+Super Admin can:
+View dashboard data
+Manipulate dashboard data for monitoring, support, demos, and analytics verification
+Restriction:
+Genuine schools cannot be deleted from the Super Admin Panel
+Genuine schools  GiNi School Dashboard  data can be manipulated
+5. Dummy / Demo Schools
+Example
+Dummy schools created for demo/testing purposes:
+X
+Y
+Z
+Behavior
+Dummy schools X, Y, Z appear in the School List
+On Clicking a Dummy School (Example: School X)
+Super Admin is redirected to:
+X School → HOME → GiNi School Dashboard
+Super Admin has full control to:
+Manipulate dashboard data
+Use the environment for sales demos, feature testing, training, and UI/UX validation
+Permissions
+Dummy schools **can be edited added/deleted **
+Deleting a dummy school does not affect genuine schools or real client data
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+2
+6. Data Manipulation Rules (GiNi School Dashboard)
+School Type View Dashboard Manipulate Data Delete School
+Genuine Yes Yes No
+Dummy Yes Yes Yes
+7. Key Summary
+School List is the master control for all ERP-linked schools
+Clicking any school opens its GiNi School Dashboard (HOME)
+Super Admin has full dashboard data control for:
+Genuine schools
+Dummy schools
+Deletion is allowed only for Dummy Schools
+Genuine schools are protected from deletion

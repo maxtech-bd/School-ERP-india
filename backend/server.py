@@ -24125,6 +24125,129 @@ async def calculate_grade(percentage: float, tenant_id: str, school_id: str) -> 
 # END RESULT CONFIGURATION API ENDPOINTS
 # ============================================================================
 
+# ============================================================================
+# SCHOOL LIST API ENDPOINTS (Super Admin Panel)
+# ============================================================================
+
+class SchoolCreate(BaseModel):
+    school_name: str
+    school_type: str = "small"  # small, medium, large
+    package_amount: int
+    is_genuine: bool = False
+
+class SchoolUpdate(BaseModel):
+    school_name: Optional[str] = None
+    school_type: Optional[str] = None
+    package_amount: Optional[int] = None
+    is_genuine: Optional[bool] = None
+
+@api_router.get("/schools")
+async def get_schools(current_user: User = Depends(get_current_user)):
+    """Get all schools (Super Admin only) - Global cross-tenant feature for ERP management"""
+    try:
+        if current_user.role != "super_admin":
+            raise HTTPException(status_code=403, detail="Only Super Admin can access school list")
+        
+        schools = await db.schools.find({"is_active": {"$ne": False}}).sort("created_at", -1).to_list(1000)
+        return sanitize_mongo_data(schools)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching schools: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch schools")
+
+@api_router.post("/schools")
+async def create_school(
+    school: SchoolCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new school (Super Admin only) - Global ERP school management"""
+    try:
+        if current_user.role != "super_admin":
+            raise HTTPException(status_code=403, detail="Only Super Admin can create schools")
+        
+        school_doc = {
+            "id": str(uuid.uuid4()),
+            "school_name": school.school_name,
+            "school_type": school.school_type,
+            "package_amount": school.package_amount,
+            "is_genuine": school.is_genuine,
+            "is_active": True,
+            "created_at": datetime.utcnow(),
+            "created_by": current_user.id,
+            "updated_at": datetime.utcnow()
+        }
+        
+        await db.schools.insert_one(school_doc)
+        return sanitize_mongo_data(school_doc)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating school: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create school")
+
+@api_router.put("/schools/{school_id}")
+async def update_school(
+    school_id: str,
+    school: SchoolUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a school (Super Admin only)"""
+    try:
+        if current_user.role != "super_admin":
+            raise HTTPException(status_code=403, detail="Only Super Admin can update schools")
+        
+        update_data = {k: v for k, v in school.dict().items() if v is not None}
+        update_data["updated_at"] = datetime.utcnow()
+        
+        result = await db.schools.update_one(
+            {"id": school_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="School not found")
+        
+        updated_school = await db.schools.find_one({"id": school_id})
+        return sanitize_mongo_data(updated_school)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating school: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update school")
+
+@api_router.delete("/schools/{school_id}")
+async def delete_school(
+    school_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Soft-delete a school (Super Admin only, dummy schools only)"""
+    try:
+        if current_user.role != "super_admin":
+            raise HTTPException(status_code=403, detail="Only Super Admin can delete schools")
+        
+        school = await db.schools.find_one({"id": school_id, "is_active": {"$ne": False}})
+        if not school:
+            raise HTTPException(status_code=404, detail="School not found")
+        
+        if school.get("is_genuine", False):
+            raise HTTPException(status_code=403, detail="Genuine schools cannot be deleted")
+        
+        await db.schools.update_one(
+            {"id": school_id},
+            {"$set": {"is_active": False, "deleted_at": datetime.utcnow(), "deleted_by": current_user.id}}
+        )
+        return {"message": "School deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting school: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete school")
+
+# ============================================================================
+# END SCHOOL LIST API ENDPOINTS
+# ============================================================================
+
 # Include router and middleware
 app.include_router(api_router)
 

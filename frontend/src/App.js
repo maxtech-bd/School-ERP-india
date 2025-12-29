@@ -45,6 +45,7 @@ import StudentResults from "./components/StudentResults";
 import ParentResults from "./components/ParentResults";
 import ResultConfiguration from "./components/ResultConfiguration";
 import TenantManagement from "./components/TenantManagement";
+import SchoolList from "./components/SchoolList";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import { Toaster } from "./components/ui/sonner";
@@ -177,7 +178,7 @@ const AuthProvider = ({ children }) => {
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles = null }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -188,7 +189,15 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return user ? children : <Navigate to="/login" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
 };
 
 // Results Router - routes to appropriate results page based on user role
@@ -288,6 +297,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/school-list"
+                  element={
+                    <ProtectedRoute allowedRoles={["super_admin"]}>
+                      <SchoolList />
                     </ProtectedRoute>
                   }
                 />

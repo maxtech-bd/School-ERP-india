@@ -551,33 +551,35 @@ const TestGenerator = () => {
             </div>
           </div>
 
-          {/* Subject Configuration Table */}
+          {/* Subject Configuration - Responsive */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 dark:text-white">
               Subject Configuration
             </label>
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full">
+            
+            {/* Desktop Table View */}
+            <div className="hidden sm:block border rounded-lg overflow-hidden overflow-x-auto">
+              <table className="w-full min-w-[400px]">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                    <th className="px-3 py-2 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                       Subject *
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                    <th className="px-3 py-2 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                       Questions
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                      Maximum Marks
+                    <th className="px-3 py-2 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Max Marks
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                      Actions
+                    <th className="px-3 py-2 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                      
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y dark:divide-gray-600">
                   {subjectConfigs.map((config, index) => (
                     <tr key={index}>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2">
                         <select
                           value={config.subject}
                           onChange={(e) =>
@@ -587,17 +589,17 @@ const TestGenerator = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full px-3 py-2 border rounded-lg"
+                          className="w-full px-2 py-1.5 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                           disabled={!testForm.class_standard || subjectsLoading}
                         >
                           <option value="">
                             {subjectsLoading
-                              ? "Loading subjects..."
+                              ? "Loading..."
                               : !testForm.class_standard
-                              ? "Select class first"
+                              ? "Select class"
                               : subjectOptions.length === 0
-                              ? "No subjects available"
-                              : "Select Subject"}
+                              ? "No subjects"
+                              : "Select"}
                           </option>
                           {subjectOptions.map((s) => (
                             <option key={s.id || s.subject_name} value={s.subject_name}>
@@ -606,7 +608,7 @@ const TestGenerator = () => {
                           ))}
                         </select>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2">
                         <input
                           type="number"
                           min="5"
@@ -619,10 +621,10 @@ const TestGenerator = () => {
                               parseInt(e.target.value),
                             )
                           }
-                          className="w-full px-3 py-2 border rounded-lg"
+                          className="w-full px-2 py-1.5 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2">
                         <input
                           type="number"
                           min="10"
@@ -635,16 +637,16 @@ const TestGenerator = () => {
                               parseInt(e.target.value),
                             )
                           }
-                          className="w-full px-3 py-2 border rounded-lg"
+                          className="w-full px-2 py-1.5 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2">
                         <button
                           onClick={() => handleRemoveSubject(index)}
                           className="text-red-600 hover:text-red-800"
                           disabled={subjectConfigs.length === 1}
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
@@ -654,17 +656,92 @@ const TestGenerator = () => {
                   <tr>
                     <td
                       colSpan="2"
-                      className="px-4 py-3 text-right font-semibold"
+                      className="px-3 py-2 text-right font-semibold text-sm dark:text-white"
                     >
                       Total Marks:
                     </td>
-                    <td className="px-4 py-3 font-bold text-emerald-600">
+                    <td className="px-3 py-2 font-bold text-emerald-600">
                       {calculateTotalMarks()}
                     </td>
-                    <td className="px-4 py-3"></td>
+                    <td className="px-3 py-2"></td>
                   </tr>
                 </tfoot>
               </table>
+            </div>
+            
+            {/* Mobile Card View */}
+            <div className="sm:hidden space-y-3">
+              {subjectConfigs.map((config, index) => (
+                <div key={index} className="border dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Subject #{index + 1}</span>
+                    <button
+                      onClick={() => handleRemoveSubject(index)}
+                      className="text-red-600 hover:text-red-800"
+                      disabled={subjectConfigs.length === 1}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <select
+                      value={config.subject}
+                      onChange={(e) =>
+                        handleSubjectConfigChange(index, "subject", e.target.value)
+                      }
+                      className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white"
+                      disabled={!testForm.class_standard || subjectsLoading}
+                    >
+                      <option value="">
+                        {subjectsLoading
+                          ? "Loading subjects..."
+                          : !testForm.class_standard
+                          ? "Select class first"
+                          : subjectOptions.length === 0
+                          ? "No subjects"
+                          : "Select Subject"}
+                      </option>
+                      {subjectOptions.map((s) => (
+                        <option key={s.id || s.subject_name} value={s.subject_name}>
+                          {s.subject_name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Questions</label>
+                        <input
+                          type="number"
+                          min="5"
+                          max="50"
+                          value={config.num_questions}
+                          onChange={(e) =>
+                            handleSubjectConfigChange(index, "num_questions", parseInt(e.target.value))
+                          }
+                          className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Max Marks</label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="500"
+                          value={config.max_marks}
+                          onChange={(e) =>
+                            handleSubjectConfigChange(index, "max_marks", parseInt(e.target.value))
+                          }
+                          className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-between items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <span className="font-semibold text-sm dark:text-white">Total Marks:</span>
+                <span className="font-bold text-emerald-600">{calculateTotalMarks()}</span>
+              </div>
             </div>
             <button
               onClick={handleAddSubject}
