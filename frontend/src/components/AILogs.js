@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  ChevronDown,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -13,10 +14,122 @@ import { Button } from "./ui/button";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
+const AccordionItem = ({ log, isOpen, onToggle, formatDate }) => {
+  const tags = log?.tags || {};
+  const hasTags = tags.subject || tags.chapter || tags.topic || 
+    tags.academic_book || tags.reference_book || 
+    tags.qa_knowledge_base || tags.previous_papers;
+
+  return (
+    <div className="border dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+      <button
+        onClick={onToggle}
+        className="w-full px-4 py-3 flex items-start justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+      >
+        <div className="flex-1 pr-3">
+          <p className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2">
+            {log?.question || "No question recorded"}
+          </p>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {log?.created_at ? formatDate(log.created_at) : "—"}
+            </span>
+            {log?.source && (
+              <span className={`px-2 py-0.5 rounded text-xs ${
+                log.source === 'FAQ' 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                  : log.source === 'GPT' 
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
+                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+              }`}>
+                {log.source === 'FAQ' ? '❓ FAQ' : log.source === 'GPT' ? '🤖 GPT' : log.source}
+              </span>
+            )}
+            {log?.user_name && (
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded text-xs">
+                {log.user_name}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className={`flex-shrink-0 p-1 rounded-full bg-gray-100 dark:bg-gray-700 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+          <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        </div>
+      </button>
+
+      <div 
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700">
+          {log?.answer && (
+            <div className="mb-3">
+              <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                Answer:
+              </p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                {log.answer}
+              </p>
+            </div>
+          )}
+
+          {hasTags && (
+            <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs font-semibold mb-2 text-gray-600 dark:text-gray-400">
+                📚 Source Tags:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {tags.subject && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded text-xs">
+                    Subject: {tags.subject}
+                  </span>
+                )}
+                {tags.chapter && (
+                  <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded text-xs">
+                    Chapter: {tags.chapter}
+                  </span>
+                )}
+                {tags.topic && (
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 rounded text-xs">
+                    Topic: {tags.topic}
+                  </span>
+                )}
+                {tags.academic_book && (
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 rounded text-xs">
+                    📖 Academic Book: {tags.academic_book}
+                  </span>
+                )}
+                {tags.reference_book && (
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300 rounded text-xs">
+                    📚 Reference Book: {tags.reference_book}
+                  </span>
+                )}
+                {tags.qa_knowledge_base && (
+                  <span className="px-2 py-1 bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 rounded text-xs">
+                    ❓ Q&A Knowledge Base
+                  </span>
+                )}
+                {tags.previous_papers && (
+                  <span className="px-2 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded text-xs">
+                    📝 Previous Papers: {tags.previous_papers}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AILogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(0);
 
   const [contentSource, setContentSource] = useState("");
   const [subject, setSubject] = useState("");
@@ -59,6 +172,7 @@ export default function AILogs() {
 
       setLogs(Array.isArray(data?.logs) ? data.logs : []);
       setPagination(data?.pagination ?? null);
+      setExpandedIndex(0);
     } catch (error) {
       console.error("Error fetching logs:", error);
       setLogs([]);
@@ -146,6 +260,10 @@ export default function AILogs() {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleItem = (index) => {
+    setExpandedIndex(expandedIndex === index ? -1 : index);
   };
 
   const dynamicSources = (filterOptions.content_sources || []).filter(
@@ -340,109 +458,15 @@ export default function AILogs() {
             </div>
           ) : (
             <div className="space-y-2">
-              {logs.map((log, index) => {
-                const tags = log?.tags || {};
-                const hasTags = tags.subject || tags.chapter || tags.topic || 
-                  tags.academic_book || tags.reference_book || 
-                  tags.qa_knowledge_base || tags.previous_papers;
-
-                return (
-                  <div
-                    key={index}
-                    className="collapse collapse-plus bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg"
-                  >
-                    <input 
-                      type="radio" 
-                      name="ai-logs-accordion" 
-                      defaultChecked={index === 0}
-                    />
-                    <div className="collapse-title pr-12">
-                      <p className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2">
-                        {log?.question || "No question recorded"}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 mt-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {log?.created_at ? formatDate(log.created_at) : "—"}
-                        </span>
-                        {log?.source && (
-                          <span className={`px-2 py-0.5 rounded text-xs ${
-                            log.source === 'FAQ' 
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                              : log.source === 'GPT' 
-                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
-                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                          }`}>
-                            {log.source === 'FAQ' ? '❓ FAQ' : log.source === 'GPT' ? '🤖 GPT' : log.source}
-                          </span>
-                        )}
-                        {log?.user_name && (
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded text-xs">
-                            {log.user_name}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="collapse-content">
-                      {log?.answer && (
-                        <div className="mb-3 pt-2">
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                            Answer:
-                          </p>
-                          <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
-                            {log.answer}
-                          </p>
-                        </div>
-                      )}
-
-                      {hasTags && (
-                        <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                          <p className="text-xs font-semibold mb-2 text-gray-600 dark:text-gray-400">
-                            📚 Source Tags:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {tags.subject && (
-                              <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded text-xs">
-                                Subject: {tags.subject}
-                              </span>
-                            )}
-                            {tags.chapter && (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded text-xs">
-                                Chapter: {tags.chapter}
-                              </span>
-                            )}
-                            {tags.topic && (
-                              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 rounded text-xs">
-                                Topic: {tags.topic}
-                              </span>
-                            )}
-                            {tags.academic_book && (
-                              <span className="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 rounded text-xs">
-                                📖 Academic Book: {tags.academic_book}
-                              </span>
-                            )}
-                            {tags.reference_book && (
-                              <span className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300 rounded text-xs">
-                                📚 Reference Book: {tags.reference_book}
-                              </span>
-                            )}
-                            {tags.qa_knowledge_base && (
-                              <span className="px-2 py-1 bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 rounded text-xs">
-                                ❓ Q&A Knowledge Base
-                              </span>
-                            )}
-                            {tags.previous_papers && (
-                              <span className="px-2 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded text-xs">
-                                📝 Previous Papers: {tags.previous_papers}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {logs.map((log, index) => (
+                <AccordionItem
+                  key={index}
+                  log={log}
+                  isOpen={expandedIndex === index}
+                  onToggle={() => toggleItem(index)}
+                  formatDate={formatDate}
+                />
+              ))}
             </div>
           )}
 
@@ -475,62 +499,6 @@ export default function AILogs() {
           )}
         </CardContent>
       </Card>
-
-      <style jsx>{`
-        .collapse {
-          position: relative;
-          display: grid;
-          overflow: hidden;
-        }
-        .collapse-title,
-        .collapse-content {
-          grid-column-start: 1;
-          grid-row-start: 1;
-        }
-        .collapse-title {
-          position: relative;
-          padding: 1rem;
-          padding-right: 3rem;
-          cursor: pointer;
-          user-select: none;
-        }
-        .collapse-content {
-          grid-row-start: 2;
-          overflow: hidden;
-          max-height: 0;
-          padding: 0 1rem;
-          transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-        }
-        .collapse > input[type="radio"] {
-          position: absolute;
-          opacity: 0;
-          width: 100%;
-          height: 100%;
-          cursor: pointer;
-          z-index: 1;
-        }
-        .collapse > input[type="radio"]:checked ~ .collapse-content {
-          max-height: 1000px;
-          padding: 0 1rem 1rem 1rem;
-        }
-        .collapse-plus .collapse-title::after {
-          content: "+";
-          position: absolute;
-          right: 1rem;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 1.5rem;
-          font-weight: 300;
-          transition: transform 0.2s ease;
-          color: #6b7280;
-        }
-        .collapse-plus > input[type="radio"]:checked ~ .collapse-title::after {
-          content: "−";
-        }
-        .dark .collapse-plus .collapse-title::after {
-          color: #9ca3af;
-        }
-      `}</style>
     </div>
   );
 }
