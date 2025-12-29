@@ -422,9 +422,9 @@ const Notifications = () => {
       </div>
 
       <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="relative flex-1 min-w-[200px]">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
+            <div className="relative flex-1 min-w-0">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search notifications..."
@@ -434,51 +434,54 @@ const Notifications = () => {
               />
             </div>
 
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {notificationTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {canManageNotifications && (
-              <Select value={filterRole} onValueChange={setFilterRole}>
-                <SelectTrigger className="w-[180px]">
-                  <Users className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by audience" />
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Audiences</SelectItem>
-                  {targetRoles.map((role) => (
-                    <SelectItem key={role.value} value={role.value}>
-                      {role.label}
+                  <SelectItem value="all">All Types</SelectItem>
+                  {notificationTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            )}
 
-            <Button
-              variant={showUnreadOnly ? "default" : "outline"}
-              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
-              className={showUnreadOnly ? "bg-emerald-600" : ""}
-            >
-              {showUnreadOnly ? <Check className="h-4 w-4 mr-2" /> : null}
-              Unread Only
-            </Button>
+              {canManageNotifications && (
+                <Select value={filterRole} onValueChange={setFilterRole}>
+                  <SelectTrigger className="w-full sm:w-[160px]">
+                    <Users className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Audience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Audiences</SelectItem>
+                    {targetRoles.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              <Button
+                variant={showUnreadOnly ? "default" : "outline"}
+                onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+                className={`text-xs sm:text-sm ${showUnreadOnly ? "bg-emerald-600" : ""}`}
+              >
+                {showUnreadOnly ? <Check className="h-4 w-4 mr-1 sm:mr-2" /> : null}
+                <span className="hidden sm:inline">Unread Only</span>
+                <span className="sm:hidden">Unread</span>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">

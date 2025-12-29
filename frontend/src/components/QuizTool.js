@@ -349,31 +349,32 @@ const QuizTool = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <BookOpen className="w-8 h-8 text-blue-600" />
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
           AI Quiz Tool
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Practice and self-assessment with AI-generated quizzes
         </p>
       </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide pb-px">
           <button
             onClick={() => setActiveTab("generate")}
             className={`${
               activeTab === "generate"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-shrink-0`}
           >
-            <Target size={18} />
-            Generate Quiz
+            <Target size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span className="hidden xs:inline">Generate</span>
+            <span className="xs:hidden">Gen</span>
           </button>
           <button
             onClick={() => setActiveTab("quiz")}
@@ -381,11 +382,12 @@ const QuizTool = () => {
               activeTab === "quiz"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-shrink-0`}
             disabled={!currentQuiz}
           >
-            <Play size={18} />
-            Take Quiz
+            <Play size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span className="hidden xs:inline">Take Quiz</span>
+            <span className="xs:hidden">Quiz</span>
           </button>
           <button
             onClick={() => setActiveTab("results")}
@@ -393,10 +395,10 @@ const QuizTool = () => {
               activeTab === "results"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-shrink-0`}
             disabled={!results}
           >
-            <Award size={18} />
+            <Award size={16} className="sm:w-[18px] sm:h-[18px]" />
             Results
           </button>
           <button
@@ -405,9 +407,9 @@ const QuizTool = () => {
               activeTab === "history"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-shrink-0`}
           >
-            <Clock size={18} />
+            <Clock size={16} className="sm:w-[18px] sm:h-[18px]" />
             History
           </button>
           <button
@@ -416,20 +418,20 @@ const QuizTool = () => {
               activeTab === "progress"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-shrink-0`}
           >
-            <TrendingUp size={18} />
-            Progress Report
+            <TrendingUp size={16} className="sm:w-[18px] sm:h-[18px]" />
+            Progress
           </button>
         </nav>
       </div>
 
       {/* Generate Quiz Tab */}
       {activeTab === "generate" && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Generate Custom Quiz</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-4 dark:text-white">Generate Custom Quiz</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
             {/* Class */}
             <div>
               <label className="block text-sm font-medium mb-2">Class *</label>
