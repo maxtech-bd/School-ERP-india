@@ -15,19 +15,6 @@ Preferred communication style: Simple, everyday language.
 - **Responsiveness**: Fully responsive design across all devices using Tailwind CSS breakpoints and adaptive layouts.
 
 ## Recent Changes (December 2025)
-- **Enterprise Attendance System**: Comprehensive attendance management system with:
-  - Session-based attendance model (class/date/period context) with individual student records
-  - Multi-mode tracking: Daily attendance and period-wise attendance support
-  - TeacherAttendance component (`/attendance/mark`) - Teachers mark attendance with bulk actions, search, real-time stats
-  - StudentAttendanceWidget (`/attendance/my-attendance`) - Students view calendar, history, attendance percentage, apply for leave
-  - ParentAttendanceWidget (`/attendance/children`) - Parents view all children's attendance with child selector
-  - AdminAttendanceAnalytics (`/attendance/analytics`) - Admins view trends, class comparisons, low attendance alerts, rules configuration
-  - Leave management workflow: Students/parents apply, teachers approve/reject
-  - Automatic absence notifications to parents via notification system
-  - Configurable attendance rules per school (late threshold, minimum percentage, notification settings)
-  - Role-based access: teachers see assigned classes only, students/parents view-only, admin full control
-  - New MongoDB collections: `attendance_sessions`, `enterprise_attendance`, `attendance_rules`, `student_leave_requests`
-  - Backend APIs: `/attendance/enterprise/sessions`, `/attendance/enterprise/mark`, `/attendance/enterprise/student/{id}`, `/attendance/enterprise/my-attendance`, `/attendance/enterprise/parent-view`, `/attendance/leave/apply`, `/attendance/leave/list`, `/attendance/leave/{id}`, `/attendance/enterprise/analytics`, `/attendance/enterprise/rules`
 - **Enterprise Fee Management System**: Comprehensive monthly invoice-based fee tracking system with:
   - Monthly billing cycles with automated invoice generation for all students
   - Invoice status tracking (pending, partial, paid, overdue)
