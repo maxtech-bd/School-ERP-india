@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+import { useCurrency } from '../context/CurrencyContext';
 
 const API = process.env.REACT_APP_API_URL || '/api';
 
@@ -29,7 +30,7 @@ const ParentFeeDashboard = () => {
   const [childDetails, setChildDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [expandedMonth, setExpandedMonth] = useState(null);
-  const [currency, setCurrency] = useState('₹');
+  const { formatCurrency } = useCurrency();
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -73,39 +74,15 @@ const ParentFeeDashboard = () => {
     }
   }, []);
 
-  const fetchCurrency = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API}/settings/currency`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.data?.symbol) {
-        setCurrency(response.data.symbol);
-      }
-    } catch (error) {
-      console.log('Using default currency');
-    }
-  }, []);
-
   useEffect(() => {
     fetchDashboardData();
-    fetchCurrency();
-  }, [fetchDashboardData, fetchCurrency]);
+  }, [fetchDashboardData]);
 
   useEffect(() => {
     if (selectedChild) {
       fetchChildDetails(selectedChild);
     }
   }, [selectedChild, fetchChildDetails]);
-
-  const formatCurrency = (amount) => {
-    if (amount >= 100000) {
-      return `${currency}${(amount / 100000).toFixed(1)}L`;
-    } else if (amount >= 1000) {
-      return `${currency}${(amount / 1000).toFixed(1)}K`;
-    }
-    return `${currency}${amount?.toLocaleString() || '0'}`;
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
