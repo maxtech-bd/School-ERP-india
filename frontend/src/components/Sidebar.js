@@ -210,18 +210,28 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       roles: ["super_admin", "admin"],
       subItems: [
         {
-          title: "HSS Students",
-          path: "/hss/students",
+          title: "Dashboard",
+          path: "/hss",
           roles: ["super_admin", "admin"],
         },
         {
-          title: "HSS Subjects",
-          path: "/hss/subjects",
+          title: "New Enrollment",
+          path: "/hss/enroll",
           roles: ["super_admin", "admin"],
         },
         {
-          title: "HSS Results",
-          path: "/hss/results",
+          title: "Admission Register",
+          path: "/hss/register",
+          roles: ["super_admin", "admin"],
+        },
+        {
+          title: "Transfer Certificate",
+          path: "/hss/transfer",
+          roles: ["super_admin", "admin"],
+        },
+        {
+          title: "Consolidated Report",
+          path: "/hss/consolidated",
           roles: ["super_admin", "admin"],
         },
       ],
