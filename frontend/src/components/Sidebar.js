@@ -419,18 +419,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       title: "Reports",
       icon: BarChart3,
       roles: ["super_admin", "admin"],
-      subItems: [
-        {
-          title: "GiNi Dashboard",
-          path: "/reports/gini",
-          roles: ["super_admin", "admin"],
-        },
-        {
-          title: "All Reports",
-          path: "/reports",
-          roles: ["super_admin", "admin"],
-        },
-      ],
+      path: "/reports",
     },
     {
       key: "biometric",

@@ -46,6 +46,7 @@ import ParentResults from "./components/ParentResults";
 import ResultConfiguration from "./components/ResultConfiguration";
 import TenantManagement from "./components/TenantManagement";
 import SchoolList from "./components/SchoolList";
+import Profile from "./components/Profile";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import { Toaster } from "./components/ui/sonner";
@@ -457,6 +458,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <OnlineAdmission />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
                     </ProtectedRoute>
                   }
                 />

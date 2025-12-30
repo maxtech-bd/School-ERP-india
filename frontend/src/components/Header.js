@@ -328,11 +328,11 @@ const Header = ({ onMenuClick }) => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile")}>
+                <DropdownMenuItem className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   <span>{t("settings.profile")}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/settings")}>
+                <DropdownMenuItem className="cursor-pointer" onClick={""}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>{t("common.settings")}</span>
                 </DropdownMenuItem>
