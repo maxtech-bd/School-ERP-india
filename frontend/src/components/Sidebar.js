@@ -134,6 +134,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           path: "/students/import",
           roles: ["super_admin", "admin"],
         },
+        {
+          title: "Attendance",
+          path: "/students/attendance",
+          roles: ["super_admin", "admin", "teacher"],
+        },
       ],
     },
     {
