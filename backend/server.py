@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
@@ -13494,12 +13494,64 @@ class PaymentCreate(BaseModel):
     transaction_id: Optional[str] = None
     remarks: Optional[str] = None
 
+    @field_validator('amount')
+    @classmethod
+    def validate_amount(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError('Payment amount must be greater than 0')
+        if v > 10000000:
+            raise ValueError('Payment amount exceeds maximum limit (10,000,000)')
+        return round(v, 2)
+
+    @field_validator('student_id', 'fee_type')
+    @classmethod
+    def validate_required_fields(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Field cannot be empty')
+        return v.strip()
+
+    @field_validator('payment_mode')
+    @classmethod
+    def validate_payment_mode(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Payment mode cannot be empty')
+        valid_modes = ['cash', 'card', 'upi', 'netbanking', 'cheque', 'bank_transfer', 'online']
+        if v.lower() not in valid_modes:
+            raise ValueError(f'Payment mode must be one of: {", ".join(valid_modes)}')
+        return v.lower()
+
 class BulkPaymentCreate(BaseModel):
     student_ids: List[str]
     fee_type: str
     payment_mode: str
     transaction_id: Optional[str] = None
     remarks: Optional[str] = None
+
+    @field_validator('student_ids')
+    @classmethod
+    def validate_student_ids(cls, v: List[str]) -> List[str]:
+        if not v or len(v) == 0:
+            raise ValueError('At least one student ID is required')
+        if len(v) > 100:
+            raise ValueError('Maximum 100 students per bulk payment')
+        return [s.strip() for s in v if s.strip()]
+
+    @field_validator('fee_type')
+    @classmethod
+    def validate_fee_type(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Fee type cannot be empty')
+        return v.strip()
+
+    @field_validator('payment_mode')
+    @classmethod
+    def validate_payment_mode(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Payment mode cannot be empty')
+        valid_modes = ['cash', 'card', 'upi', 'netbanking', 'cheque', 'bank_transfer', 'online']
+        if v.lower() not in valid_modes:
+            raise ValueError(f'Payment mode must be one of: {", ".join(valid_modes)}')
+        return v.lower()
 
 class FeeDashboard(BaseModel):
     total_fees: float
@@ -14764,6 +14816,14 @@ async def create_fee_configuration(
 ):
     """Create a new fee configuration"""
     try:
+        # Role-based access control - only admin can create fee configurations
+        allowed_roles = ['super_admin', 'admin', 'accountant']
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Unauthorized: Only {', '.join(allowed_roles)} can create fee configurations"
+            )
+        
         logging.info(f"=== CREATE FEE CONFIG START === User: {current_user.full_name}, Tenant: {current_user.tenant_id}")
         
         # Get school_id from current user context
@@ -14837,6 +14897,14 @@ async def update_fee_configuration(
 ):
     """Update an existing fee configuration"""
     try:
+        # Role-based access control
+        allowed_roles = ['super_admin', 'admin', 'accountant']
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Unauthorized: Only {', '.join(allowed_roles)} can update fee configurations"
+            )
+        
         # Check if configuration exists and belongs to current tenant
         existing_config = await db.fee_configurations.find_one({
             "id": config_id,
@@ -14885,6 +14953,14 @@ async def delete_fee_configuration(
 ):
     """Delete a fee configuration"""
     try:
+        # Role-based access control - only admin can delete fee configurations
+        allowed_roles = ['super_admin', 'admin']
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Unauthorized: Only {', '.join(allowed_roles)} can delete fee configurations"
+            )
+        
         # Check if configuration exists and belongs to current tenant
         existing_config = await db.fee_configurations.find_one({
             "id": config_id,
@@ -15339,6 +15415,14 @@ async def create_payment(
 ):
     """Record a new payment"""
     try:
+        # Role-based access control - only admin/super_admin/teacher can process payments
+        allowed_roles = ['super_admin', 'admin', 'teacher', 'accountant']
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Unauthorized: Only {', '.join(allowed_roles)} can process payments"
+            )
+        
         # Get student details
         student = await db.students.find_one({
             "id": payment_data.student_id,
@@ -15348,6 +15432,22 @@ async def create_payment(
         
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
+        
+        # Duplicate payment prevention - check for same payment in last 60 seconds
+        duplicate_window = datetime.utcnow() - timedelta(seconds=60)
+        existing_payment = await db.payments.find_one({
+            "student_id": payment_data.student_id,
+            "fee_type": payment_data.fee_type,
+            "amount": payment_data.amount,
+            "tenant_id": current_user.tenant_id,
+            "payment_date": {"$gte": duplicate_window}
+        })
+        
+        if existing_payment:
+            raise HTTPException(
+                status_code=409, 
+                detail=f"Duplicate payment detected. A similar payment was made within the last minute. Receipt: {existing_payment.get('receipt_no')}"
+            )
         
         # Generate receipt number
         receipt_no = f"RCP{datetime.utcnow().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
@@ -15457,8 +15557,17 @@ async def create_bulk_payment(
 ):
     """Process bulk payments for multiple students"""
     try:
+        # Role-based access control - only admin/super_admin can process bulk payments
+        allowed_roles = ['super_admin', 'admin', 'accountant']
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Unauthorized: Only {', '.join(allowed_roles)} can process bulk payments"
+            )
+        
         payments = []
         total_amount = 0
+        skipped_students = []
         
         for student_id in bulk_data.student_ids:
             # Get student details
