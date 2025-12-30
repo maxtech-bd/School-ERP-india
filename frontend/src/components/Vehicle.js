@@ -27,6 +27,7 @@ const Vehicle = () => {
   const [boardingPoints, setBoardingPoints] = useState([]);
   const [students, setStudents] = useState([]);
   const [transportStudents, setTransportStudents] = useState([]);
+  const [classesMap, setClassesMap] = useState({});
   const [refreshKey, setRefreshKey] = useState(0); // Force re-render key
 
   // Modal States
@@ -303,6 +304,36 @@ const Vehicle = () => {
     } catch (error) {
       console.error('Error deleting route:', error);
       throw error;
+    }
+  };
+
+  // Fetch Classes for mapping
+  const fetchClasses = async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) return {};
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/classes`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) return {};
+
+      const data = await response.json();
+      const classesArray = data.classes || data || [];
+      const map = {};
+      classesArray.forEach(cls => {
+        if (cls.id) {
+          map[cls.id] = cls.name || cls.class_name || 'Unknown';
+        }
+      });
+      return map;
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+      return {};
     }
   };
 
@@ -704,19 +735,28 @@ const Vehicle = () => {
   };
 
   const handleAssignStudentsClick = async () => {
-    // Load fresh students and routes for the assignment modal
+    // Load fresh students, routes, and classes for the assignment modal
     setLoading(true);
     try {
       console.log('🔄 Fetching fresh student data for assignment...');
-      const [studentsData, routesData] = await Promise.all([
+      const [studentsData, routesData, classesData] = await Promise.all([
         fetchStudents(),
-        fetchRoutes()
+        fetchRoutes(),
+        fetchClasses()
       ]);
       
       console.log('✅ Fetched students for assignment:', studentsData?.length, 'students');
       console.log('📋 Student data:', studentsData);
       
-      setStudents(studentsData);
+      // Map class names to students
+      setClassesMap(classesData);
+      const studentsWithClassNames = studentsData.map(student => ({
+        ...student,
+        class_name: student.class_name || classesData[student.class_id] || classesData[student.class] || 'N/A',
+        section: student.section || 'N/A'
+      }));
+      
+      setStudents(studentsWithClassNames);
       setRoutes(routesData);
       
       // Wait for state to update before showing modal
