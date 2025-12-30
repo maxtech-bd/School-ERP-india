@@ -157,6 +157,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           path: "/staff/add",
           roles: ["super_admin", "admin"],
         },
+        {
+          title: "Attendance",
+          path: "/staff/attendance",
+          roles: ["super_admin", "admin", "teacher"],
+        },
       ],
     },
     {
@@ -181,13 +186,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           roles: ["super_admin", "admin"],
         },
       ],
-    },
-    {
-      key: "attendance",
-      title: "Staff Attendance",
-      icon: ClipboardCheck,
-      path: "/attendance",
-      roles: ["super_admin", "admin", "teacher"],
     },
     {
       key: "results",
