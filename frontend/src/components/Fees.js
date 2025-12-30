@@ -3534,16 +3534,18 @@ const Fees = () => {
 // Payment Form Component
 const PaymentForm = ({ students, classes, onSubmit, onCancel, loading, feeConfigurations = {}, preselectedStudent = null }) => {
   const [selectedStudent, setSelectedStudent] = useState(preselectedStudent?.id || '');
-  const [amount, setAmount] = useState('');
-  const [feeType, setFeeType] = useState('');
+  const [amount, setAmount] = useState(preselectedStudent?.pending_amount?.toString() || '');
+  const [feeType, setFeeType] = useState(preselectedStudent?.fee_type || '');
   const [paymentMode, setPaymentMode] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [remarks, setRemarks] = useState('');
 
-  // Update selected student when preselectedStudent changes (modal reopens with different student)
+  // Update all fields when preselectedStudent changes (modal reopens with different student)
   useEffect(() => {
-    if (preselectedStudent?.id) {
-      setSelectedStudent(preselectedStudent.id);
+    if (preselectedStudent) {
+      setSelectedStudent(preselectedStudent.id || '');
+      setFeeType(preselectedStudent.fee_type || '');
+      setAmount(preselectedStudent.pending_amount?.toString() || '');
     }
   }, [preselectedStudent]);
 
