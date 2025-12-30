@@ -37,6 +37,16 @@ import { toast } from "sonner";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
+const getErrorMessage = (error) => {
+  const detail = error.response?.data?.detail;
+  if (!detail) return "An error occurred";
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && detail.length > 0) {
+    return detail.map((e) => e.msg || e.message || JSON.stringify(e)).join(", ");
+  }
+  return "An error occurred";
+};
+
 const SchoolList = () => {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +113,7 @@ const SchoolList = () => {
       fetchSchools();
     } catch (error) {
       console.error("Error creating school:", error);
-      toast.error(error.response?.data?.detail || "Failed to create school");
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -129,7 +139,7 @@ const SchoolList = () => {
       fetchSchools();
     } catch (error) {
       console.error("Error updating school:", error);
-      toast.error(error.response?.data?.detail || "Failed to update school");
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -153,7 +163,7 @@ const SchoolList = () => {
       fetchSchools();
     } catch (error) {
       console.error("Error deleting school:", error);
-      toast.error(error.response?.data?.detail || "Failed to delete school");
+      toast.error(getErrorMessage(error));
     }
   };
 
