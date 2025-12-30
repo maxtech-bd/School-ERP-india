@@ -2892,6 +2892,7 @@ const Fees = () => {
             onSubmit={submitPayment}
             onCancel={() => setShowPaymentModal(false)}
             loading={loading}
+            preselectedStudent={selectedStudent}
           />
         </DialogContent>
       </Dialog>
@@ -3497,13 +3498,20 @@ const Fees = () => {
 };
 
 // Payment Form Component
-const PaymentForm = ({ students, classes, onSubmit, onCancel, loading, feeConfigurations = {} }) => {
-  const [selectedStudent, setSelectedStudent] = useState('');
+const PaymentForm = ({ students, classes, onSubmit, onCancel, loading, feeConfigurations = {}, preselectedStudent = null }) => {
+  const [selectedStudent, setSelectedStudent] = useState(preselectedStudent?.id || '');
   const [amount, setAmount] = useState('');
   const [feeType, setFeeType] = useState('');
   const [paymentMode, setPaymentMode] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [remarks, setRemarks] = useState('');
+
+  // Update selected student when preselectedStudent changes (modal reopens with different student)
+  useEffect(() => {
+    if (preselectedStudent?.id) {
+      setSelectedStudent(preselectedStudent.id);
+    }
+  }, [preselectedStudent]);
 
   // Auto-fill amount when student and fee type are selected
   useEffect(() => {
