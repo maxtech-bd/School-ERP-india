@@ -1323,8 +1323,7 @@ const Certificates = () => {
         const validStaff = Array.isArray(data) ? data.filter(staff => 
           staff && 
           typeof staff === 'object' &&
-          typeof staff.full_name === 'string' &&
-          typeof staff.employee_id === 'string' &&
+          (staff.full_name || staff.name) &&
           staff.id
         ) : [];
         setAvailableStaff(validStaff);
@@ -1505,25 +1504,28 @@ const Certificates = () => {
     try {
       const selectedStaff = availableStaff.filter(staff => staffIds.includes(staff.id));
       
-      const newCards = selectedStaff.map(staff => ({
-        id: `staff-${staff.id}-${Date.now()}`,
-        type: 'staff',
-        staffData: {
-          name: staff.full_name,
-          employee_id: staff.employee_id,
-          department: staff.department || 'General',
-          designation: staff.designation || 'Staff',
-          phone: staff.phone || 'N/A',
-          email: staff.email || 'N/A',
-          photo: staff.photo || null,
-          join_date: staff.join_date || 'N/A',
-          staff_id: staff.id
-        },
-        generatedDate: new Date().toISOString(),
-        generatedBy: 'System Admin',
-        status: 'generated',
-        cardNumber: `STF${staff.employee_id}${new Date().getFullYear()}`
-      }));
+      const newCards = selectedStaff.map(staff => {
+        const empId = staff.employee_id || staff.staff_id || staff.id;
+        return {
+          id: `staff-${staff.id}-${Date.now()}`,
+          type: 'staff',
+          staffData: {
+            name: staff.full_name || staff.name,
+            employee_id: empId,
+            department: staff.department || 'General',
+            designation: staff.designation || staff.role || 'Staff',
+            phone: staff.phone || staff.contact || 'N/A',
+            email: staff.email || 'N/A',
+            photo: staff.photo || staff.profile_picture || null,
+            join_date: staff.join_date || staff.joining_date || 'N/A',
+            staff_id: staff.id
+          },
+          generatedDate: new Date().toISOString(),
+          generatedBy: 'System Admin',
+          status: 'generated',
+          cardNumber: `STF${empId}${new Date().getFullYear()}`
+        };
+      });
 
       setGeneratedIdCards(prev => [...prev, ...newCards]);
       setIdCardsView('generated');
@@ -1591,6 +1593,10 @@ const Certificates = () => {
       const isStudent = card.type === 'student';
       const data = isStudent ? card.studentData : card.staffData;
       
+      const photoHtml = data?.photo 
+        ? `<img src="${data.photo}" alt="Photo" class="photo-img" />`
+        : `<div class="photo-placeholder"><span>PHOTO</span></div>`;
+      
       return `
         <div class="id-card">
           <div class="card-header">
@@ -1599,9 +1605,7 @@ const Certificates = () => {
           </div>
           <div class="card-body">
             <div class="photo-section">
-              <div class="photo-placeholder">
-                <span>PHOTO</span>
-              </div>
+              ${photoHtml}
             </div>
             <div class="info-section">
               <h4>${data?.name}</h4>
@@ -1648,6 +1652,10 @@ const Certificates = () => {
           display: flex; padding: 8px; flex: 1; gap: 8px; 
         }
         .photo-section { flex-shrink: 0; }
+        .photo-img {
+          width: 40px; height: 50px; object-fit: cover;
+          border: 1px solid #ccc; border-radius: 4px;
+        }
         .photo-placeholder { 
           width: 40px; height: 50px; border: 1px solid #ccc; 
           display: flex; align-items: center; justify-content: center; 
@@ -1675,6 +1683,10 @@ const Certificates = () => {
           display: flex; padding: 12px; flex: 1; gap: 12px; 
         }
         .photo-section { flex-shrink: 0; }
+        .photo-img {
+          width: 60px; height: 75px; object-fit: cover;
+          border: 1px solid #ccc; border-radius: 4px;
+        }
         .photo-placeholder { 
           width: 60px; height: 75px; border: 1px solid #ccc; 
           display: flex; align-items: center; justify-content: center; 
@@ -5519,8 +5531,8 @@ const Certificates = () => {
                       key={staff.id}
                       className={`p-3 border rounded-md cursor-pointer transition-colors ${
                         selectedStaffForId.includes(staff.id) 
-                          ? 'border-emerald-500 bg-emerald-50' 
-                          : 'border-gray-200 hover:border-emerald-300'
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' 
+                          : 'border-gray-200 dark:border-gray-600 hover:border-emerald-300'
                       }`}
                       onClick={() => {
                         setSelectedStaffForId(prev => 
@@ -5532,9 +5544,9 @@ const Certificates = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">{staff.full_name}</p>
-                          <p className="text-sm text-gray-600">ID: {staff.employee_id}</p>
-                          <p className="text-xs text-gray-400">Dept: {staff.department || 'N/A'}</p>
+                          <p className="font-medium dark:text-white">{staff.full_name || staff.name}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">ID: {staff.employee_id || staff.staff_id || 'N/A'}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">Dept: {staff.department || 'N/A'}</p>
                         </div>
                         <div className="text-right">
                           {selectedStaffForId.includes(staff.id) && (
