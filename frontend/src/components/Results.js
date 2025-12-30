@@ -106,18 +106,20 @@ const Results = () => {
   const fetchExamTerms = useCallback(async () => {
     try {
       const response = await axios.get('/api/exam-terms');
-      setExamTerms(response.data);
+      setExamTerms(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching exam terms:', error);
+      setExamTerms([]);
     }
   }, []);
 
   const fetchClasses = useCallback(async () => {
     try {
       const response = await axios.get('/api/classes');
-      setClasses(response.data);
+      setClasses(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching classes:', error);
+      setClasses([]);
     }
   }, []);
 
@@ -128,9 +130,10 @@ const Results = () => {
     }
     try {
       const response = await axios.get(`/api/sections?class_id=${classId}`);
-      setSections(response.data);
+      setSections(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching sections:', error);
+      setSections([]);
     }
   }, []);
 
@@ -141,9 +144,10 @@ const Results = () => {
     }
     try {
       const response = await axios.get(`/api/subjects?class_id=${classId}`);
-      setSubjects(response.data);
+      setSubjects(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching subjects:', error);
+      setSubjects([]);
     }
   }, []);
 
@@ -154,9 +158,10 @@ const Results = () => {
     }
     try {
       const response = await axios.get(`/api/students?class_id=${classId}&section_id=${sectionId}`);
-      setStudents(response.data);
+      setStudents(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching students:', error);
+      setStudents([]);
     }
   }, []);
 
@@ -168,9 +173,10 @@ const Results = () => {
       if (selectedSection) url += `section_id=${selectedSection}&`;
       
       const response = await axios.get(url);
-      setResults(response.data);
+      setResults(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching results:', error);
+      setResults([]);
     }
   }, [selectedExamTerm, selectedClass, selectedSection]);
 
