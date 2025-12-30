@@ -17063,6 +17063,8 @@ async def create_student_fees_from_config(fee_config: FeeConfiguration, current_
 async def apply_payment_to_student_fees(payment: Payment, current_user: User):
     """Apply payment to student fees using ERP logic (overdue -> pending -> advance)"""
     try:
+        logging.info(f"🔍 APPLY_PAYMENT: Looking for student_id={payment.student_id}, fee_type={payment.fee_type}, tenant={current_user.tenant_id}")
+        
         # ⚠️ CRITICAL: is_active filter MUST be True to update correct records
         # Removing this filter will update inactive/deleted records instead of active ones
         # Result: Payments will succeed but Fee Due tab won't update
@@ -17072,6 +17074,8 @@ async def apply_payment_to_student_fees(payment: Payment, current_user: User):
             "tenant_id": current_user.tenant_id,
             "is_active": {"$ne": False}  # Matches True, None, or missing - allows legacy records
         }).to_list(100)
+        
+        logging.info(f"🔍 APPLY_PAYMENT: Found {len(student_fees)} matching fee records")
         
         # If no student_fee exists, create one on-the-fly (payment-first scenario)
         if not student_fees:

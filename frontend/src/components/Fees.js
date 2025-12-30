@@ -784,13 +784,15 @@ const Fees = () => {
         setTodaysCollection(paymentResult.dashboard_stats.todays_collection);
       }
       
-      // Also refresh student financials and full dashboard data in background
-      console.log('🔄 payment ok → refreshing student financials...');
-      await Promise.all([
-        loadFeeDataFromBackend(), // Background refresh for recent payments list
-        fetchStudentFinancials(paymentResult?.student_id ?? paymentData.student_id)
-      ]);
-      console.log('✅ refresh complete');
+      // Refresh ALL fee data after payment to ensure Outstanding Payments list updates
+      console.log('🔄 payment ok → refreshing ALL fee data...');
+      
+      // Force sequential refresh to ensure data consistency
+      await loadFeeDataFromBackend();  // This updates dueFees state - must complete first
+      console.log('📊 Due fees refreshed');
+      
+      await fetchStudentFinancials(paymentResult?.student_id ?? paymentData.student_id);
+      console.log('✅ All data refresh complete');
       
       // Auto-generate and download receipt immediately after payment
       generateReceipt(paymentResult.receipt_no, paymentData, student);
