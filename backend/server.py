@@ -15467,7 +15467,7 @@ async def get_student_fees(
         # Removing this filter will show all records including inactive/deleted ones
         query_filter = {
             "tenant_id": current_user.tenant_id,
-            "is_active": True  # 🔒 PROTECTED - DO NOT REMOVE
+            "is_active": {"$ne": False}  # Matches True, None, or missing - allows legacy records
         }
         
         if student_id:
@@ -17070,7 +17070,7 @@ async def apply_payment_to_student_fees(payment: Payment, current_user: User):
             "student_id": payment.student_id,
             "fee_type": payment.fee_type,
             "tenant_id": current_user.tenant_id,
-            "is_active": True  # 🔒 PROTECTED - DO NOT REMOVE
+            "is_active": {"$ne": False}  # Matches True, None, or missing - allows legacy records
         }).to_list(100)
         
         # If no student_fee exists, create one on-the-fly (payment-first scenario)
