@@ -1,0 +1,175 @@
+You are a senior enterprise SaaS architect and full-stack engineer.
+
+You are working inside an EXISTING Replit ERP project.
+Do NOT rebuild the project.
+Do NOT change existing architecture unless required.
+Extend the system cleanly.
+
+GOAL:
+Implement a Super Admin feature called “School List” which acts as the MASTER CONTROL PANEL
+for all schools (Genuine + Dummy) in the ERP system.
+
+-----------------------------------
+1️⃣ SIDEBAR NAVIGATION (MANDATORY)
+-----------------------------------
+- Add a new sidebar menu item:
+  - Label: "School List"
+  - Position: TOP-MOST item
+  - Must appear ABOVE:
+    - Home
+    - Admission Summary
+- Sidebar visibility:
+  - Only for Super Admin role
+  - Hidden for Admin / Teacher / Student / Parent
+
+-----------------------------------
+2️⃣ SCHOOL LIST PURPOSE
+-----------------------------------
+School List is a centralized control panel for Super Admin to manage:
+- Genuine (Real Client) Schools
+- Dummy / Demo / Test Schools
+
+Both must appear in the SAME list.
+
+-----------------------------------
+3️⃣ SCHOOL LIST TABLE (UI + DATA)
+-----------------------------------
+Display the following columns:
+- School Name
+- School Type (Small / Medium / Large)
+- Package (Money XXXX RS)
+- Created Date
+- School Mode (Genuine / Dummy)
+
+Features:
+- Pagination
+- Search by school name
+- Filter by:
+  - School Type
+  - Package
+  - School Mode (Genuine / Dummy)
+
+-----------------------------------
+4️⃣ SCHOOL TYPES & FLAGS (CRITICAL LOGIC)
+-----------------------------------
+Each school MUST have:
+- is_dummy (boolean)
+- school_type ENUM('small','medium','large')
+
+Rules:
+- is_dummy = false → Genuine School
+- is_dummy = true → Dummy / Demo School
+
+This flag controls DELETE permission.
+
+-----------------------------------
+5️⃣ CLICK BEHAVIOR (SCHOOL SWITCHING)
+-----------------------------------
+When Super Admin clicks ANY school row:
+
+Redirect to:
+  → [Selected School] → HOME → GiNi School Dashboard
+
+Implementation rules:
+- Switch active tenant context dynamically
+- Load the selected school's LIVE dashboard data
+- No page reload hacks
+- No duplicate login
+
+-----------------------------------
+6️⃣ GiNi SCHOOL DASHBOARD CONTROL
+-----------------------------------
+For BOTH Genuine and Dummy schools:
+Super Admin can:
+- View dashboard metrics
+- Manipulate dashboard data
+- Modify stats for:
+  - Monitoring
+  - Support
+  - Demo
+  - Analytics verification
+
+This manipulation must:
+- NOT affect other schools
+- Be isolated per school (tenant-safe)
+
+-----------------------------------
+7️⃣ DELETION RULES (NON-NEGOTIABLE)
+-----------------------------------
+IF school.is_dummy === true:
+- Allow:
+  - Edit school
+  - Delete school
+- Deletion must:
+  - Soft delete OR hard delete safely
+  - Remove only dummy data
+  - NEVER touch genuine school data
+
+IF school.is_dummy === false (Genuine):
+- DELETE button MUST NOT exist
+- API must BLOCK delete attempts
+- Return 403 Forbidden if attempted manually
+
+-----------------------------------
+8️⃣ PERMISSION MATRIX (ENFORCED IN BACKEND)
+-----------------------------------
+| School Type | View Dashboard | Manipulate Data | Delete |
+|------------|---------------|-----------------|--------|
+| Genuine    | Yes           | Yes             | No     |
+| Dummy      | Yes           | Yes             | Yes    |
+
+-----------------------------------
+9️⃣ BACKEND REQUIREMENTS (STRICT)
+-----------------------------------
+- Use Role-Based Access Control (RBAC)
+- Validate Super Admin role on every route
+- Enforce delete protection at:
+  - UI level
+  - API level
+- No hardcoded values
+- No bypass via API tools
+
+-----------------------------------
+🔟 DATABASE & TENANCY SAFETY
+-----------------------------------
+- Use tenant_id / school_id in every dashboard query
+- Prevent data leakage between schools
+- Ensure dashboard manipulation affects ONLY selected school
+
+-----------------------------------
+1️⃣1️⃣ API REQUIREMENTS
+-----------------------------------
+Required endpoints:
+- GET /super-admin/schools
+- GET /super-admin/schools/:id
+- DELETE /super-admin/schools/:id (Dummy only)
+- POST /super-admin/schools/switch-context
+
+All routes must:
+- Validate inputs
+- Handle errors gracefully
+- Return consistent API responses
+
+-----------------------------------
+1️⃣2️⃣ UI/UX REQUIREMENTS
+-----------------------------------
+- Clear visual indicator:
+  - Genuine School → Protected badge
+  - Dummy School → Demo badge
+- Disable delete button for genuine schools
+- Confirmation modal for deletion
+
+-----------------------------------
+1️⃣3️⃣ FINAL SELF-CHECK (MANDATORY)
+-----------------------------------
+Before marking this feature complete:
+- Verify genuine schools cannot be deleted
+- Verify dummy schools can be deleted safely
+- Verify dashboard switches correctly
+- Verify no cross-school data leakage
+- Verify sidebar order is correct
+
+If ANY rule is unclear:
+ASK BEFORE IMPLEMENTING.
+Do NOT assume.
+Do NOT skip.

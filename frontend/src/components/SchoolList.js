@@ -52,9 +52,12 @@ const SchoolList = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [filterSize, setFilterSize] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
+  const itemsPerPage = 10;
 
   const [formData, setFormData] = useState({
     school_name: "",
@@ -208,8 +211,20 @@ const SchoolList = () => {
       filterType === "all" ||
       (filterType === "genuine" && school.is_genuine) ||
       (filterType === "dummy" && !school.is_genuine);
-    return matchesSearch && matchesType;
+    const matchesSize =
+      filterSize === "all" || school.school_type === filterSize;
+    return matchesSearch && matchesType && matchesSize;
   });
+
+  const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
+  const paginatedSchools = filteredSchools.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, filterSize]);
 
   const genuineCount = schools.filter((s) => s.is_genuine).length;
   const dummyCount = schools.filter((s) => !s.is_genuine).length;
@@ -289,12 +304,23 @@ const SchoolList = () => {
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Filter" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Schools</SelectItem>
                 <SelectItem value="genuine">Genuine Only</SelectItem>
-                <SelectItem value="dummy">Dummy Only</SelectItem>
+                <SelectItem value="dummy">Demo Only</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterSize} onValueChange={setFilterSize}>
+              <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectValue placeholder="Size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sizes</SelectItem>
+                <SelectItem value="small">Small</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="large">Large</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -318,6 +344,7 @@ const SchoolList = () => {
           </CardContent>
         </Card>
       ) : (
+        <>
         <div className="overflow-x-auto">
           <table className="w-full bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
             <thead className="bg-gray-50 dark:bg-gray-700">
@@ -343,7 +370,7 @@ const SchoolList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-              {filteredSchools.map((school) => (
+              {paginatedSchools.map((school) => (
                 <tr key={school.id || school._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-3 sm:px-4 py-3">
                     <div>
@@ -427,6 +454,39 @@ const SchoolList = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, filteredSchools.length)} of{" "}
+              {filteredSchools.length} schools
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="flex items-center px-3 text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>

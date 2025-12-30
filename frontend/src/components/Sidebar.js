@@ -31,6 +31,7 @@ import {
   Calendar,
   Clock,
   FileSpreadsheet,
+  Building2,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -95,9 +96,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     {
       key: "school-list",
       title: "School List",
-      icon: BookOpen,
+      icon: Building2,
       path: "/school-list",
       roles: ["super_admin"],
+      badge: "Master",
     },
     {
       key: "home",
