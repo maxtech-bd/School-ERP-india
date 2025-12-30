@@ -350,7 +350,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/attendance/*"
+                  path="/attendance"
                   element={
                     <ProtectedRoute>
                       <Attendance />
