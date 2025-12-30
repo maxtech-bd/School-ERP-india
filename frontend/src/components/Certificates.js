@@ -74,6 +74,7 @@ const Certificates = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showStudentModal, setShowStudentModal] = useState(false);
   const [availableStudents, setAvailableStudents] = useState([]);
+  const [classesMap, setClassesMap] = useState({});
   const [loading, setLoading] = useState(false);
   
   // TC View/Print States
@@ -219,7 +220,33 @@ const Certificates = () => {
     fetchAERecords();
     fetchStudents();
     fetchStaff();
+    fetchClasses();
   }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const API = process.env.REACT_APP_API_URL;
+      const response = await fetch(`${API}/classes`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const classesArray = data.classes || data || [];
+        const map = {};
+        classesArray.forEach(cls => {
+          if (cls.id) {
+            map[cls.id] = cls.name || cls.class_name || 'Unknown';
+          }
+        });
+        setClassesMap(map);
+      }
+    } catch (error) {
+      console.error('Failed to fetch classes:', error);
+    }
+  };
 
   const fetchCertificatesData = async () => {
     try {
@@ -1471,25 +1498,30 @@ const Certificates = () => {
     try {
       const selectedStudents = availableStudents.filter(student => studentIds.includes(student.id));
       
-      const newCards = selectedStudents.map(student => ({
-        id: `student-${student.id}-${Date.now()}`,
-        type: 'student',
-        studentData: {
-          name: student.name,
-          admission_no: student.admission_no,
-          class_name: student.class_name || student.class_id || 'N/A',
-          section: student.section || 'A',
-          roll_number: student.roll_number || student.admission_no,
-          photo: student.photo_url || student.photo || student.profile_picture || null,
-          emergency_contact: student.emergency_contact || 'N/A',
-          blood_group: student.blood_group || 'N/A',
-          student_id: student.id
-        },
-        generatedDate: new Date().toISOString(),
-        generatedBy: 'System Admin',
-        status: 'generated',
-        cardNumber: `STU${student.admission_no}${new Date().getFullYear()}`
-      }));
+      const newCards = selectedStudents.map(student => {
+        // Get class name from classesMap using class_id, or fallback to existing class_name
+        const className = student.class_name || classesMap[student.class_id] || classesMap[student.class] || 'N/A';
+        
+        return {
+          id: `student-${student.id}-${Date.now()}`,
+          type: 'student',
+          studentData: {
+            name: student.name,
+            admission_no: student.admission_no,
+            class_name: className,
+            section: student.section || 'A',
+            roll_number: student.roll_number || student.admission_no,
+            photo: student.photo_url || student.photo || student.profile_picture || null,
+            emergency_contact: student.emergency_contact || 'N/A',
+            blood_group: student.blood_group || 'N/A',
+            student_id: student.id
+          },
+          generatedDate: new Date().toISOString(),
+          generatedBy: 'System Admin',
+          status: 'generated',
+          cardNumber: `STU${student.admission_no}${new Date().getFullYear()}`
+        };
+      });
 
       setGeneratedIdCards(prev => [...prev, ...newCards]);
       setIdCardsView('generated');
