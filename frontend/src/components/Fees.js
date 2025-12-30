@@ -890,26 +890,30 @@ const Fees = () => {
 
   // Fee Due Tab: Collect Payment for specific student
   const handleStudentCollectPayment = (student) => {
-    // Store selected student for payment processing
-    setSelectedStudent(student);
-    setShowPaymentModal(true);
-    
     // Get proper student properties with fallbacks
     const studentName = student.name || 'Unknown Student';
     const admissionNo = student.admission_no || student.admission || 'N/A';
-    const pendingAmount = student.pending_amount || student.amount || 15000; // Fallback amount
+    const pendingAmount = student.pending_amount || student.amount || 15000;
     const feeType = student.fee_type || '';
     
-    // Pre-fill the collection form with the student's fee data including fee_type
-    setCollectionForm(prev => ({
-      ...prev,
+    // Store selected student for payment processing
+    setSelectedStudent(student);
+    
+    // Pre-fill the collection form BEFORE opening modal for instant auto-selection
+    setCollectionForm({
       student_id: student.id || '',
       fee_type: feeType,
-      amount: pendingAmount > 0 ? pendingAmount.toString() : ''
-    }));
+      amount: pendingAmount > 0 ? pendingAmount.toString() : '',
+      payment_mode: '',
+      transaction_id: '',
+      remarks: ''
+    });
     
-    toast.info(`💰 Collecting Payment`, {
-      description: `Opening payment collection for ${studentName} (${admissionNo}) - ${feeType ? feeType + ' - ' : ''}${formatCurrency(pendingAmount)}`,
+    // Open modal after form is set
+    setShowPaymentModal(true);
+    
+    toast.info(`Collecting Payment`, {
+      description: `${studentName} (${admissionNo}) - ${feeType} - ${formatCurrency(pendingAmount)}`,
       duration: 3000
     });
   };
