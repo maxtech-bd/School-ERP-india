@@ -2927,6 +2927,7 @@ const Fees = () => {
             onCancel={() => setShowPaymentModal(false)}
             loading={loading}
             preselectedStudent={selectedStudent}
+            prefillData={collectionForm}
           />
         </DialogContent>
       </Dialog>
@@ -3532,22 +3533,22 @@ const Fees = () => {
 };
 
 // Payment Form Component
-const PaymentForm = ({ students, classes, onSubmit, onCancel, loading, feeConfigurations = {}, preselectedStudent = null }) => {
+const PaymentForm = ({ students, classes, onSubmit, onCancel, loading, feeConfigurations = {}, preselectedStudent = null, prefillData = null }) => {
   const [selectedStudent, setSelectedStudent] = useState(preselectedStudent?.id || '');
-  const [amount, setAmount] = useState(preselectedStudent?.pending_amount?.toString() || '');
-  const [feeType, setFeeType] = useState(preselectedStudent?.fee_type || '');
+  const [amount, setAmount] = useState('');
+  const [feeType, setFeeType] = useState('');
   const [paymentMode, setPaymentMode] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [remarks, setRemarks] = useState('');
 
-  // Update all fields when preselectedStudent changes (modal reopens with different student)
+  // Update all fields when prefillData changes (modal reopens with different data)
   useEffect(() => {
-    if (preselectedStudent) {
-      setSelectedStudent(preselectedStudent.id || '');
-      setFeeType(preselectedStudent.fee_type || '');
-      setAmount(preselectedStudent.pending_amount?.toString() || '');
+    if (prefillData) {
+      setSelectedStudent(prefillData.student_id || '');
+      setFeeType(prefillData.fee_type || '');
+      setAmount(prefillData.amount?.toString() || '');
     }
-  }, [preselectedStudent]);
+  }, [prefillData]);
 
   // Auto-fill amount when student and fee type are selected
   useEffect(() => {
