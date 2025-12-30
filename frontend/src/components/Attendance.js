@@ -280,28 +280,66 @@ const MarkAttendance = () => {
 // Attendance Report Component
 const AttendanceReport = () => {
   const [summary, setSummary] = useState(null);
+  const [staff, setStaff] = useState([]);
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    fetchAttendanceSummary();
+    fetchData();
   }, [selectedDate]);
 
-  const fetchAttendanceSummary = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API}/attendance/summary?date=${selectedDate}&type=staff`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSummary(response.data);
+      
+      const [summaryRes, staffRes, attendanceRes] = await Promise.all([
+        axios.get(`${API}/attendance/summary?date=${selectedDate}&type=staff`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/staff`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/attendance?date=${selectedDate}&type=staff`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      
+      setSummary(summaryRes.data);
+      setStaff(Array.isArray(staffRes.data) ? staffRes.data : []);
+      setAttendanceRecords(Array.isArray(attendanceRes.data) ? attendanceRes.data : []);
     } catch (error) {
-      console.error('Failed to fetch summary:', error);
-      toast.error('Failed to load attendance summary');
+      console.error('Failed to fetch data:', error);
+      toast.error('Failed to load attendance data');
     } finally {
       setLoading(false);
     }
   };
+
+  const getStaffAttendanceStatus = (staffId) => {
+    const record = attendanceRecords.find(r => r.staff_id === staffId);
+    return record?.status || 'not_marked';
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'present':
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Present</Badge>;
+      case 'absent':
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Absent</Badge>;
+      case 'late':
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Late</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Not Marked</Badge>;
+    }
+  };
+
+  const filteredStaff = staff.filter(member => {
+    if (filterStatus === 'all') return true;
+    return getStaffAttendanceStatus(member.id) === filterStatus;
+  });
 
   const handleExport = async (format) => {
     try {
@@ -401,38 +439,123 @@ const AttendanceReport = () => {
             </Card>
           </div>
 
-          {summary.by_department && summary.by_department.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Department-wise Attendance</CardTitle>
-              </CardHeader>
-              <CardContent>
+          {/* Individual Staff Attendance */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="text-lg">Individual Attendance Records</CardTitle>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    size="sm" 
+                    variant={filterStatus === 'all' ? 'default' : 'outline'}
+                    onClick={() => setFilterStatus('all')}
+                  >
+                    All ({staff.length})
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant={filterStatus === 'present' ? 'default' : 'outline'}
+                    onClick={() => setFilterStatus('present')}
+                    className={filterStatus === 'present' ? 'bg-green-500 hover:bg-green-600' : ''}
+                  >
+                    <Check className="h-3 w-3 mr-1" />
+                    Present ({staff.filter(s => getStaffAttendanceStatus(s.id) === 'present').length})
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant={filterStatus === 'absent' ? 'default' : 'outline'}
+                    onClick={() => setFilterStatus('absent')}
+                    className={filterStatus === 'absent' ? 'bg-red-500 hover:bg-red-600' : ''}
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Absent ({staff.filter(s => getStaffAttendanceStatus(s.id) === 'absent').length})
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant={filterStatus === 'late' ? 'default' : 'outline'}
+                    onClick={() => setFilterStatus('late')}
+                    className={filterStatus === 'late' ? 'bg-yellow-500 hover:bg-yellow-600' : ''}
+                  >
+                    <Clock className="h-3 w-3 mr-1" />
+                    Late ({staff.filter(s => getStaffAttendanceStatus(s.id) === 'late').length})
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Department</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Present</TableHead>
-                      <TableHead>Absent</TableHead>
-                      <TableHead>Attendance Rate</TableHead>
+                      <TableHead className="text-xs sm:text-sm">#</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden md:table-cell">Employee ID</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Department</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Designation</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {summary.by_department.map((dept, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{dept.department || 'N/A'}</TableCell>
-                        <TableCell>{dept.total || 0}</TableCell>
-                        <TableCell className="text-green-600">{dept.present || 0}</TableCell>
-                        <TableCell className="text-red-600">{dept.absent || 0}</TableCell>
-                        <TableCell>
-                          <Badge variant={dept.total > 0 && (dept.present / dept.total) >= 0.8 ? 'success' : 'warning'}>
-                            {dept.total > 0 ? Math.round((dept.present / dept.total) * 100) : 0}%
-                          </Badge>
+                    {filteredStaff.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                          No staff found with this filter
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      filteredStaff.map((member, index) => (
+                        <TableRow key={member.id} className={getStaffAttendanceStatus(member.id) === 'absent' ? 'bg-red-50 dark:bg-red-950' : ''}>
+                          <TableCell className="text-xs sm:text-sm">{index + 1}</TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden md:table-cell">{member.employee_id || '-'}</TableCell>
+                          <TableCell className="text-xs sm:text-sm font-medium">{member.name}</TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{member.department || '-'}</TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{member.designation || '-'}</TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            {getStatusBadge(getStaffAttendanceStatus(member.id))}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {summary.by_department && summary.by_department.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Department-wise Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead>Present</TableHead>
+                        <TableHead>Absent</TableHead>
+                        <TableHead>Attendance Rate</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {summary.by_department.map((dept, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{dept.department || 'N/A'}</TableCell>
+                          <TableCell>{dept.total || 0}</TableCell>
+                          <TableCell className="text-green-600">{dept.present || 0}</TableCell>
+                          <TableCell className="text-red-600">{dept.absent || 0}</TableCell>
+                          <TableCell>
+                            <Badge variant={dept.total > 0 && (dept.present / dept.total) >= 0.8 ? 'success' : 'warning'}>
+                              {dept.total > 0 ? Math.round((dept.present / dept.total) * 100) : 0}%
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           )}
