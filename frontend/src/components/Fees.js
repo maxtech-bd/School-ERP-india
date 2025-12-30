@@ -2667,12 +2667,13 @@ const Fees = () => {
                         <SelectValue placeholder="Select fee type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Tuition Fee">Tuition Fee</SelectItem>
-                        <SelectItem value="Transport Fee">Transport Fee</SelectItem>
-                        <SelectItem value="Lab Fee">Lab Fee</SelectItem>
-                        <SelectItem value="Library Fee">Library Fee</SelectItem>
-                        <SelectItem value="Exam Fee">Exam Fee</SelectItem>
-                        <SelectItem value="Annual Fee">Annual Fee</SelectItem>
+                        <SelectItem value="Admission Fees">Admission Fees</SelectItem>
+                        <SelectItem value="Tuition Fees">Tuition Fees</SelectItem>
+                        <SelectItem value="Transport Fees">Transport Fees</SelectItem>
+                        <SelectItem value="Lab Fees">Lab Fees</SelectItem>
+                        <SelectItem value="Library Fees">Library Fees</SelectItem>
+                        <SelectItem value="Exam Fees">Exam Fees</SelectItem>
+                        <SelectItem value="Annual Fees">Annual Fees</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
