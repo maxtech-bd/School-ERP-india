@@ -298,24 +298,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       key: "vehicle",
       title: "Vehicle",
       icon: Car,
+      path: "/vehicle",
       roles: ["super_admin", "admin"],
-      subItems: [
-        {
-          title: "Routes",
-          path: "/transport/routes",
-          roles: ["super_admin", "admin"],
-        },
-        {
-          title: "Vehicles",
-          path: "/transport/vehicles",
-          roles: ["super_admin", "admin"],
-        },
-        {
-          title: "Assign Students",
-          path: "/transport/assign",
-          roles: ["super_admin", "admin"],
-        },
-      ],
     },
     {
       key: "calendar",
