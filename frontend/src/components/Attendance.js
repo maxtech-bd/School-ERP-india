@@ -453,10 +453,10 @@ const Attendance = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // If on base /attendance path, redirect to mark
+  // If on base /attendance path, redirect to report (view attendance)
   useEffect(() => {
     if (location.pathname === '/attendance') {
-      navigate('/attendance/mark');
+      navigate('/attendance/report');
     }
   }, [location.pathname, navigate]);
 
@@ -464,6 +464,7 @@ const Attendance = () => {
     <Routes>
       <Route path="mark" element={<MarkAttendance />} />
       <Route path="report" element={<AttendanceReport />} />
+      <Route path="reports" element={<AttendanceReport />} />
     </Routes>
   );
 };
