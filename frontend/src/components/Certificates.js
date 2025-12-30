@@ -1668,18 +1668,25 @@ const Certificates = () => {
   const getCardPrintStyles = () => {
     return `
       @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
         body { margin: 0; font-family: Arial, sans-serif; }
         .id-card { 
           width: 85mm; height: 54mm; border: 2px solid #059669; 
           margin: 10mm; page-break-inside: avoid; display: flex; flex-direction: column;
-          background: white; border-radius: 8px; overflow: hidden;
+          background: white !important; border-radius: 8px; overflow: hidden;
         }
         .card-header { 
-          background: linear-gradient(135deg, #059669, #10b981); color: white; 
+          background: linear-gradient(135deg, #059669, #10b981) !important; 
+          background-color: #059669 !important;
+          color: white !important; 
           padding: 8px; text-align: center; flex-shrink: 0;
         }
-        .card-header h3 { margin: 0; font-size: 14px; font-weight: bold; }
-        .card-header p { margin: 2px 0 0 0; font-size: 10px; }
+        .card-header h3 { margin: 0; font-size: 14px; font-weight: bold; color: white !important; }
+        .card-header p { margin: 2px 0 0 0; font-size: 10px; color: white !important; }
         .card-body { 
           display: flex; padding: 8px; flex: 1; gap: 8px; 
         }
@@ -1691,10 +1698,10 @@ const Certificates = () => {
         .photo-placeholder { 
           width: 40px; height: 50px; border: 1px solid #ccc; 
           display: flex; align-items: center; justify-content: center; 
-          font-size: 8px; color: #666; background: #f9f9f9;
+          font-size: 8px; color: #666; background: #f9f9f9 !important;
         }
         .info-section { flex: 1; }
-        .info-section h4 { margin: 0 0 8px 0; font-size: 12px; color: #059669; }
+        .info-section h4 { margin: 0 0 8px 0; font-size: 12px; color: #059669 !important; }
         .details p { margin: 2px 0; font-size: 9px; line-height: 1.2; }
         .card-footer { margin-top: auto; border-top: 1px solid #eee; padding-top: 4px; }
         .card-footer p { margin: 1px 0; font-size: 7px; color: #666; }
