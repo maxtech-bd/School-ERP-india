@@ -2673,12 +2673,16 @@ const Fees = () => {
               </div>
 
               <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleClearCollectionForm}>
                   Clear Form
                 </Button>
-                <Button className="bg-green-500 hover:bg-green-600">
+                <Button 
+                  className="bg-green-500 hover:bg-green-600"
+                  onClick={handleCollectionFormSubmit}
+                  disabled={loading || !collectionForm.student_id || !collectionForm.fee_type || !collectionForm.amount || !collectionForm.payment_mode}
+                >
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Process Payment & Generate Receipt
+                  {loading ? 'Processing...' : 'Process Payment & Generate Receipt'}
                 </Button>
               </div>
             </CardContent>
