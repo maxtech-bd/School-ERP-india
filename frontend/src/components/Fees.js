@@ -2002,7 +2002,7 @@ const Fees = () => {
                     <CardContent>
                       <div className="flex flex-wrap gap-3">
                         <Button 
-                          onClick={handleCollectPayment}
+                          onClick={() => handleStudentCollectPayment(selectedStudent)}
                           className="bg-emerald-500 hover:bg-emerald-600"
                         >
                           <CreditCard className="h-4 w-4 mr-2" />
@@ -2043,19 +2043,36 @@ const Fees = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-3">
-                        <Button className="bg-emerald-500 hover:bg-emerald-600">
+                        <Button 
+                          className="bg-emerald-500 hover:bg-emerald-600"
+                          onClick={() => handleStudentCollectPayment(selectedStudent)}
+                        >
                           <CreditCard className="h-4 w-4 mr-2" />
                           Collect Payment
                         </Button>
-                        <Button variant="outline">
+                        <Button 
+                          variant="outline"
+                          onClick={() => exportStudentReport(selectedStudent)}
+                        >
                           <Download className="h-4 w-4 mr-2" />
                           Export Report
                         </Button>
-                        <Button variant="outline">
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleViewAllReceipts(selectedStudent)}
+                        >
                           <Receipt className="h-4 w-4 mr-2" />
                           View Receipts
                         </Button>
-                        <Button variant="outline">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            toast.info('Fee Statement', {
+                              description: `Generating fee statement for ${selectedStudent?.name || 'student'}...`,
+                              duration: 3000
+                            });
+                          }}
+                        >
                           <FileText className="h-4 w-4 mr-2" />
                           Fee Statement
                         </Button>
