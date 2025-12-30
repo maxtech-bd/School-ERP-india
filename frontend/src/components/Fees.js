@@ -129,6 +129,14 @@ const Fees = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExportOptions, setShowExportOptions] = useState(false);
   const [dueFees, setDueFees] = useState([]);
+  const [dueFeesSummary, setDueFeesSummary] = useState({
+    pendingAmount: 0,
+    pendingCount: 0,
+    overdueAmount: 0,
+    overdueCount: 0,
+    dueThisWeekAmount: 0,
+    dueThisWeekCount: 0
+  });
   
   // Modal states for new functionality
   const [showFeeConfigModal, setShowFeeConfigModal] = useState(false);
@@ -242,6 +250,47 @@ const Fees = () => {
       // Set due fees data
       const dueFeesData = dueFeesRes.data || [];
       setDueFees(dueFeesData);
+      
+      // Calculate due fees summary from actual data
+      const now = new Date();
+      const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      
+      let pendingAmount = 0, pendingCount = 0;
+      let overdueAmount = 0, overdueCount = 0;
+      let dueThisWeekAmount = 0, dueThisWeekCount = 0;
+      
+      dueFeesData.forEach(fee => {
+        const totalDue = fee.total_due || fee.pending_amount || 0;
+        const daysOverdue = fee.days_overdue || 0;
+        const dueDate = fee.due_date ? new Date(fee.due_date) : null;
+        
+        // Count all pending fees
+        if (totalDue > 0) {
+          pendingAmount += totalDue;
+          pendingCount += 1;
+        }
+        
+        // Count overdue fees (days_overdue > 0)
+        if (daysOverdue > 0) {
+          overdueAmount += totalDue;
+          overdueCount += 1;
+        }
+        
+        // Count fees due this week (within next 7 days and not overdue)
+        if (dueDate && dueDate >= now && dueDate <= oneWeekFromNow && daysOverdue === 0) {
+          dueThisWeekAmount += totalDue;
+          dueThisWeekCount += 1;
+        }
+      });
+      
+      setDueFeesSummary({
+        pendingAmount,
+        pendingCount,
+        overdueAmount,
+        overdueCount,
+        dueThisWeekAmount,
+        dueThisWeekCount
+      });
       
       console.log('✅ Fee data loaded from backend successfully');
       console.log('📊 Today\'s metrics:', {
@@ -2176,8 +2225,8 @@ const Fees = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Pending Fees</p>
-                    <p className="text-2xl font-bold text-orange-600">{getCurrencySymbol()}7.2L</p>
-                    <p className="text-xs text-orange-500">45 students</p>
+                    <p className="text-2xl font-bold text-orange-600">{formatCurrency(dueFeesSummary.pendingAmount)}</p>
+                    <p className="text-xs text-orange-500">{dueFeesSummary.pendingCount} student{dueFeesSummary.pendingCount !== 1 ? 's' : ''}</p>
                   </div>
                   <Clock className="h-8 w-8 text-orange-500" />
                 </div>
@@ -2188,8 +2237,8 @@ const Fees = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Overdue Fees</p>
-                    <p className="text-2xl font-bold text-red-600">{getCurrencySymbol()}2.8L</p>
-                    <p className="text-xs text-red-500">18 students</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(dueFeesSummary.overdueAmount)}</p>
+                    <p className="text-xs text-red-500">{dueFeesSummary.overdueCount} student{dueFeesSummary.overdueCount !== 1 ? 's' : ''}</p>
                   </div>
                   <AlertTriangle className="h-8 w-8 text-red-500" />
                 </div>
@@ -2200,8 +2249,8 @@ const Fees = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Due This Week</p>
-                    <p className="text-2xl font-bold text-yellow-600">{getCurrencySymbol()}1.5L</p>
-                    <p className="text-xs text-yellow-500">12 students</p>
+                    <p className="text-2xl font-bold text-yellow-600">{formatCurrency(dueFeesSummary.dueThisWeekAmount)}</p>
+                    <p className="text-xs text-yellow-500">{dueFeesSummary.dueThisWeekCount} student{dueFeesSummary.dueThisWeekCount !== 1 ? 's' : ''}</p>
                   </div>
                   <Calendar className="h-8 w-8 text-yellow-500" />
                 </div>
