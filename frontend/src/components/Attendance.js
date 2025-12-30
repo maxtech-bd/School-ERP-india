@@ -25,8 +25,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL;
-const API = BACKEND_URL;
+const API = process.env.REACT_APP_API_URL || '/api';
 
 // Mark Attendance Component
 const MarkAttendance = () => {
