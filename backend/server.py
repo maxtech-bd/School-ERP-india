@@ -2342,26 +2342,6 @@ async def get_current_tenant_modules(current_user: User = Depends(get_current_us
     
     return {"allowed_modules": allowed_modules}
 
-# ==================== SCHOOL MANAGEMENT ====================
-
-@api_router.get("/schools", response_model=List[School])
-async def get_schools(current_user: User = Depends(get_current_user)):
-    query = {"tenant_id": current_user.tenant_id, "is_active": True}
-    schools = await db.schools.find(query).to_list(1000)
-    return [School(**school) for school in schools]
-
-@api_router.post("/schools", response_model=School)
-async def create_school(school_data: SchoolCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["super_admin", "admin"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    school_dict = school_data.dict()
-    school_dict["tenant_id"] = current_user.tenant_id
-    school = School(**school_dict)
-    
-    await db.schools.insert_one(school.dict())
-    return school
-
 # ==================== INSTITUTION MANAGEMENT ====================
 
 @api_router.get("/institution", response_model=Institution)
