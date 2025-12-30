@@ -5143,7 +5143,7 @@ const Settings = () => {
               <Label>Role Name *</Label>
               <input
                 type="text"
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="e.g., Teacher, Accountant, Admin Staff"
                 value={roleFormData.role_name}
                 onChange={(e) => setRoleFormData({...roleFormData, role_name: e.target.value})}
@@ -5152,7 +5152,7 @@ const Settings = () => {
             <div>
               <Label>Description</Label>
               <textarea
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 rows="3"
                 placeholder="Enter role description"
                 value={roleFormData.description}
@@ -5163,7 +5163,7 @@ const Settings = () => {
               <input
                 type="checkbox"
                 id="role_active"
-                className="mr-2"
+                className="mr-2 dark:accent-emerald-500"
                 checked={roleFormData.is_active}
                 onChange={(e) => setRoleFormData({...roleFormData, is_active: e.target.checked})}
               />
@@ -5190,7 +5190,7 @@ const Settings = () => {
               <Label>Department Name *</Label>
               <input
                 type="text"
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="e.g., Science, Mathematics, Administration"
                 value={departmentFormData.department_name}
                 onChange={(e) => setDepartmentFormData({...departmentFormData, department_name: e.target.value})}
@@ -5199,7 +5199,7 @@ const Settings = () => {
             <div>
               <Label>Description</Label>
               <textarea
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 rows="3"
                 placeholder="Enter department description"
                 value={departmentFormData.description}
@@ -5210,7 +5210,7 @@ const Settings = () => {
               <input
                 type="checkbox"
                 id="dept_active"
-                className="mr-2"
+                className="mr-2 dark:accent-emerald-500"
                 checked={departmentFormData.is_active}
                 onChange={(e) => setDepartmentFormData({...departmentFormData, is_active: e.target.checked})}
               />
@@ -5237,7 +5237,7 @@ const Settings = () => {
               <Label>Employment Type Name *</Label>
               <input
                 type="text"
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="e.g., Full-time, Part-time, Contract"
                 value={employmentFormData.type_name}
                 onChange={(e) => setEmploymentFormData({...employmentFormData, type_name: e.target.value})}
@@ -5246,7 +5246,7 @@ const Settings = () => {
             <div>
               <Label>Description</Label>
               <textarea
-                className="w-full mt-1 px-3 py-2 border rounded-md"
+                className="w-full mt-1 px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 rows="3"
                 placeholder="Enter employment type description"
                 value={employmentFormData.description}
@@ -5257,7 +5257,7 @@ const Settings = () => {
               <input
                 type="checkbox"
                 id="emp_active"
-                className="mr-2"
+                className="mr-2 dark:accent-emerald-500"
                 checked={employmentFormData.is_active}
                 onChange={(e) => setEmploymentFormData({...employmentFormData, is_active: e.target.checked})}
               />
