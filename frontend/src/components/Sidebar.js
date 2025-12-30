@@ -184,26 +184,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     },
     {
       key: "attendance",
-      title: "Attendance",
+      title: "Staff Attendance",
       icon: ClipboardCheck,
+      path: "/attendance",
       roles: ["super_admin", "admin", "teacher"],
-      subItems: [
-        {
-          title: "Mark Attendance",
-          path: "/attendance/mark",
-          roles: ["super_admin", "admin", "teacher"],
-        },
-        {
-          title: "View Attendance",
-          path: "/attendance",
-          roles: ["super_admin", "admin", "teacher"],
-        },
-        {
-          title: "Attendance Reports",
-          path: "/attendance/reports",
-          roles: ["super_admin", "admin"],
-        },
-      ],
     },
     {
       key: "results",
