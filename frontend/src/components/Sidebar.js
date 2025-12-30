@@ -168,24 +168,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       key: "class",
       title: "Classes",
       icon: BookOpen,
+      path: "/classes",
       roles: ["super_admin", "admin", "teacher"],
-      subItems: [
-        {
-          title: "Manage Classes",
-          path: "/classes",
-          roles: ["super_admin", "admin", "teacher"],
-        },
-        {
-          title: "Sections",
-          path: "/classes/sections",
-          roles: ["super_admin", "admin"],
-        },
-        {
-          title: "Class Subjects",
-          path: "/classes/subjects",
-          roles: ["super_admin", "admin"],
-        },
-      ],
     },
     {
       key: "results",
