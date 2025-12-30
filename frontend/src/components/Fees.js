@@ -2468,18 +2468,15 @@ const Fees = () => {
                           size="sm" 
                           className="bg-purple-500 hover:bg-purple-600 text-xs"
                           onClick={() => {
-                            // Set selected student and show details in toast for grid view
+                            // Set selected student and switch to student-specific tab
                             setSelectedStudent(student);
                             fetchStudentFinancials(student.id);
+                            // Switch to the student-specific tab to show details
+                            handleTabChange('student-specific');
                             toast.success(`👤 ${student.name}`, {
                               description: `Viewing details for ${student.name} (${student.admission_no}) - ${getClassName(student.class_id)}`,
-                              duration: 4000
+                              duration: 3000
                             });
-                            // Scroll to the list view section to show details
-                            const studentListSection = document.querySelector('[data-section="student-list-details"]');
-                            if (studentListSection) {
-                              studentListSection.scrollIntoView({ behavior: 'smooth' });
-                            }
                           }}
                         >
                           <User className="h-3 w-3 mr-1" />
