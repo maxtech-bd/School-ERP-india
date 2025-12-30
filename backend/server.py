@@ -4633,6 +4633,173 @@ class BulkAttendanceRequest(BaseModel):
     type: str
     records: List[AttendanceRecord]
 
+# ===== ENTERPRISE ATTENDANCE SYSTEM =====
+
+class AttendanceSession(BaseModel):
+    """Session context for attendance (class/date/period)"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    class_id: str
+    class_name: Optional[str] = None
+    section_id: Optional[str] = None
+    section_name: Optional[str] = None
+    date: str  # YYYY-MM-DD
+    period_id: Optional[str] = None  # For period-wise attendance
+    period_name: Optional[str] = None
+    subject_id: Optional[str] = None
+    subject_name: Optional[str] = None
+    session_type: str = "daily"  # daily, period
+    status: str = "open"  # open, closed, submitted
+    total_students: int = 0
+    present_count: int = 0
+    absent_count: int = 0
+    late_count: int = 0
+    leave_count: int = 0
+    marked_by: Optional[str] = None
+    marked_by_name: Optional[str] = None
+    submitted_at: Optional[datetime] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AttendanceSessionCreate(BaseModel):
+    class_id: str
+    section_id: Optional[str] = None
+    date: str
+    period_id: Optional[str] = None
+    subject_id: Optional[str] = None
+    session_type: str = "daily"
+
+class EnterpriseAttendanceRecord(BaseModel):
+    """Individual student attendance record"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    session_id: str
+    student_id: str
+    student_name: str
+    admission_no: str
+    class_id: str
+    class_name: Optional[str] = None
+    section_id: Optional[str] = None
+    section_name: Optional[str] = None
+    date: str  # YYYY-MM-DD
+    period_id: Optional[str] = None
+    status: str = "absent"  # present, absent, late, leave, half_day
+    check_in_time: Optional[str] = None
+    check_out_time: Optional[str] = None
+    late_minutes: int = 0
+    reason: Optional[str] = None
+    leave_request_id: Optional[str] = None
+    source: str = "manual"  # manual, biometric, app
+    marked_by: Optional[str] = None
+    marked_by_name: Optional[str] = None
+    parent_notified: bool = False
+    notification_sent_at: Optional[datetime] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AttendanceMarkRequest(BaseModel):
+    """Request to mark attendance for students"""
+    session_id: Optional[str] = None
+    class_id: str
+    section_id: Optional[str] = None
+    date: str
+    period_id: Optional[str] = None
+    session_type: str = "daily"
+    records: List[Dict[str, Any]] = Field(default_factory=list)  # [{student_id, status, reason, late_minutes}]
+
+class AttendanceRules(BaseModel):
+    """School-specific attendance configuration"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    late_threshold_minutes: int = 15  # Minutes after which student is marked late
+    half_day_threshold_minutes: int = 120  # Minutes for half day
+    minimum_attendance_percentage: float = 75.0  # Required for exams
+    auto_notify_parents: bool = True
+    notify_after_absences: int = 3  # Notify parent after N consecutive absences
+    grace_period_minutes: int = 5  # Grace period before late marking
+    enable_period_wise: bool = False
+    enable_biometric: bool = False
+    working_days: List[str] = Field(default_factory=lambda: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
+    school_start_time: str = "08:00"
+    school_end_time: str = "15:00"
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AttendanceRulesUpdate(BaseModel):
+    late_threshold_minutes: Optional[int] = None
+    half_day_threshold_minutes: Optional[int] = None
+    minimum_attendance_percentage: Optional[float] = None
+    auto_notify_parents: Optional[bool] = None
+    notify_after_absences: Optional[int] = None
+    grace_period_minutes: Optional[int] = None
+    enable_period_wise: Optional[bool] = None
+    enable_biometric: Optional[bool] = None
+    working_days: Optional[List[str]] = None
+    school_start_time: Optional[str] = None
+    school_end_time: Optional[str] = None
+
+class StudentLeaveRequest(BaseModel):
+    """Student leave application"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    student_id: str
+    student_name: str
+    admission_no: str
+    class_id: str
+    class_name: Optional[str] = None
+    section_id: Optional[str] = None
+    section_name: Optional[str] = None
+    leave_type: str  # sick, personal, family, other
+    start_date: str
+    end_date: str
+    total_days: int = 1
+    reason: str
+    supporting_document: Optional[str] = None
+    applied_by: str  # student or parent_id
+    applied_by_name: str
+    applied_by_role: str  # student, parent
+    status: str = "pending"  # pending, approved, rejected, cancelled
+    reviewed_by: Optional[str] = None
+    reviewed_by_name: Optional[str] = None
+    reviewed_at: Optional[datetime] = None
+    review_remarks: Optional[str] = None
+    parent_id: Optional[str] = None
+    parent_name: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class StudentLeaveRequestCreate(BaseModel):
+    student_id: str
+    leave_type: str
+    start_date: str
+    end_date: str
+    reason: str
+    supporting_document: Optional[str] = None
+
+class StudentLeaveRequestUpdate(BaseModel):
+    status: str  # approved, rejected
+    review_remarks: Optional[str] = None
+
+class AttendanceSummary(BaseModel):
+    """Attendance summary for dashboards"""
+    total_working_days: int = 0
+    total_present: int = 0
+    total_absent: int = 0
+    total_late: int = 0
+    total_leave: int = 0
+    attendance_percentage: float = 0.0
+    consecutive_absences: int = 0
+    last_attendance_date: Optional[str] = None
+    last_status: Optional[str] = None
+
 @api_router.get("/attendance")
 async def get_attendance(
     date: Optional[str] = None,
@@ -4862,6 +5029,861 @@ async def get_attendance_summary(
     except Exception as e:
         logging.error(f"Failed to get attendance summary: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to retrieve attendance summary")
+
+# ===== ENTERPRISE ATTENDANCE API ENDPOINTS =====
+
+@api_router.post("/attendance/enterprise/sessions")
+async def create_attendance_session(
+    session_data: AttendanceSessionCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create an attendance session for a class/date/period"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher", "principal"]:
+            raise HTTPException(status_code=403, detail="Not authorized to create attendance sessions")
+        
+        # Get class info
+        class_doc = await db.classes.find_one({
+            "id": session_data.class_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        # Check if session already exists
+        existing = await db.attendance_sessions.find_one({
+            "tenant_id": current_user.tenant_id,
+            "class_id": session_data.class_id,
+            "section_id": session_data.section_id,
+            "date": session_data.date,
+            "period_id": session_data.period_id,
+            "session_type": session_data.session_type,
+            "is_active": True
+        })
+        
+        if existing:
+            return existing
+        
+        # Count students in class/section
+        student_filter = {
+            "tenant_id": current_user.tenant_id,
+            "class_id": session_data.class_id,
+            "is_active": True
+        }
+        if session_data.section_id:
+            student_filter["section_id"] = session_data.section_id
+        total_students = await db.students.count_documents(student_filter)
+        
+        session = AttendanceSession(
+            tenant_id=current_user.tenant_id,
+            school_id=current_user.school_id or "",
+            class_id=session_data.class_id,
+            class_name=class_doc.get("name") if class_doc else None,
+            section_id=session_data.section_id,
+            date=session_data.date,
+            period_id=session_data.period_id,
+            subject_id=session_data.subject_id,
+            session_type=session_data.session_type,
+            total_students=total_students,
+            marked_by=current_user.id,
+            marked_by_name=current_user.name or current_user.username
+        )
+        
+        await db.attendance_sessions.insert_one(session.model_dump())
+        return session.model_dump()
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to create attendance session: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create attendance session")
+
+@api_router.get("/attendance/enterprise/sessions")
+async def list_attendance_sessions(
+    class_id: Optional[str] = None,
+    date: Optional[str] = None,
+    session_type: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """List attendance sessions with optional filters"""
+    try:
+        filter_criteria = {
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        }
+        
+        if class_id:
+            filter_criteria["class_id"] = class_id
+        if date:
+            filter_criteria["date"] = date
+        if session_type:
+            filter_criteria["session_type"] = session_type
+            
+        # For teachers, filter by assigned classes
+        if current_user.role == "teacher":
+            teacher = await db.staff.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if teacher and teacher.get("assigned_classes"):
+                filter_criteria["class_id"] = {"$in": teacher.get("assigned_classes", [])}
+        
+        sessions = await db.attendance_sessions.find(filter_criteria).sort("date", -1).to_list(100)
+        return sessions
+        
+    except Exception as e:
+        logging.error(f"Failed to list attendance sessions: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to list attendance sessions")
+
+@api_router.post("/attendance/enterprise/mark")
+async def mark_enterprise_attendance(
+    request: AttendanceMarkRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Mark attendance for multiple students at once"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher", "principal"]:
+            raise HTTPException(status_code=403, detail="Not authorized to mark attendance")
+        
+        # Get or create session
+        session_id = request.session_id
+        if not session_id:
+            session_result = await create_attendance_session(
+                AttendanceSessionCreate(
+                    class_id=request.class_id,
+                    section_id=request.section_id,
+                    date=request.date,
+                    period_id=request.period_id,
+                    session_type=request.session_type
+                ),
+                current_user
+            )
+            session_id = session_result.get("id") if isinstance(session_result, dict) else session_result.id
+        
+        # Get class info
+        class_doc = await db.classes.find_one({
+            "id": request.class_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        # Delete existing records for this session
+        await db.enterprise_attendance.delete_many({
+            "tenant_id": current_user.tenant_id,
+            "session_id": session_id,
+            "date": request.date
+        })
+        
+        # Create attendance records
+        records_to_insert = []
+        present_count = 0
+        absent_count = 0
+        late_count = 0
+        leave_count = 0
+        
+        for record in request.records:
+            student = await db.students.find_one({
+                "id": record.get("student_id"),
+                "tenant_id": current_user.tenant_id
+            })
+            
+            if not student:
+                continue
+            
+            status = record.get("status", "absent")
+            if status == "present":
+                present_count += 1
+            elif status == "absent":
+                absent_count += 1
+            elif status == "late":
+                late_count += 1
+            elif status == "leave":
+                leave_count += 1
+            
+            attendance_record = EnterpriseAttendanceRecord(
+                tenant_id=current_user.tenant_id,
+                school_id=current_user.school_id or "",
+                session_id=session_id,
+                student_id=student["id"],
+                student_name=student.get("name", ""),
+                admission_no=student.get("admission_no", ""),
+                class_id=request.class_id,
+                class_name=class_doc.get("name") if class_doc else None,
+                section_id=request.section_id,
+                date=request.date,
+                period_id=request.period_id,
+                status=status,
+                late_minutes=record.get("late_minutes", 0),
+                reason=record.get("reason"),
+                source="manual",
+                marked_by=current_user.id,
+                marked_by_name=current_user.name or current_user.username
+            )
+            records_to_insert.append(attendance_record.model_dump())
+        
+        if records_to_insert:
+            await db.enterprise_attendance.insert_many(records_to_insert)
+        
+        # Update session counts
+        await db.attendance_sessions.update_one(
+            {"id": session_id},
+            {
+                "$set": {
+                    "present_count": present_count,
+                    "absent_count": absent_count,
+                    "late_count": late_count,
+                    "leave_count": leave_count,
+                    "status": "submitted",
+                    "submitted_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        # Send absence notifications to parents
+        if absent_count > 0:
+            await send_absence_notifications(request.date, session_id, current_user.tenant_id)
+        
+        return {
+            "message": f"Attendance marked for {len(records_to_insert)} students",
+            "session_id": session_id,
+            "present": present_count,
+            "absent": absent_count,
+            "late": late_count,
+            "leave": leave_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to mark attendance: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to mark attendance")
+
+async def send_absence_notifications(date: str, session_id: str, tenant_id: str):
+    """Send notifications to parents for absent students"""
+    try:
+        absent_records = await db.enterprise_attendance.find({
+            "tenant_id": tenant_id,
+            "session_id": session_id,
+            "status": "absent",
+            "parent_notified": False
+        }).to_list(100)
+        
+        for record in absent_records:
+            student = await db.students.find_one({
+                "id": record["student_id"],
+                "tenant_id": tenant_id
+            })
+            
+            if student and student.get("parent_id"):
+                # Create notification
+                notification = {
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": tenant_id,
+                    "user_id": student["parent_id"],
+                    "title": "Absence Alert",
+                    "message": f"Your child {student.get('name')} was marked absent on {date}",
+                    "type": "attendance_alert",
+                    "priority": "high",
+                    "is_read": False,
+                    "created_at": datetime.utcnow()
+                }
+                await db.notifications.insert_one(notification)
+                
+                # Mark as notified
+                await db.enterprise_attendance.update_one(
+                    {"id": record["id"]},
+                    {"$set": {"parent_notified": True, "notification_sent_at": datetime.utcnow()}}
+                )
+                
+    except Exception as e:
+        logging.error(f"Failed to send absence notifications: {str(e)}")
+
+@api_router.get("/attendance/enterprise/student/{student_id}")
+async def get_student_attendance(
+    student_id: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance history and summary for a student"""
+    try:
+        # Verify access
+        if current_user.role == "student":
+            student = await db.students.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if not student or student["id"] != student_id:
+                raise HTTPException(status_code=403, detail="Not authorized to view this student's attendance")
+        elif current_user.role == "parent":
+            parent = await db.parents.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if not parent or student_id not in parent.get("linked_student_ids", []):
+                raise HTTPException(status_code=403, detail="Not authorized to view this student's attendance")
+        
+        filter_criteria = {
+            "tenant_id": current_user.tenant_id,
+            "student_id": student_id,
+            "is_active": True
+        }
+        
+        if start_date:
+            filter_criteria["date"] = {"$gte": start_date}
+        if end_date:
+            if "date" in filter_criteria:
+                filter_criteria["date"]["$lte"] = end_date
+            else:
+                filter_criteria["date"] = {"$lte": end_date}
+        
+        # Get attendance records
+        records = await db.enterprise_attendance.find(filter_criteria).sort("date", -1).to_list(365)
+        
+        # Calculate summary
+        total = len(records)
+        present = sum(1 for r in records if r.get("status") == "present")
+        absent = sum(1 for r in records if r.get("status") == "absent")
+        late = sum(1 for r in records if r.get("status") == "late")
+        leave = sum(1 for r in records if r.get("status") == "leave")
+        
+        # Calculate consecutive absences
+        consecutive = 0
+        for r in records:
+            if r.get("status") == "absent":
+                consecutive += 1
+            else:
+                break
+        
+        summary = {
+            "total_working_days": total,
+            "total_present": present,
+            "total_absent": absent,
+            "total_late": late,
+            "total_leave": leave,
+            "attendance_percentage": round((present / total * 100), 2) if total > 0 else 0,
+            "consecutive_absences": consecutive,
+            "last_attendance_date": records[0].get("date") if records else None,
+            "last_status": records[0].get("status") if records else None
+        }
+        
+        return {
+            "summary": summary,
+            "records": records[:30]  # Return last 30 records
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get student attendance: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get student attendance")
+
+@api_router.get("/attendance/enterprise/my-attendance")
+async def get_my_attendance(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance for current logged-in student"""
+    try:
+        if current_user.role != "student":
+            raise HTTPException(status_code=403, detail="This endpoint is for students only")
+        
+        student = await db.students.find_one({
+            "user_id": current_user.id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not student:
+            raise HTTPException(status_code=404, detail="Student profile not found")
+        
+        return await get_student_attendance(student["id"], start_date, end_date, current_user)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get my attendance: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get attendance")
+
+@api_router.get("/attendance/enterprise/parent-view")
+async def get_parent_attendance_view(
+    child_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance summary for parent's children"""
+    try:
+        if current_user.role != "parent":
+            raise HTTPException(status_code=403, detail="This endpoint is for parents only")
+        
+        parent = await db.parents.find_one({
+            "user_id": current_user.id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not parent:
+            raise HTTPException(status_code=404, detail="Parent profile not found")
+        
+        children_ids = parent.get("linked_student_ids", [])
+        if not children_ids:
+            return {"children": [], "total_children": 0}
+        
+        # If specific child requested
+        if child_id and child_id in children_ids:
+            children_ids = [child_id]
+        
+        children_summaries = []
+        for cid in children_ids:
+            student = await db.students.find_one({
+                "id": cid,
+                "tenant_id": current_user.tenant_id
+            })
+            
+            if student:
+                # Get attendance summary
+                records = await db.enterprise_attendance.find({
+                    "tenant_id": current_user.tenant_id,
+                    "student_id": cid,
+                    "is_active": True
+                }).sort("date", -1).to_list(100)
+                
+                total = len(records)
+                present = sum(1 for r in records if r.get("status") == "present")
+                absent = sum(1 for r in records if r.get("status") == "absent")
+                
+                # Count consecutive absences
+                consecutive = 0
+                for r in records:
+                    if r.get("status") == "absent":
+                        consecutive += 1
+                    else:
+                        break
+                
+                children_summaries.append({
+                    "student_id": cid,
+                    "student_name": student.get("name"),
+                    "admission_no": student.get("admission_no"),
+                    "class_name": student.get("class_name"),
+                    "section_name": student.get("section_name"),
+                    "total_days": total,
+                    "present": present,
+                    "absent": absent,
+                    "attendance_percentage": round((present / total * 100), 2) if total > 0 else 0,
+                    "consecutive_absences": consecutive,
+                    "last_status": records[0].get("status") if records else None,
+                    "last_date": records[0].get("date") if records else None,
+                    "recent_records": records[:7]  # Last 7 days
+                })
+        
+        return {
+            "children": children_summaries,
+            "total_children": len(children_summaries)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get parent attendance view: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get attendance")
+
+# ===== STUDENT LEAVE MANAGEMENT =====
+
+@api_router.post("/attendance/leave/apply")
+async def apply_student_leave(
+    request: StudentLeaveRequestCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Apply for student leave (by student or parent)"""
+    try:
+        if current_user.role not in ["student", "parent", "admin", "super_admin"]:
+            raise HTTPException(status_code=403, detail="Not authorized to apply for leave")
+        
+        # Get student info
+        student = await db.students.find_one({
+            "id": request.student_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+        
+        # Verify access for parent
+        if current_user.role == "parent":
+            parent = await db.parents.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if not parent or request.student_id not in parent.get("linked_student_ids", []):
+                raise HTTPException(status_code=403, detail="Not authorized for this student")
+        
+        # Calculate total days
+        start = datetime.strptime(request.start_date, "%Y-%m-%d")
+        end = datetime.strptime(request.end_date, "%Y-%m-%d")
+        total_days = (end - start).days + 1
+        
+        # Get class info
+        class_doc = await db.classes.find_one({
+            "id": student.get("class_id"),
+            "tenant_id": current_user.tenant_id
+        })
+        
+        leave_request = StudentLeaveRequest(
+            tenant_id=current_user.tenant_id,
+            school_id=current_user.school_id or "",
+            student_id=request.student_id,
+            student_name=student.get("name", ""),
+            admission_no=student.get("admission_no", ""),
+            class_id=student.get("class_id", ""),
+            class_name=class_doc.get("name") if class_doc else None,
+            section_id=student.get("section_id"),
+            leave_type=request.leave_type,
+            start_date=request.start_date,
+            end_date=request.end_date,
+            total_days=total_days,
+            reason=request.reason,
+            supporting_document=request.supporting_document,
+            applied_by=current_user.id,
+            applied_by_name=current_user.name or current_user.username,
+            applied_by_role=current_user.role,
+            parent_id=student.get("parent_id"),
+            parent_name=student.get("parent_name")
+        )
+        
+        await db.student_leave_requests.insert_one(leave_request.model_dump())
+        
+        return {"message": "Leave application submitted successfully", "leave_id": leave_request.id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to apply for leave: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to submit leave application")
+
+@api_router.get("/attendance/leave/list")
+async def list_student_leaves(
+    student_id: Optional[str] = None,
+    status: Optional[str] = None,
+    class_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """List student leave requests"""
+    try:
+        filter_criteria = {
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        }
+        
+        # Role-based filtering
+        if current_user.role == "student":
+            student = await db.students.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if student:
+                filter_criteria["student_id"] = student["id"]
+        elif current_user.role == "parent":
+            parent = await db.parents.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if parent:
+                filter_criteria["student_id"] = {"$in": parent.get("linked_student_ids", [])}
+        elif current_user.role == "teacher":
+            teacher = await db.staff.find_one({
+                "user_id": current_user.id,
+                "tenant_id": current_user.tenant_id
+            })
+            if teacher and teacher.get("assigned_classes"):
+                filter_criteria["class_id"] = {"$in": teacher.get("assigned_classes", [])}
+        
+        if student_id:
+            filter_criteria["student_id"] = student_id
+        if status:
+            filter_criteria["status"] = status
+        if class_id:
+            filter_criteria["class_id"] = class_id
+        
+        leaves = await db.student_leave_requests.find(filter_criteria).sort("created_at", -1).to_list(100)
+        return leaves
+        
+    except Exception as e:
+        logging.error(f"Failed to list leaves: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to list leave requests")
+
+@api_router.put("/attendance/leave/{leave_id}")
+async def update_student_leave(
+    leave_id: str,
+    request: StudentLeaveRequestUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Approve or reject student leave request"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher", "principal"]:
+            raise HTTPException(status_code=403, detail="Not authorized to approve/reject leave")
+        
+        leave = await db.student_leave_requests.find_one({
+            "id": leave_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not leave:
+            raise HTTPException(status_code=404, detail="Leave request not found")
+        
+        update_data = {
+            "status": request.status,
+            "reviewed_by": current_user.id,
+            "reviewed_by_name": current_user.name or current_user.username,
+            "reviewed_at": datetime.utcnow(),
+            "review_remarks": request.review_remarks,
+            "updated_at": datetime.utcnow()
+        }
+        
+        await db.student_leave_requests.update_one(
+            {"id": leave_id},
+            {"$set": update_data}
+        )
+        
+        # If approved, mark attendance as leave for those dates
+        if request.status == "approved":
+            start = datetime.strptime(leave["start_date"], "%Y-%m-%d")
+            end = datetime.strptime(leave["end_date"], "%Y-%m-%d")
+            current = start
+            while current <= end:
+                await db.enterprise_attendance.update_many(
+                    {
+                        "tenant_id": current_user.tenant_id,
+                        "student_id": leave["student_id"],
+                        "date": current.strftime("%Y-%m-%d")
+                    },
+                    {
+                        "$set": {
+                            "status": "leave",
+                            "leave_request_id": leave_id,
+                            "updated_at": datetime.utcnow()
+                        }
+                    }
+                )
+                current += timedelta(days=1)
+        
+        return {"message": f"Leave request {request.status}"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to update leave: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update leave request")
+
+# ===== ATTENDANCE ANALYTICS =====
+
+@api_router.get("/attendance/enterprise/analytics")
+async def get_attendance_analytics(
+    class_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get attendance analytics for admin dashboard"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "principal", "teacher"]:
+            raise HTTPException(status_code=403, detail="Not authorized to view analytics")
+        
+        filter_criteria = {
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        }
+        
+        if class_id:
+            filter_criteria["class_id"] = class_id
+        if start_date:
+            filter_criteria["date"] = {"$gte": start_date}
+        if end_date:
+            if "date" in filter_criteria:
+                filter_criteria["date"]["$lte"] = end_date
+            else:
+                filter_criteria["date"] = {"$lte": end_date}
+        
+        records = await db.enterprise_attendance.find(filter_criteria).to_list(10000)
+        
+        # Overall summary
+        total = len(records)
+        present = sum(1 for r in records if r.get("status") == "present")
+        absent = sum(1 for r in records if r.get("status") == "absent")
+        late = sum(1 for r in records if r.get("status") == "late")
+        leave = sum(1 for r in records if r.get("status") == "leave")
+        
+        # Daily trend
+        daily_trend = {}
+        for r in records:
+            date = r.get("date")
+            if date not in daily_trend:
+                daily_trend[date] = {"present": 0, "absent": 0, "late": 0, "leave": 0, "total": 0}
+            daily_trend[date][r.get("status", "absent")] += 1
+            daily_trend[date]["total"] += 1
+        
+        # Class-wise summary
+        class_summary = {}
+        for r in records:
+            cid = r.get("class_id")
+            cname = r.get("class_name", cid)
+            if cid not in class_summary:
+                class_summary[cid] = {"class_name": cname, "present": 0, "absent": 0, "late": 0, "total": 0}
+            class_summary[cid][r.get("status", "absent")] += 1
+            class_summary[cid]["total"] += 1
+        
+        # Students with low attendance
+        student_attendance = {}
+        for r in records:
+            sid = r.get("student_id")
+            if sid not in student_attendance:
+                student_attendance[sid] = {
+                    "student_name": r.get("student_name"),
+                    "class_name": r.get("class_name"),
+                    "present": 0, "total": 0
+                }
+            student_attendance[sid]["total"] += 1
+            if r.get("status") == "present":
+                student_attendance[sid]["present"] += 1
+        
+        low_attendance = []
+        for sid, data in student_attendance.items():
+            pct = (data["present"] / data["total"] * 100) if data["total"] > 0 else 0
+            if pct < 75:
+                low_attendance.append({
+                    "student_id": sid,
+                    "student_name": data["student_name"],
+                    "class_name": data["class_name"],
+                    "attendance_percentage": round(pct, 2),
+                    "present": data["present"],
+                    "total": data["total"]
+                })
+        
+        low_attendance.sort(key=lambda x: x["attendance_percentage"])
+        
+        return {
+            "summary": {
+                "total_records": total,
+                "present": present,
+                "absent": absent,
+                "late": late,
+                "leave": leave,
+                "attendance_rate": round((present / total * 100), 2) if total > 0 else 0
+            },
+            "daily_trend": [{"date": k, **v} for k, v in sorted(daily_trend.items())],
+            "class_summary": list(class_summary.values()),
+            "low_attendance_students": low_attendance[:20]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get attendance analytics")
+
+# ===== ATTENDANCE RULES =====
+
+@api_router.get("/attendance/enterprise/rules")
+async def get_attendance_rules(current_user: User = Depends(get_current_user)):
+    """Get attendance rules for the school"""
+    try:
+        rules = await db.attendance_rules.find_one({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        })
+        
+        if not rules:
+            # Return default rules
+            return {
+                "late_threshold_minutes": 15,
+                "half_day_threshold_minutes": 120,
+                "minimum_attendance_percentage": 75.0,
+                "auto_notify_parents": True,
+                "notify_after_absences": 3,
+                "grace_period_minutes": 5,
+                "enable_period_wise": False,
+                "enable_biometric": False,
+                "working_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                "school_start_time": "08:00",
+                "school_end_time": "15:00"
+            }
+        
+        return rules
+        
+    except Exception as e:
+        logging.error(f"Failed to get attendance rules: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get attendance rules")
+
+@api_router.put("/attendance/enterprise/rules")
+async def update_attendance_rules(
+    request: AttendanceRulesUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update attendance rules for the school"""
+    try:
+        if current_user.role not in ["super_admin", "admin"]:
+            raise HTTPException(status_code=403, detail="Not authorized to update rules")
+        
+        update_data = {k: v for k, v in request.model_dump().items() if v is not None}
+        update_data["updated_at"] = datetime.utcnow()
+        
+        existing = await db.attendance_rules.find_one({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        })
+        
+        if existing:
+            await db.attendance_rules.update_one(
+                {"id": existing["id"]},
+                {"$set": update_data}
+            )
+        else:
+            rules = AttendanceRules(
+                tenant_id=current_user.tenant_id,
+                school_id=current_user.school_id or "",
+                **{k: v for k, v in request.model_dump().items() if v is not None}
+            )
+            await db.attendance_rules.insert_one(rules.model_dump())
+        
+        return {"message": "Attendance rules updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to update attendance rules: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update attendance rules")
+
+@api_router.get("/attendance/enterprise/class-students/{class_id}")
+async def get_class_students_for_attendance(
+    class_id: str,
+    section_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get list of students in a class for attendance marking"""
+    try:
+        if current_user.role not in ["super_admin", "admin", "teacher", "principal"]:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        filter_criteria = {
+            "tenant_id": current_user.tenant_id,
+            "class_id": class_id,
+            "is_active": True
+        }
+        
+        if section_id:
+            filter_criteria["section_id"] = section_id
+        
+        students = await db.students.find(filter_criteria).sort("name", 1).to_list(100)
+        
+        return [{
+            "id": s["id"],
+            "name": s.get("name"),
+            "admission_no": s.get("admission_no"),
+            "roll_no": s.get("roll_no"),
+            "section_id": s.get("section_id"),
+            "photo": s.get("photo")
+        } for s in students]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get class students: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get class students")
 
 @api_router.put("/biometric/device-status")
 async def update_device_status(
