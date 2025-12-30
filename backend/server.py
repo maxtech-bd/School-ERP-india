@@ -4613,6 +4613,7 @@ async def update_leave_request(
 
 class AttendanceRecord(BaseModel):
     employee_id: Optional[str] = None
+    staff_id: Optional[str] = None  # Alias for employee_id (frontend uses this)
     staff_name: Optional[str] = None
     department: Optional[str] = None
     person_id: Optional[str] = None
@@ -4688,7 +4689,7 @@ async def get_attendance(
             sample = attendance_records[0]
             date_value = sample.get('date')
             date_type_name = date_value.__class__.__name__ if date_value else 'None'
-            logging.info(f"[ATTENDANCE-GET] Sample record - date={date_value}, date_type={date_type_name}, employee={sample.get('employee_id')}, status={sample.get('status')}")
+            logging.info(f"[ATTENDANCE-GET] Sample record - date={date_value}, date_type={date_type_name}, staff_id={sample.get('staff_id')}, status={sample.get('status')}")
         
         # Convert ObjectIds to strings
         for record in attendance_records:
@@ -4744,8 +4745,11 @@ async def save_bulk_attendance(
                     "section_name": record.section_name
                 })
             else:  # staff
+                # Use staff_id if provided (frontend uses this), fallback to employee_id
+                staff_identifier = record.staff_id or record.employee_id
                 attendance_doc.update({
-                    "employee_id": record.employee_id,
+                    "staff_id": staff_identifier,  # Primary field for matching
+                    "employee_id": staff_identifier,  # Keep for backward compatibility
                     "staff_name": record.staff_name,
                     "department": record.department
                 })
@@ -4754,7 +4758,7 @@ async def save_bulk_attendance(
             if idx == 0:
                 date_value = attendance_doc['date']
                 date_type_name = date_value.__class__.__name__ if date_value else 'None'
-                logging.info(f"[ATTENDANCE-POST] Sample record - date={date_value} (date_type={date_type_name}), employee={attendance_doc.get('employee_id')}, status={attendance_doc['status']}")
+                logging.info(f"[ATTENDANCE-POST] Sample record - date={date_value} (date_type={date_type_name}), staff_id={attendance_doc.get('staff_id')}, status={attendance_doc['status']}")
             
             attendance_records.append(attendance_doc)
         
