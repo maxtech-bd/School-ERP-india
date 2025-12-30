@@ -896,9 +896,18 @@ const Fees = () => {
     const studentName = student.name || 'Unknown Student';
     const admissionNo = student.admission_no || student.admission || 'N/A';
     const pendingAmount = student.pending_amount || student.amount || 15000; // Fallback amount
+    const feeType = student.fee_type || '';
+    
+    // Pre-fill the collection form with the student's fee data including fee_type
+    setCollectionForm(prev => ({
+      ...prev,
+      student_id: student.id || '',
+      fee_type: feeType,
+      amount: pendingAmount > 0 ? pendingAmount.toString() : ''
+    }));
     
     toast.info(`💰 Collecting Payment`, {
-      description: `Opening payment collection for ${studentName} (${admissionNo}) - ${formatCurrency(pendingAmount)}`,
+      description: `Opening payment collection for ${studentName} (${admissionNo}) - ${feeType ? feeType + ' - ' : ''}${formatCurrency(pendingAmount)}`,
       duration: 3000
     });
   };
@@ -2349,7 +2358,8 @@ const Fees = () => {
                                     admission_no: fee.admission_no,
                                     pending_amount: fee.total_due,
                                     class_id: fee.class_id,
-                                    section_id: fee.section_id
+                                    section_id: fee.section_id,
+                                    fee_type: fee.fee_type
                                   })}
                                 >
                                   <CreditCard className="h-4 w-4 mr-1" />
