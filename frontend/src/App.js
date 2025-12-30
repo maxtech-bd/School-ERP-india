@@ -261,16 +261,6 @@ const Layout = ({ children }) => {
         >
           <div className={`max-w-full overflow-x-hidden ${isAIAssistant ? '' : 'min-h-[calc(100vh-100px)]'}`}>
             {children}
-            <div className="mt-8 py-4 text-center border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <a 
-                href="https://maxtechbd.com/?utm_source=footer-badge" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                Developed by MaxTechBD
-              </a>
-            </div>
           </div>
         </main>
       </div>
