@@ -23387,6 +23387,7 @@ async def create_qa_knowledge_base(
         })
         
         await db.qa_knowledge_base.insert_one(qa_data)
+        qa_data.pop("_id", None)
         return qa_data
     except Exception as e:
         logger.error(f"Error creating Q&A knowledge base entry: {e}")
