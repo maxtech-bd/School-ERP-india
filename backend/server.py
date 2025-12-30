@@ -13565,6 +13565,120 @@ class FeeDashboard(BaseModel):
     pending_approvals: int
     monthly_target: float
 
+# ===== ENTERPRISE FEE MANAGEMENT - INVOICE & BILLING SYSTEM =====
+
+class FeeInvoice(BaseModel):
+    """Monthly invoice per student for enterprise fee tracking"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    student_id: str
+    student_name: str
+    admission_no: str
+    class_id: Optional[str] = None
+    class_name: Optional[str] = None
+    section_id: Optional[str] = None
+    section_name: Optional[str] = None
+    
+    # Billing period info
+    billing_month: int  # 1-12
+    billing_year: int   # e.g., 2025
+    billing_period: str  # "2025-01" format for easy querying
+    
+    # Fee breakdown
+    fee_items: List[Dict[str, Any]] = Field(default_factory=list)  # [{fee_type, amount, description}]
+    total_amount: float = 0.0
+    paid_amount: float = 0.0
+    pending_amount: float = 0.0
+    discount_amount: float = 0.0
+    late_fee_amount: float = 0.0
+    
+    # Dates
+    due_date: str  # YYYY-MM-DD
+    payment_date: Optional[str] = None
+    
+    # Status: pending, partial, paid, overdue
+    status: str = "pending"
+    days_overdue: int = 0
+    
+    # Parent info for parent dashboard
+    parent_id: Optional[str] = None
+    parent_name: Optional[str] = None
+    
+    # Tracking
+    payments: List[Dict[str, Any]] = Field(default_factory=list)  # Payment history for this invoice
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class FeeBillingCycle(BaseModel):
+    """Monthly billing cycle metadata for automated invoice generation"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    school_id: str
+    
+    # Cycle info
+    billing_month: int  # 1-12
+    billing_year: int
+    billing_period: str  # "2025-01" format
+    cycle_name: str  # "January 2025"
+    
+    # Dates
+    start_date: str  # First day of the billing month
+    end_date: str    # Last day of the billing month
+    due_date: str    # Payment due date (e.g., 15th of next month)
+    
+    # Status
+    status: str = "draft"  # draft, active, closed
+    invoices_generated: bool = False
+    total_invoices: int = 0
+    total_amount: float = 0.0
+    collected_amount: float = 0.0
+    
+    # Tracking
+    generated_at: Optional[datetime] = None
+    generated_by: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class FeeInvoiceCreate(BaseModel):
+    """Create invoice for a student"""
+    student_id: str
+    billing_month: int
+    billing_year: int
+    fee_items: List[Dict[str, Any]] = Field(default_factory=list)
+    due_date: Optional[str] = None
+    discount_amount: float = 0.0
+
+class StudentFeeSummary(BaseModel):
+    """Summary of student's fee status for dashboard"""
+    student_id: str
+    student_name: str
+    admission_no: str
+    class_name: Optional[str] = None
+    section_name: Optional[str] = None
+    total_fees: float = 0.0
+    total_paid: float = 0.0
+    total_pending: float = 0.0
+    total_overdue: float = 0.0
+    current_month_dues: float = 0.0
+    upcoming_dues: float = 0.0
+    last_payment_date: Optional[str] = None
+    last_payment_amount: float = 0.0
+    invoices: List[Dict[str, Any]] = Field(default_factory=list)
+
+class ParentFeeSummary(BaseModel):
+    """Consolidated fee summary for parent with all children"""
+    parent_id: str
+    parent_name: str
+    total_children: int = 0
+    total_fees: float = 0.0
+    total_paid: float = 0.0
+    total_pending: float = 0.0
+    total_overdue: float = 0.0
+    children_summaries: List[StudentFeeSummary] = Field(default_factory=list)
+
 # ===== ACCOUNTS & TRANSACTIONS =====
 class Transaction(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -16212,6 +16326,643 @@ async def send_sms_reminder(phone: str, student_name: str, amount: float):
     except Exception as e:
         logging.error(f"Failed to send SMS reminder: {str(e)}")
         raise
+
+# ==================== ENTERPRISE FEE MANAGEMENT - INVOICE & BILLING APIs ====================
+
+@api_router.get("/fees/invoices")
+async def get_fee_invoices(
+    billing_period: Optional[str] = None,
+    status: Optional[str] = None,
+    class_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all fee invoices with optional filters (Admin/Accountant view)"""
+    try:
+        if current_user.role not in ['super_admin', 'admin', 'accountant']:
+            raise HTTPException(status_code=403, detail="Only admin/accountant can view all invoices")
+        
+        query = {"tenant_id": current_user.tenant_id, "is_active": True}
+        if billing_period:
+            query["billing_period"] = billing_period
+        if status:
+            query["status"] = status
+        if class_id:
+            query["class_id"] = class_id
+        
+        invoices = await db.fee_invoices.find(query).sort("created_at", -1).to_list(1000)
+        return sanitize_mongo_data(invoices)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get fee invoices: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get fee invoices")
+
+@api_router.get("/fees/billing-cycles")
+async def get_billing_cycles(
+    year: Optional[int] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all billing cycles with optional year filter"""
+    try:
+        if current_user.role not in ['super_admin', 'admin', 'accountant']:
+            raise HTTPException(status_code=403, detail="Only admin/accountant can view billing cycles")
+        
+        query = {"tenant_id": current_user.tenant_id, "is_active": True}
+        if year:
+            query["billing_year"] = year
+        
+        cycles = await db.fee_billing_cycles.find(query).sort([("billing_year", -1), ("billing_month", -1)]).to_list(100)
+        return sanitize_mongo_data(cycles)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get billing cycles: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get billing cycles")
+
+@api_router.post("/fees/billing-cycles/generate")
+async def generate_billing_cycle(
+    cycle_data: Dict[str, Any],
+    current_user: User = Depends(get_current_user)
+):
+    """Generate invoices for a billing cycle"""
+    try:
+        if current_user.role not in ['super_admin', 'admin', 'accountant']:
+            raise HTTPException(status_code=403, detail="Only admin/accountant can generate billing cycles")
+        
+        billing_month = cycle_data.get("billing_month", datetime.utcnow().month)
+        billing_year = cycle_data.get("billing_year", datetime.utcnow().year)
+        billing_period = f"{billing_year}-{str(billing_month).zfill(2)}"
+        
+        # Check if cycle already exists
+        existing_cycle = await db.fee_billing_cycles.find_one({
+            "tenant_id": current_user.tenant_id,
+            "billing_period": billing_period,
+            "is_active": True
+        })
+        
+        if existing_cycle and existing_cycle.get("invoices_generated"):
+            raise HTTPException(status_code=400, detail="Invoices already generated for this billing period")
+        
+        # Get month name
+        import calendar
+        month_name = calendar.month_name[billing_month]
+        cycle_name = f"{month_name} {billing_year}"
+        
+        # Calculate dates
+        last_day = calendar.monthrange(billing_year, billing_month)[1]
+        start_date = f"{billing_year}-{str(billing_month).zfill(2)}-01"
+        end_date = f"{billing_year}-{str(billing_month).zfill(2)}-{last_day}"
+        
+        # Due date: 15th of next month
+        next_month = billing_month + 1 if billing_month < 12 else 1
+        next_year = billing_year if billing_month < 12 else billing_year + 1
+        due_date = f"{next_year}-{str(next_month).zfill(2)}-15"
+        
+        # Get all active fee configurations
+        fee_configs = await db.fee_configurations.find({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        }).to_list(100)
+        
+        # Get all active students
+        students = await db.students.find({
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        }).to_list(5000)
+        
+        # Get classes for class names
+        classes = await db.classes.find({"tenant_id": current_user.tenant_id}).to_list(100)
+        class_map = {c["id"]: c for c in classes}
+        
+        # Get sections
+        sections = await db.sections.find({"tenant_id": current_user.tenant_id}).to_list(100)
+        section_map = {s["id"]: s for s in sections}
+        
+        # Generate invoices for each student
+        invoices_created = 0
+        total_amount = 0.0
+        
+        for student in students:
+            # Calculate fee items for this student
+            fee_items = []
+            student_total = 0.0
+            
+            for config in fee_configs:
+                # Check if config applies to this student's class
+                if config.get("apply_to_classes") == "all" or config.get("apply_to_classes") == student.get("class_id"):
+                    # Check frequency - only include monthly fees or split yearly fees
+                    frequency = config.get("frequency", "monthly")
+                    fee_amount = config.get("amount", 0)
+                    
+                    if frequency == "monthly":
+                        fee_items.append({
+                            "fee_type": config.get("fee_type"),
+                            "amount": fee_amount,
+                            "description": f"Monthly {config.get('fee_type')}"
+                        })
+                        student_total += fee_amount
+                    elif frequency == "quarterly" and billing_month in [1, 4, 7, 10]:
+                        fee_items.append({
+                            "fee_type": config.get("fee_type"),
+                            "amount": fee_amount,
+                            "description": f"Quarterly {config.get('fee_type')}"
+                        })
+                        student_total += fee_amount
+                    elif frequency == "half-yearly" and billing_month in [1, 7]:
+                        fee_items.append({
+                            "fee_type": config.get("fee_type"),
+                            "amount": fee_amount,
+                            "description": f"Half-Yearly {config.get('fee_type')}"
+                        })
+                        student_total += fee_amount
+                    elif frequency == "yearly" and billing_month == 1:
+                        fee_items.append({
+                            "fee_type": config.get("fee_type"),
+                            "amount": fee_amount,
+                            "description": f"Yearly {config.get('fee_type')}"
+                        })
+                        student_total += fee_amount
+            
+            if fee_items and student_total > 0:
+                # Get class and section names
+                class_info = class_map.get(student.get("class_id"), {})
+                section_info = section_map.get(student.get("section_id"), {})
+                
+                # Get parent info if available
+                parent_user = await db.users.find_one({
+                    "tenant_id": current_user.tenant_id,
+                    "linked_student_ids": student.get("id"),
+                    "role": "parent"
+                })
+                
+                invoice = FeeInvoice(
+                    tenant_id=current_user.tenant_id,
+                    school_id=current_user.school_id or "default",
+                    student_id=student["id"],
+                    student_name=student.get("name", ""),
+                    admission_no=student.get("admission_no", ""),
+                    class_id=student.get("class_id"),
+                    class_name=class_info.get("name", ""),
+                    section_id=student.get("section_id"),
+                    section_name=section_info.get("name", ""),
+                    billing_month=billing_month,
+                    billing_year=billing_year,
+                    billing_period=billing_period,
+                    fee_items=fee_items,
+                    total_amount=student_total,
+                    pending_amount=student_total,
+                    due_date=due_date,
+                    status="pending",
+                    parent_id=parent_user.get("id") if parent_user else None,
+                    parent_name=parent_user.get("full_name") if parent_user else None
+                )
+                
+                await db.fee_invoices.insert_one(invoice.dict())
+                invoices_created += 1
+                total_amount += student_total
+        
+        # Create or update billing cycle
+        cycle_doc = {
+            "id": existing_cycle.get("id") if existing_cycle else str(uuid.uuid4()),
+            "tenant_id": current_user.tenant_id,
+            "school_id": current_user.school_id or "default",
+            "billing_month": billing_month,
+            "billing_year": billing_year,
+            "billing_period": billing_period,
+            "cycle_name": cycle_name,
+            "start_date": start_date,
+            "end_date": end_date,
+            "due_date": due_date,
+            "status": "active",
+            "invoices_generated": True,
+            "total_invoices": invoices_created,
+            "total_amount": total_amount,
+            "collected_amount": 0.0,
+            "generated_at": datetime.utcnow(),
+            "generated_by": current_user.id,
+            "is_active": True,
+            "created_at": existing_cycle.get("created_at", datetime.utcnow()) if existing_cycle else datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        if existing_cycle:
+            await db.fee_billing_cycles.update_one(
+                {"id": existing_cycle["id"]},
+                {"$set": cycle_doc}
+            )
+        else:
+            await db.fee_billing_cycles.insert_one(cycle_doc)
+        
+        logging.info(f"Generated {invoices_created} invoices for billing period {billing_period}")
+        
+        return {
+            "message": f"Successfully generated {invoices_created} invoices for {cycle_name}",
+            "billing_period": billing_period,
+            "invoices_created": invoices_created,
+            "total_amount": total_amount,
+            "due_date": due_date
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to generate billing cycle: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate billing cycle: {str(e)}")
+
+@api_router.get("/fees/student-dashboard/{student_id}")
+async def get_student_fee_dashboard(
+    student_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get fee dashboard for a student (Student/Admin/Parent can access)"""
+    try:
+        # Validate access
+        if current_user.role == 'student':
+            # Students can only view their own fees
+            student_user = await db.users.find_one({"id": current_user.id, "role": "student"})
+            if not student_user or student_user.get("linked_student_id") != student_id:
+                raise HTTPException(status_code=403, detail="Can only view your own fee dashboard")
+        elif current_user.role == 'parent':
+            # Parents can view their children's fees
+            parent_user = await db.users.find_one({"id": current_user.id, "role": "parent"})
+            linked_ids = parent_user.get("linked_student_ids", []) if parent_user else []
+            if student_id not in linked_ids:
+                raise HTTPException(status_code=403, detail="Can only view your children's fee dashboard")
+        elif current_user.role not in ['super_admin', 'admin', 'accountant', 'teacher']:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Get student info
+        student = await db.students.find_one({
+            "id": student_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+        
+        # Get class and section names
+        class_info = await db.classes.find_one({"id": student.get("class_id")})
+        section_info = await db.sections.find_one({"id": student.get("section_id")})
+        
+        # Get all invoices for the student
+        invoices = await db.fee_invoices.find({
+            "tenant_id": current_user.tenant_id,
+            "student_id": student_id,
+            "is_active": True
+        }).sort([("billing_year", -1), ("billing_month", -1)]).to_list(100)
+        
+        # Get payment history
+        payments = await db.payments.find({
+            "tenant_id": current_user.tenant_id,
+            "student_id": student_id
+        }).sort("payment_date", -1).to_list(50)
+        
+        # Calculate totals
+        total_fees = sum(inv.get("total_amount", 0) for inv in invoices)
+        total_paid = sum(inv.get("paid_amount", 0) for inv in invoices)
+        total_pending = sum(inv.get("pending_amount", 0) for inv in invoices)
+        
+        # Calculate overdue
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        total_overdue = sum(
+            inv.get("pending_amount", 0) 
+            for inv in invoices 
+            if inv.get("due_date", "") < today and inv.get("status") != "paid"
+        )
+        
+        # Current month dues
+        current_period = datetime.utcnow().strftime("%Y-%m")
+        current_month_dues = sum(
+            inv.get("pending_amount", 0) 
+            for inv in invoices 
+            if inv.get("billing_period") == current_period
+        )
+        
+        # Get last payment info
+        last_payment = payments[0] if payments else None
+        
+        # Build monthly breakdown
+        monthly_breakdown = []
+        for inv in invoices:
+            monthly_breakdown.append({
+                "billing_period": inv.get("billing_period"),
+                "month_name": f"{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][inv.get('billing_month', 1) - 1]} {inv.get('billing_year')}",
+                "total_amount": inv.get("total_amount", 0),
+                "paid_amount": inv.get("paid_amount", 0),
+                "pending_amount": inv.get("pending_amount", 0),
+                "due_date": inv.get("due_date"),
+                "status": inv.get("status"),
+                "fee_items": inv.get("fee_items", [])
+            })
+        
+        return {
+            "student_id": student_id,
+            "student_name": student.get("name", ""),
+            "admission_no": student.get("admission_no", ""),
+            "class_name": class_info.get("name", "") if class_info else "",
+            "section_name": section_info.get("name", "") if section_info else "",
+            "summary": {
+                "total_fees": total_fees,
+                "total_paid": total_paid,
+                "total_pending": total_pending,
+                "total_overdue": total_overdue,
+                "current_month_dues": current_month_dues,
+                "payment_percentage": round((total_paid / total_fees * 100) if total_fees > 0 else 0, 1)
+            },
+            "last_payment": {
+                "date": last_payment.get("payment_date").isoformat() if last_payment and last_payment.get("payment_date") else None,
+                "amount": last_payment.get("amount", 0) if last_payment else 0,
+                "payment_mode": last_payment.get("payment_mode", "") if last_payment else ""
+            } if last_payment else None,
+            "monthly_breakdown": monthly_breakdown,
+            "recent_payments": sanitize_mongo_data(payments[:10])
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get student fee dashboard: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get student fee dashboard")
+
+@api_router.get("/fees/parent-dashboard")
+async def get_parent_fee_dashboard(
+    current_user: User = Depends(get_current_user)
+):
+    """Get consolidated fee dashboard for parent (all children)"""
+    try:
+        if current_user.role != 'parent':
+            raise HTTPException(status_code=403, detail="Only parents can access this dashboard")
+        
+        # Get parent's linked students
+        parent_user = await db.users.find_one({"id": current_user.id, "role": "parent"})
+        linked_student_ids = parent_user.get("linked_student_ids", []) if parent_user else []
+        
+        if not linked_student_ids:
+            return {
+                "parent_id": current_user.id,
+                "parent_name": current_user.full_name or current_user.username,
+                "total_children": 0,
+                "summary": {
+                    "total_fees": 0,
+                    "total_paid": 0,
+                    "total_pending": 0,
+                    "total_overdue": 0
+                },
+                "children": []
+            }
+        
+        # Get all children's data
+        children_data = []
+        total_fees = 0
+        total_paid = 0
+        total_pending = 0
+        total_overdue = 0
+        
+        for student_id in linked_student_ids:
+            student = await db.students.find_one({
+                "id": student_id,
+                "tenant_id": current_user.tenant_id
+            })
+            
+            if not student:
+                continue
+            
+            # Get class info
+            class_info = await db.classes.find_one({"id": student.get("class_id")})
+            
+            # Get invoices
+            invoices = await db.fee_invoices.find({
+                "tenant_id": current_user.tenant_id,
+                "student_id": student_id,
+                "is_active": True
+            }).sort([("billing_year", -1), ("billing_month", -1)]).to_list(24)
+            
+            # Calculate totals for this child
+            child_total = sum(inv.get("total_amount", 0) for inv in invoices)
+            child_paid = sum(inv.get("paid_amount", 0) for inv in invoices)
+            child_pending = sum(inv.get("pending_amount", 0) for inv in invoices)
+            
+            # Calculate overdue
+            today = datetime.utcnow().strftime("%Y-%m-%d")
+            child_overdue = sum(
+                inv.get("pending_amount", 0) 
+                for inv in invoices 
+                if inv.get("due_date", "") < today and inv.get("status") != "paid"
+            )
+            
+            # Get last payment
+            last_payment = await db.payments.find_one(
+                {"tenant_id": current_user.tenant_id, "student_id": student_id},
+                sort=[("payment_date", -1)]
+            )
+            
+            children_data.append({
+                "student_id": student_id,
+                "student_name": student.get("name", ""),
+                "admission_no": student.get("admission_no", ""),
+                "class_name": class_info.get("name", "") if class_info else "",
+                "photo": student.get("photo_url") or student.get("photo"),
+                "total_fees": child_total,
+                "total_paid": child_paid,
+                "total_pending": child_pending,
+                "total_overdue": child_overdue,
+                "payment_percentage": round((child_paid / child_total * 100) if child_total > 0 else 0, 1),
+                "last_payment_date": last_payment.get("payment_date").isoformat() if last_payment and last_payment.get("payment_date") else None,
+                "status": "overdue" if child_overdue > 0 else ("pending" if child_pending > 0 else "paid")
+            })
+            
+            # Add to totals
+            total_fees += child_total
+            total_paid += child_paid
+            total_pending += child_pending
+            total_overdue += child_overdue
+        
+        return {
+            "parent_id": current_user.id,
+            "parent_name": current_user.full_name or current_user.username,
+            "total_children": len(children_data),
+            "summary": {
+                "total_fees": total_fees,
+                "total_paid": total_paid,
+                "total_pending": total_pending,
+                "total_overdue": total_overdue,
+                "payment_percentage": round((total_paid / total_fees * 100) if total_fees > 0 else 0, 1)
+            },
+            "children": children_data
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get parent fee dashboard: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get parent fee dashboard")
+
+@api_router.get("/fees/my-fees")
+async def get_my_fees(
+    current_user: User = Depends(get_current_user)
+):
+    """Get fees for the currently logged-in student"""
+    try:
+        if current_user.role != 'student':
+            raise HTTPException(status_code=403, detail="Only students can access this endpoint")
+        
+        # Get student's linked student record
+        student_user = await db.users.find_one({"id": current_user.id, "role": "student"})
+        student_id = student_user.get("linked_student_id") if student_user else None
+        
+        if not student_id:
+            raise HTTPException(status_code=404, detail="No linked student record found")
+        
+        # Get student info
+        student = await db.students.find_one({
+            "id": student_id,
+            "tenant_id": current_user.tenant_id
+        })
+        
+        if not student:
+            raise HTTPException(status_code=404, detail="Student record not found")
+        
+        # Get invoices
+        invoices = await db.fee_invoices.find({
+            "tenant_id": current_user.tenant_id,
+            "student_id": student_id,
+            "is_active": True
+        }).sort([("billing_year", -1), ("billing_month", -1)]).to_list(24)
+        
+        # Get payments
+        payments = await db.payments.find({
+            "tenant_id": current_user.tenant_id,
+            "student_id": student_id
+        }).sort("payment_date", -1).to_list(20)
+        
+        # Calculate totals
+        total_fees = sum(inv.get("total_amount", 0) for inv in invoices)
+        total_paid = sum(inv.get("paid_amount", 0) for inv in invoices)
+        total_pending = sum(inv.get("pending_amount", 0) for inv in invoices)
+        
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        total_overdue = sum(
+            inv.get("pending_amount", 0) 
+            for inv in invoices 
+            if inv.get("due_date", "") < today and inv.get("status") != "paid"
+        )
+        
+        return {
+            "student_name": student.get("name", ""),
+            "admission_no": student.get("admission_no", ""),
+            "summary": {
+                "total_fees": total_fees,
+                "total_paid": total_paid,
+                "total_pending": total_pending,
+                "total_overdue": total_overdue
+            },
+            "invoices": sanitize_mongo_data(invoices),
+            "payments": sanitize_mongo_data(payments)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to get my fees: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get my fees")
+
+@api_router.post("/fees/invoices/{invoice_id}/pay")
+async def pay_invoice(
+    invoice_id: str,
+    payment_data: PaymentCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Record payment against an invoice"""
+    try:
+        if current_user.role not in ['super_admin', 'admin', 'accountant']:
+            raise HTTPException(status_code=403, detail="Only admin/accountant can process payments")
+        
+        # Get the invoice
+        invoice = await db.fee_invoices.find_one({
+            "id": invoice_id,
+            "tenant_id": current_user.tenant_id,
+            "is_active": True
+        })
+        
+        if not invoice:
+            raise HTTPException(status_code=404, detail="Invoice not found")
+        
+        if invoice.get("status") == "paid":
+            raise HTTPException(status_code=400, detail="Invoice is already paid")
+        
+        # Validate payment amount
+        pending = invoice.get("pending_amount", 0)
+        if payment_data.amount > pending:
+            raise HTTPException(status_code=400, detail=f"Payment amount exceeds pending amount (₹{pending})")
+        
+        # Create payment record
+        receipt_no = f"RCP{datetime.utcnow().strftime('%Y%m%d%H%M%S')}{str(uuid.uuid4())[:4].upper()}"
+        
+        payment = Payment(
+            tenant_id=current_user.tenant_id,
+            school_id=invoice.get("school_id", "default"),
+            student_id=invoice.get("student_id"),
+            student_name=invoice.get("student_name"),
+            admission_no=invoice.get("admission_no"),
+            fee_type=payment_data.fee_type,
+            amount=payment_data.amount,
+            payment_mode=payment_data.payment_mode,
+            transaction_id=payment_data.transaction_id,
+            receipt_no=receipt_no,
+            remarks=payment_data.remarks,
+            created_by=current_user.id
+        )
+        
+        await db.payments.insert_one(payment.dict())
+        
+        # Update invoice
+        new_paid = invoice.get("paid_amount", 0) + payment_data.amount
+        new_pending = invoice.get("total_amount", 0) - new_paid
+        new_status = "paid" if new_pending <= 0 else "partial"
+        
+        payment_record = {
+            "payment_id": payment.id,
+            "amount": payment_data.amount,
+            "payment_mode": payment_data.payment_mode,
+            "receipt_no": receipt_no,
+            "payment_date": datetime.utcnow().isoformat()
+        }
+        
+        await db.fee_invoices.update_one(
+            {"id": invoice_id},
+            {
+                "$set": {
+                    "paid_amount": new_paid,
+                    "pending_amount": max(0, new_pending),
+                    "status": new_status,
+                    "payment_date": datetime.utcnow().strftime("%Y-%m-%d") if new_status == "paid" else None,
+                    "updated_at": datetime.utcnow()
+                },
+                "$push": {"payments": payment_record}
+            }
+        )
+        
+        # Update billing cycle collected amount
+        await db.fee_billing_cycles.update_one(
+            {"billing_period": invoice.get("billing_period"), "tenant_id": current_user.tenant_id},
+            {"$inc": {"collected_amount": payment_data.amount}}
+        )
+        
+        logging.info(f"Payment recorded: {payment.id} for invoice {invoice_id}, amount: {payment_data.amount}")
+        
+        return {
+            "message": "Payment processed successfully",
+            "payment_id": payment.id,
+            "receipt_no": receipt_no,
+            "invoice_status": new_status,
+            "remaining_amount": max(0, new_pending)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Failed to process payment: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process payment")
 
 # Helper functions
 async def create_student_fees_from_config(fee_config: FeeConfiguration, current_user: User):

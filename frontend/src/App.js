@@ -43,6 +43,8 @@ import RatingSurveys from "./components/RatingSurveys";
 import Results from "./components/Results";
 import StudentResults from "./components/StudentResults";
 import ParentResults from "./components/ParentResults";
+import StudentFeeDashboard from "./components/StudentFeeDashboard";
+import ParentFeeDashboard from "./components/ParentFeeDashboard";
 import ResultConfiguration from "./components/ResultConfiguration";
 import TenantManagement from "./components/TenantManagement";
 import SchoolList from "./components/SchoolList";
@@ -406,9 +408,25 @@ function App() {
                   }
                 />
                 <Route
+                  path="/fees/my-fees"
+                  element={
+                    <ProtectedRoute allowedRoles={["student"]}>
+                      <StudentFeeDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/fees/parent-dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={["parent"]}>
+                      <ParentFeeDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/fees/*"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute allowedRoles={["super_admin", "admin", "accountant"]}>
                       <Fees />
                     </ProtectedRoute>
                   }

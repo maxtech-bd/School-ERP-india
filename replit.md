@@ -15,6 +15,16 @@ Preferred communication style: Simple, everyday language.
 - **Responsiveness**: Fully responsive design across all devices using Tailwind CSS breakpoints and adaptive layouts.
 
 ## Recent Changes (December 2025)
+- **Enterprise Fee Management System**: Comprehensive monthly invoice-based fee tracking system with:
+  - Monthly billing cycles with automated invoice generation for all students
+  - Invoice status tracking (pending, partial, paid, overdue)
+  - Student Fee Dashboard (`/fees/my-fees`) - Students can view their payment history, pending fees, and monthly breakdown
+  - Parent Fee Dashboard (`/fees/parent-dashboard`) - Parents can view consolidated fee status for all children with child selector
+  - Fee invoice payment integration with existing payment processing
+  - Dynamic fee summary calculations replacing hardcoded values
+  - Role-based access: students view-only, parents view children, admin/accountant manage
+  - New MongoDB collections: `fee_invoices`, `fee_billing_cycles`
+  - Backend APIs: `/fees/invoices`, `/fees/billing-cycles`, `/fees/student-dashboard/{id}`, `/fees/parent-dashboard`, `/fees/my-fees`
 - **School List (Super Admin Panel)**: New centralized control panel for Super Admin to manage all ERP-linked schools (genuine and demo). Features include: school CRUD operations, type classification (small/medium/large), package amount tracking, genuine vs demo school distinction with deletion protection for genuine schools.
 - **Mobile Responsiveness Enhancements**: 
   - AI Quiz Tool and AI Test Generator tabs now scroll horizontally on mobile

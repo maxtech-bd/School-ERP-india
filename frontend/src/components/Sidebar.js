@@ -240,27 +240,37 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       key: "fees",
       title: "Fees",
       icon: DollarSign,
-      roles: ["super_admin", "admin"],
+      roles: ["super_admin", "admin", "accountant", "student", "parent"],
       subItems: [
         {
           title: "Fee Structure",
           path: "/fees/structure",
-          roles: ["super_admin", "admin"],
+          roles: ["super_admin", "admin", "accountant"],
         },
         {
           title: "Fee Collection",
           path: "/fees/collection",
-          roles: ["super_admin", "admin"],
+          roles: ["super_admin", "admin", "accountant"],
         },
         {
           title: "Fee Reports",
           path: "/fees/reports",
-          roles: ["super_admin", "admin"],
+          roles: ["super_admin", "admin", "accountant"],
         },
         {
           title: "Due Fees",
           path: "/fees/due",
-          roles: ["super_admin", "admin"],
+          roles: ["super_admin", "admin", "accountant"],
+        },
+        {
+          title: "My Fees",
+          path: "/fees/my-fees",
+          roles: ["student"],
+        },
+        {
+          title: "Children's Fees",
+          path: "/fees/parent-dashboard",
+          roles: ["parent"],
         },
       ],
     },
