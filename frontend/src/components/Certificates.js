@@ -1480,7 +1480,7 @@ const Certificates = () => {
           class_name: student.class_name || student.class_id || 'N/A',
           section: student.section || 'A',
           roll_number: student.roll_number || student.admission_no,
-          photo: student.photo || null,
+          photo: student.photo_url || student.photo || student.profile_picture || null,
           emergency_contact: student.emergency_contact || 'N/A',
           blood_group: student.blood_group || 'N/A',
           student_id: student.id
