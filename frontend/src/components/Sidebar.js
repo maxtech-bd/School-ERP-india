@@ -172,6 +172,34 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       roles: ["super_admin", "admin", "teacher"],
     },
     {
+      key: "attendance-enterprise",
+      title: "Attendance",
+      icon: ClipboardCheck,
+      roles: ["super_admin", "admin", "teacher", "principal", "student", "parent"],
+      subItems: [
+        {
+          title: "Mark Attendance",
+          path: "/attendance/mark",
+          roles: ["super_admin", "admin", "teacher", "principal"],
+        },
+        {
+          title: "My Attendance",
+          path: "/attendance/my-attendance",
+          roles: ["student"],
+        },
+        {
+          title: "Children's Attendance",
+          path: "/attendance/children",
+          roles: ["parent"],
+        },
+        {
+          title: "Analytics",
+          path: "/attendance/analytics",
+          roles: ["super_admin", "admin", "principal"],
+        },
+      ],
+    },
+    {
       key: "results",
       title: "Results",
       icon: FileSpreadsheet,

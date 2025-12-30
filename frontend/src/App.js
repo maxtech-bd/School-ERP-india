@@ -46,6 +46,10 @@ import ParentResults from "./components/ParentResults";
 import StudentFeeDashboard from "./components/StudentFeeDashboard";
 import ParentFeeDashboard from "./components/ParentFeeDashboard";
 import ResultConfiguration from "./components/ResultConfiguration";
+import TeacherAttendance from "./components/TeacherAttendance";
+import StudentAttendanceWidget from "./components/StudentAttendanceWidget";
+import ParentAttendanceWidget from "./components/ParentAttendanceWidget";
+import AdminAttendanceAnalytics from "./components/AdminAttendanceAnalytics";
 import TenantManagement from "./components/TenantManagement";
 import SchoolList from "./components/SchoolList";
 import Profile from "./components/Profile";
@@ -356,6 +360,38 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Attendance />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/attendance/mark"
+                  element={
+                    <ProtectedRoute allowedRoles={["super_admin", "admin", "teacher", "principal"]}>
+                      <TeacherAttendance />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/attendance/my-attendance"
+                  element={
+                    <ProtectedRoute allowedRoles={["student"]}>
+                      <StudentAttendanceWidget />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/attendance/children"
+                  element={
+                    <ProtectedRoute allowedRoles={["parent"]}>
+                      <ParentAttendanceWidget />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/attendance/analytics"
+                  element={
+                    <ProtectedRoute allowedRoles={["super_admin", "admin", "principal"]}>
+                      <AdminAttendanceAnalytics />
                     </ProtectedRoute>
                   }
                 />
