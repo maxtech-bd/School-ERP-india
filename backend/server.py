@@ -15590,6 +15590,32 @@ async def create_payment(
         # Update student fees (ERP logic: overdue -> pending -> advance)
         await apply_payment_to_student_fees(payment, current_user)
         
+        # Automatically create transaction in Accounts module for this fee payment
+        try:
+            transaction_receipt = f"TXN{datetime.utcnow().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
+            fee_transaction = {
+                "id": str(uuid.uuid4()),
+                "tenant_id": current_user.tenant_id,
+                "school_id": student["school_id"],
+                "transaction_type": "income",
+                "category": "Fee Collection",
+                "description": f"{payment_data.fee_type} payment from {student['name']} (Adm: {student['admission_no']})",
+                "amount": payment_data.amount,
+                "payment_method": payment_data.payment_mode,
+                "transaction_date": datetime.utcnow(),
+                "receipt_no": transaction_receipt,
+                "reference_no": receipt_no,  # Link to payment receipt
+                "remarks": f"Auto-generated from fee payment. Payment Receipt: {receipt_no}",
+                "created_by": current_user.id,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "is_active": True
+            }
+            await db.transactions.insert_one(fee_transaction)
+            logging.info(f"Transaction auto-created: {transaction_receipt} for payment {receipt_no}")
+        except Exception as tx_error:
+            logging.error(f"Failed to auto-create transaction for payment {receipt_no}: {str(tx_error)}")
+        
         # Calculate updated dashboard statistics AFTER all updates complete using aggregation
         # This handles unlimited records efficiently without loading all into memory
         
@@ -15730,6 +15756,31 @@ async def create_bulk_payment(
             
             # Update student fees
             await apply_payment_to_student_fees(payment, current_user)
+            
+            # Auto-create transaction in Accounts for this bulk payment
+            try:
+                transaction_receipt = f"TXN{datetime.utcnow().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
+                fee_transaction = {
+                    "id": str(uuid.uuid4()),
+                    "tenant_id": current_user.tenant_id,
+                    "school_id": student["school_id"],
+                    "transaction_type": "income",
+                    "category": "Fee Collection",
+                    "description": f"{bulk_data.fee_type} payment from {student['name']} (Adm: {student['admission_no']})",
+                    "amount": payment_amount,
+                    "payment_method": bulk_data.payment_mode,
+                    "transaction_date": datetime.utcnow(),
+                    "receipt_no": transaction_receipt,
+                    "reference_no": receipt_no,
+                    "remarks": f"Auto-generated from bulk fee payment. Payment Receipt: {receipt_no}",
+                    "created_by": current_user.id,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow(),
+                    "is_active": True
+                }
+                await db.transactions.insert_one(fee_transaction)
+            except Exception as tx_error:
+                logging.error(f"Failed to auto-create transaction for bulk payment {receipt_no}: {str(tx_error)}")
             
             payments.append(payment)
             total_amount += payment_amount
