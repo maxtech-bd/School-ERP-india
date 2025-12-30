@@ -345,8 +345,14 @@ const AdmissionSummary = () => {
   };
 
   const getClassName = (classId) => {
-    const cls = classes.find(c => c.id === classId);
-    return cls ? cls.name : 'Unknown';
+    if (!classId) return 'Unknown';
+    // Try matching by ID first
+    let cls = classes.find(c => c.id === classId);
+    // Fallback: try matching by class name (for legacy data)
+    if (!cls) {
+      cls = classes.find(c => c.name === classId || c.standard === classId);
+    }
+    return cls ? cls.name : classId;
   };
 
   if (loading) {
